@@ -68,7 +68,7 @@ public static class Startup
         {
             var logPath = Path.Combine(
                 loggingOptions.ExpandedFilePath,
-                "volt-.log");
+                "incontrol-.log");
 
             loggerConfig.WriteTo.File(
                 logPath,

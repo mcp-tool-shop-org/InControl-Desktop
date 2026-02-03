@@ -8,10 +8,9 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
-                <ResourceDictionary Source="Resources/InControlTheme.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
-            <!-- Legacy keys for backward compatibility (prefer InControlTheme.xaml keys) -->
+            <!-- Layout -->
             <Thickness x:Key="PagePadding">24,24,24,24</Thickness>
             <Thickness x:Key="SmallPadding">8,8,8,8</Thickness>
             <Thickness x:Key="MediumPadding">16,16,16,16</Thickness>
@@ -20,14 +19,9 @@
             <x:Double x:Key="InspectorWidth">320</x:Double>
             <x:Double x:Key="MessageMaxWidth">800</x:Double>
 
-            <!-- Message card colors (renamed from bubble per UX contract) -->
-            <SolidColorBrush x:Key="UserIntentBackgroundBrush" Color="{ThemeResource SystemAccentColor}" Opacity="0.1" />
-            <SolidColorBrush x:Key="ModelOutputBackgroundBrush" Color="{ThemeResource SolidBackgroundFillColorTertiary}" />
-
-            <!-- Status colors -->
-            <SolidColorBrush x:Key="StatusIdleBrush" Color="{ThemeResource SystemFillColorNeutralBrush}" />
-            <SolidColorBrush x:Key="StatusRunningBrush" Color="{ThemeResource SystemFillColorSuccessBrush}" />
-            <SolidColorBrush x:Key="StatusIssueBrush" Color="{ThemeResource SystemFillColorCriticalBrush}" />
+            <!-- Message card colors -->
+            <SolidColorBrush x:Key="UserIntentBackgroundBrush" Color="#1A0078D4" />
+            <SolidColorBrush x:Key="ModelOutputBackgroundBrush" Color="#F3F3F3" />
 
         </ResourceDictionary>
     </Application.Resources>

@@ -72,11 +72,11 @@
                                  Content="Run"
                                  GroupName="InspectorTabs"
                                  IsChecked="True"
-                                 Style="{StaticResource DefaultToggleButtonStyle}" />
+                                  />
                     <RadioButton x:Name="ContextTab"
                                  Content="Context"
                                  GroupName="InspectorTabs"
-                                 Style="{StaticResource DefaultToggleButtonStyle}" />
+                                  />
                 </StackPanel>
 
                 <!-- Close Button -->

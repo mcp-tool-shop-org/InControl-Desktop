@@ -176,7 +176,7 @@
             <Button x:Name="NextButton"
                     Grid.Column="2"
                     Content="Get Started"
-                    Style="{StaticResource AccentButtonStyle}"
+                    
                     Click="NextButton_Click" />
         </Grid>
     </Grid>

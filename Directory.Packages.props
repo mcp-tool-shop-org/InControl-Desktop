@@ -4,13 +4,13 @@
   </PropertyGroup>
 
   <ItemGroup Label="Windows App SDK">
-    <PackageVersion Include="Microsoft.WindowsAppSDK" Version="1.6.250108002" />
-    <PackageVersion Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.1742" />
+    <PackageVersion Include="Microsoft.WindowsAppSDK" Version="1.8.250907003" />
+    <PackageVersion Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.4654" />
   </ItemGroup>
 
   <ItemGroup Label="MVVM">
     <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.0" />
-    <PackageVersion Include="CommunityToolkit.WinUI.Controls.SettingsControls" Version="8.2.250402" />
+    <PackageVersion Include="CommunityToolkit.WinUI.Controls.SettingsControls" Version="8.1.240916" />
   </ItemGroup>
 
   <ItemGroup Label="Microsoft Extensions">

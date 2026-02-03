@@ -9,19 +9,17 @@ namespace InControl.App;
 /// </summary>
 public partial class App : Application
 {
-    private readonly IHost _host;
+    private IHost? _host;
 
     public App()
     {
         InitializeComponent();
-
-        _host = CreateHostBuilder().Build();
     }
 
     /// <summary>
     /// Gets the application's service provider.
     /// </summary>
-    public static IServiceProvider Services => ((App)Current)._host.Services;
+    public static IServiceProvider Services => ((App)Current)._host!.Services;
 
     /// <summary>
     /// Gets a service from the DI container.
@@ -35,6 +33,8 @@ public partial class App : Application
 
     protected override async void OnLaunched(LaunchActivatedEventArgs args)
     {
+        // Initialize DI container after XAML framework is fully initialized
+        _host = CreateHostBuilder().Build();
         await _host.StartAsync();
 
         MainWindow = new MainWindow();
