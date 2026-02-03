@@ -23,15 +23,18 @@
                     Padding="8"
                     Background="Transparent"
                     BorderThickness="0"
-                    ToolTipService.ToolTip="Back"
+                    ToolTipService.ToolTip="Back (Escape)"
                     VerticalAlignment="Center"
-                    Margin="0,0,12,0">
+                    Margin="0,0,12,0"
+                    AutomationProperties.Name="Go back"
+                    AccessKey="B">
                 <FontIcon Glyph="&#xE72B;" FontSize="16" />
             </Button>
 
             <StackPanel Grid.Column="1" VerticalAlignment="Center">
                 <TextBlock Text="Settings"
-                           Style="{StaticResource TitleTextBlockStyle}" />
+                           Style="{StaticResource TitleTextBlockStyle}"
+                           AutomationProperties.HeadingLevel="Level1" />
                 <TextBlock Text="Configure InControl preferences"
                            Style="{StaticResource CaptionTextBlockStyle}"
                            Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
@@ -43,7 +46,9 @@
                             PlaceholderText="Search settings..."
                             QueryIcon="Find"
                             Width="250"
-                            VerticalAlignment="Center" />
+                            VerticalAlignment="Center"
+                            AutomationProperties.Name="Search settings"
+                            AccessKey="F" />
         </Grid>
 
         <!-- Settings Content -->
@@ -53,7 +58,8 @@
                 <!-- General Section -->
                 <StackPanel x:Name="GeneralSection" Spacing="8" Tag="theme light dark system startup launch minimize tray background">
                     <TextBlock Text="General"
-                               Style="{StaticResource SubtitleTextBlockStyle}" />
+                               Style="{StaticResource SubtitleTextBlockStyle}"
+                               AutomationProperties.HeadingLevel="Level2" />
 
                     <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                             CornerRadius="8"
@@ -71,7 +77,8 @@
                                                Style="{StaticResource CaptionTextBlockStyle}"
                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                 </StackPanel>
-                                <ComboBox Grid.Column="1" x:Name="ThemeComboBox" SelectedIndex="2" MinWidth="150">
+                                <ComboBox Grid.Column="1" x:Name="ThemeComboBox" SelectedIndex="2" MinWidth="150"
+                                          AutomationProperties.Name="Theme selection">
                                     <ComboBoxItem Content="Light" />
                                     <ComboBoxItem Content="Dark" />
                                     <ComboBoxItem Content="System" />
@@ -118,7 +125,8 @@
                 <!-- Models Section -->
                 <StackPanel x:Name="ModelsSection" Spacing="8" Tag="model default gpu cuda directml acceleration context length tokens">
                     <TextBlock Text="Models"
-                               Style="{StaticResource SubtitleTextBlockStyle}" />
+                               Style="{StaticResource SubtitleTextBlockStyle}"
+                               AutomationProperties.HeadingLevel="Level2" />
 
                     <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                             CornerRadius="8"
@@ -189,7 +197,8 @@
                 <!-- Assistant Section -->
                 <StackPanel x:Name="AssistantSection" Spacing="8" Tag="assistant memory context sessions tool extensions">
                     <TextBlock Text="Assistant"
-                               Style="{StaticResource SubtitleTextBlockStyle}" />
+                               Style="{StaticResource SubtitleTextBlockStyle}"
+                               AutomationProperties.HeadingLevel="Level2" />
 
                     <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                             CornerRadius="8"
@@ -233,7 +242,8 @@
                 <!-- Memory Section -->
                 <StackPanel x:Name="MemorySection" Spacing="8" Tag="memory storage location clear history data">
                     <TextBlock Text="Memory"
-                               Style="{StaticResource SubtitleTextBlockStyle}" />
+                               Style="{StaticResource SubtitleTextBlockStyle}"
+                               AutomationProperties.HeadingLevel="Level2" />
 
                     <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                             CornerRadius="8"
@@ -278,7 +288,8 @@
                 <!-- Extensions Section -->
                 <StackPanel x:Name="ExtensionsSection" Spacing="8" Tag="extensions plugins tools integrations install">
                     <TextBlock Text="Extensions"
-                               Style="{StaticResource SubtitleTextBlockStyle}" />
+                               Style="{StaticResource SubtitleTextBlockStyle}"
+                               AutomationProperties.HeadingLevel="Level2" />
 
                     <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                             CornerRadius="8"
@@ -310,7 +321,8 @@
                 <!-- Connectivity Section -->
                 <StackPanel x:Name="ConnectivitySection" Spacing="8" Tag="connectivity network offline policy connections internet">
                     <TextBlock Text="Connectivity"
-                               Style="{StaticResource SubtitleTextBlockStyle}" />
+                               Style="{StaticResource SubtitleTextBlockStyle}"
+                               AutomationProperties.HeadingLevel="Level2" />
 
                     <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                             CornerRadius="8"
@@ -354,7 +366,8 @@
                 <!-- Updates Section -->
                 <StackPanel x:Name="UpdatesSection" Spacing="8" Tag="updates automatic version check download">
                     <TextBlock Text="Updates"
-                               Style="{StaticResource SubtitleTextBlockStyle}" />
+                               Style="{StaticResource SubtitleTextBlockStyle}"
+                               AutomationProperties.HeadingLevel="Level2" />
 
                     <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                             CornerRadius="8"
@@ -398,7 +411,8 @@
                 <!-- Diagnostics Section -->
                 <StackPanel x:Name="DiagnosticsSection" Spacing="8" Tag="diagnostics logs export reset defaults troubleshooting support">
                     <TextBlock Text="Diagnostics"
-                               Style="{StaticResource SubtitleTextBlockStyle}" />
+                               Style="{StaticResource SubtitleTextBlockStyle}"
+                               AutomationProperties.HeadingLevel="Level2" />
 
                     <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                             CornerRadius="8"

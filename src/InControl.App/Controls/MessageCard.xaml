@@ -10,17 +10,20 @@
         <MenuFlyout x:Key="MessageContextMenu">
             <MenuFlyoutItem x:Name="CopyMenuItem"
                             Text="Copy"
-                            Icon="Copy">
+                            Icon="Copy"
+                            AutomationProperties.Name="Copy message content">
                 <MenuFlyoutItem.KeyboardAccelerators>
                     <KeyboardAccelerator Key="C" Modifiers="Control" />
                 </MenuFlyoutItem.KeyboardAccelerators>
             </MenuFlyoutItem>
             <MenuFlyoutItem x:Name="CopyAsMarkdownMenuItem"
-                            Text="Copy as Markdown" />
+                            Text="Copy as Markdown"
+                            AutomationProperties.Name="Copy as Markdown format" />
             <MenuFlyoutSeparator />
             <MenuFlyoutItem x:Name="AddToContextMenuItem"
                             Text="Add to context"
-                            Icon="Attach" />
+                            Icon="Attach"
+                            AutomationProperties.Name="Add message to context" />
         </MenuFlyout>
     </UserControl.Resources>
 
@@ -33,7 +36,8 @@
                 HorizontalAlignment="Right"
                 MaxWidth="600"
                 ContextFlyout="{StaticResource MessageContextMenu}"
-                Visibility="Collapsed">
+                Visibility="Collapsed"
+                AutomationProperties.Name="Your message">
             <Grid RowSpacing="8">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -74,7 +78,8 @@
                 HorizontalAlignment="Left"
                 MaxWidth="700"
                 ContextFlyout="{StaticResource MessageContextMenu}"
-                Visibility="Collapsed">
+                Visibility="Collapsed"
+                AutomationProperties.Name="Assistant response">
             <Grid RowSpacing="8">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -152,7 +157,8 @@
                 CornerRadius="4"
                 Padding="12,8"
                 HorizontalAlignment="Center"
-                Visibility="Collapsed">
+                Visibility="Collapsed"
+                AutomationProperties.Name="System message">
             <StackPanel Orientation="Horizontal" Spacing="8">
                 <FontIcon Glyph="&#xE946;"
                           FontSize="12"

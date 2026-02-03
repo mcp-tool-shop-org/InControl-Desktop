@@ -22,7 +22,8 @@
                    Text="InControl"
                    Style="{StaticResource TitleTextBlockStyle}"
                    VerticalAlignment="Center"
-                   Margin="16,0,24,0" />
+                   Margin="16,0,24,0"
+                   AutomationProperties.HeadingLevel="Level1" />
 
         <!-- Model Selector (now opens Model Manager) -->
         <Button Grid.Column="1"
@@ -30,7 +31,9 @@
                 VerticalAlignment="Center"
                 MinWidth="200"
                 HorizontalContentAlignment="Left"
-                ToolTipService.ToolTip="Open Model Manager">
+                ToolTipService.ToolTip="Open Model Manager"
+                AutomationProperties.Name="Open Model Manager"
+                AccessKey="M">
             <StackPanel Orientation="Horizontal" Spacing="8">
                 <FontIcon Glyph="&#xE950;" FontSize="14" />
                 <TextBlock x:Name="ModelDisplayText"
@@ -119,7 +122,9 @@
                 x:Name="SearchButton"
                 VerticalAlignment="Center"
                 Margin="0,0,8,0"
-                ToolTipService.ToolTip="Command Palette (Ctrl+K)">
+                ToolTipService.ToolTip="Command Palette (Ctrl+K)"
+                AutomationProperties.Name="Search and Command Palette"
+                AccessKey="K">
             <StackPanel Orientation="Horizontal" Spacing="8">
                 <FontIcon Glyph="&#xE721;" FontSize="14" />
                 <TextBlock Text="Search"
@@ -149,7 +154,9 @@
                     Padding="8"
                     Background="Transparent"
                     BorderThickness="0"
-                    ToolTipService.ToolTip="Toggle theme">
+                    ToolTipService.ToolTip="Toggle theme"
+                    AutomationProperties.Name="Toggle theme"
+                    AccessKey="T">
                 <FontIcon x:Name="ThemeIcon" Glyph="&#xE706;" FontSize="16" />
             </Button>
 
@@ -158,7 +165,9 @@
                     Padding="8"
                     Background="Transparent"
                     BorderThickness="0"
-                    ToolTipService.ToolTip="Settings (Ctrl+,)">
+                    ToolTipService.ToolTip="Settings (Ctrl+,)"
+                    AutomationProperties.Name="Settings"
+                    AccessKey="S">
                 <FontIcon Glyph="&#xE713;" FontSize="16" />
                 <Button.KeyboardAccelerators>
                     <KeyboardAccelerator Key="Number9" Modifiers="Control" />
@@ -170,7 +179,8 @@
                     Padding="8"
                     Background="Transparent"
                     BorderThickness="0"
-                    ToolTipService.ToolTip="Assistant">
+                    ToolTipService.ToolTip="Assistant"
+                    AutomationProperties.Name="Assistant">
                 <FontIcon Glyph="&#xE99A;" FontSize="16" />
             </Button>
 
@@ -179,7 +189,9 @@
                     Padding="8"
                     Background="Transparent"
                     BorderThickness="0"
-                    ToolTipService.ToolTip="Extensions">
+                    ToolTipService.ToolTip="Extensions"
+                    AutomationProperties.Name="Extensions"
+                    AccessKey="X">
                 <FontIcon Glyph="&#xEA86;" FontSize="16" />
             </Button>
 
@@ -188,7 +200,9 @@
                     Padding="8"
                     Background="Transparent"
                     BorderThickness="0"
-                    ToolTipService.ToolTip="Policy &amp; Governance">
+                    ToolTipService.ToolTip="Policy and Governance"
+                    AutomationProperties.Name="Policy and Governance"
+                    AccessKey="P">
                 <FontIcon Glyph="&#xE72E;" FontSize="16" />
             </Button>
 
@@ -197,7 +211,9 @@
                     Padding="8"
                     Background="Transparent"
                     BorderThickness="0"
-                    ToolTipService.ToolTip="Connectivity">
+                    ToolTipService.ToolTip="Connectivity"
+                    AutomationProperties.Name="Connectivity"
+                    AccessKey="C">
                 <FontIcon x:Name="ConnectivityIcon" Glyph="&#xE701;" FontSize="16" />
             </Button>
 
@@ -206,7 +222,9 @@
                     Padding="8"
                     Background="Transparent"
                     BorderThickness="0"
-                    ToolTipService.ToolTip="Help (F1)">
+                    ToolTipService.ToolTip="Help (F1)"
+                    AutomationProperties.Name="Help"
+                    AccessKey="H">
                 <FontIcon Glyph="&#xE897;" FontSize="16" />
                 <Button.KeyboardAccelerators>
                     <KeyboardAccelerator Key="F1" />

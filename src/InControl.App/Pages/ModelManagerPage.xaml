@@ -24,28 +24,35 @@
                     Padding="8"
                     Background="Transparent"
                     BorderThickness="0"
-                    ToolTipService.ToolTip="Back"
+                    ToolTipService.ToolTip="Back (Escape)"
                     VerticalAlignment="Center"
-                    Margin="0,0,12,0">
+                    Margin="0,0,12,0"
+                    AutomationProperties.Name="Go back"
+                    AccessKey="B">
                 <FontIcon Glyph="&#xE72B;" FontSize="16" />
             </Button>
 
             <StackPanel Grid.Column="1" VerticalAlignment="Center">
                 <TextBlock Text="Model Manager"
-                           Style="{StaticResource TitleTextBlockStyle}" />
+                           Style="{StaticResource TitleTextBlockStyle}"
+                           AutomationProperties.HeadingLevel="Level1" />
                 <TextBlock Text="Install, configure, and manage AI models"
                            Style="{StaticResource CaptionTextBlockStyle}"
                            Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
             </StackPanel>
 
             <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
-                <Button x:Name="ImportButton">
+                <Button x:Name="ImportButton"
+                        AutomationProperties.Name="Import model from file"
+                        AccessKey="I">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <FontIcon Glyph="&#xE8B5;" FontSize="14" />
                         <TextBlock Text="Import Model" />
                     </StackPanel>
                 </Button>
-                <Button x:Name="DownloadButton">
+                <Button x:Name="DownloadButton"
+                        AutomationProperties.Name="Download model from Hugging Face"
+                        AccessKey="D">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <FontIcon Glyph="&#xE896;" FontSize="14" />
                         <TextBlock Text="Download" />
@@ -128,7 +135,8 @@
                     <!-- Models ListView -->
                     <ListView x:Name="ModelsListView"
                               Visibility="Collapsed"
-                              SelectionMode="Single">
+                              SelectionMode="Single"
+                              AutomationProperties.Name="Installed models list">
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <Grid Padding="12" Margin="0,4">
@@ -213,14 +221,16 @@
                         <!-- Default Model Section -->
                         <StackPanel Spacing="8">
                             <TextBlock Text="Default Model"
-                                       Style="{StaticResource SubtitleTextBlockStyle}" />
+                                       Style="{StaticResource SubtitleTextBlockStyle}"
+                                       AutomationProperties.HeadingLevel="Level2" />
                             <TextBlock Text="Select a model to use for new sessions"
                                        Style="{StaticResource CaptionTextBlockStyle}"
                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                        TextWrapping="Wrap" />
                             <ComboBox x:Name="DefaultModelSelector"
                                       PlaceholderText="No models available"
-                                      HorizontalAlignment="Stretch" />
+                                      HorizontalAlignment="Stretch"
+                                      AutomationProperties.Name="Select default model" />
                         </StackPanel>
 
                         <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
@@ -228,7 +238,8 @@
                         <!-- GPU Info Section -->
                         <StackPanel Spacing="8">
                             <TextBlock Text="GPU Status"
-                                       Style="{StaticResource SubtitleTextBlockStyle}" />
+                                       Style="{StaticResource SubtitleTextBlockStyle}"
+                                       AutomationProperties.HeadingLevel="Level2" />
 
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -287,7 +298,8 @@
                         <!-- Compatibility Info -->
                         <StackPanel Spacing="8">
                             <TextBlock Text="Compatibility"
-                                       Style="{StaticResource SubtitleTextBlockStyle}" />
+                                       Style="{StaticResource SubtitleTextBlockStyle}"
+                                       AutomationProperties.HeadingLevel="Level2" />
 
                             <InfoBar x:Name="CompatibilityInfo"
                                      IsOpen="True"
@@ -302,7 +314,8 @@
                         <!-- VRAM Estimation -->
                         <StackPanel Spacing="8">
                             <TextBlock Text="VRAM Estimation"
-                                       Style="{StaticResource SubtitleTextBlockStyle}" />
+                                       Style="{StaticResource SubtitleTextBlockStyle}"
+                                       AutomationProperties.HeadingLevel="Level2" />
 
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -347,11 +360,14 @@
                         <!-- Quick Actions -->
                         <StackPanel Spacing="8">
                             <TextBlock Text="Quick Actions"
-                                       Style="{StaticResource SubtitleTextBlockStyle}" />
+                                       Style="{StaticResource SubtitleTextBlockStyle}"
+                                       AutomationProperties.HeadingLevel="Level2" />
 
                             <Button x:Name="OpenModelsFolderButton"
                                     HorizontalAlignment="Stretch"
-                                    HorizontalContentAlignment="Left">
+                                    HorizontalContentAlignment="Left"
+                                    AutomationProperties.Name="Open models folder in Explorer"
+                                    AccessKey="O">
                                 <StackPanel Orientation="Horizontal" Spacing="8">
                                     <FontIcon Glyph="&#xE838;" FontSize="14" />
                                     <TextBlock Text="Open models folder" />
@@ -360,7 +376,9 @@
 
                             <Button x:Name="RefreshModelsButton"
                                     HorizontalAlignment="Stretch"
-                                    HorizontalContentAlignment="Left">
+                                    HorizontalContentAlignment="Left"
+                                    AutomationProperties.Name="Refresh model list"
+                                    AccessKey="R">
                                 <StackPanel Orientation="Horizontal" Spacing="8">
                                     <FontIcon Glyph="&#xE72C;" FontSize="14" />
                                     <TextBlock Text="Refresh model list" />

@@ -50,6 +50,9 @@
                           x:Name="ModelSelector"
                           PlaceholderText="Select model"
                           MinWidth="180"
+                          TabIndex="0"
+                          AutomationProperties.Name="Model selector"
+                          AutomationProperties.HelpText="Choose the AI model for inference"
                           ItemTemplate="{StaticResource ModelItemTemplate}">
                     <ComboBox.Header>
                         <TextBlock Text="Model"
@@ -64,8 +67,10 @@
                             Spacing="4">
                     <!-- Attach File Button -->
                     <Button x:Name="AttachFileButton"
-                            ToolTipService.ToolTip="Attach file"
-                            Padding="8">
+                            ToolTipService.ToolTip="Attach file (Ctrl+Shift+O)"
+                            Padding="8"
+                            AutomationProperties.Name="Attach file"
+                            AccessKey="A">
                         <FontIcon Glyph="&#xE723;" FontSize="14" />
                         <Button.KeyboardAccelerators>
                             <KeyboardAccelerator Key="O" Modifiers="Control,Shift" />
@@ -74,7 +79,8 @@
 
                     <!-- Context Menu -->
                     <Button x:Name="ContextMenuButton"
-                            ToolTipService.ToolTip="Context options">
+                            ToolTipService.ToolTip="Context options"
+                            AutomationProperties.Name="Context options">
                         <StackPanel Orientation="Horizontal" Spacing="4">
                             <FontIcon Glyph="&#xE8F1;" FontSize="14" />
                             <TextBlock x:Name="ContextCountText"
@@ -114,7 +120,10 @@
                          Padding="12"
                          BorderThickness="1"
                          BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
-                         CornerRadius="4">
+                         CornerRadius="4"
+                         TabIndex="1"
+                         AutomationProperties.Name="Prompt input"
+                         AutomationProperties.HelpText="Enter your prompt here. Press Ctrl+Enter to run.">
                     <TextBox.KeyboardAccelerators>
                         <KeyboardAccelerator Key="Enter" Modifiers="Control" />
                     </TextBox.KeyboardAccelerators>
@@ -192,7 +201,9 @@
                     <!-- Cancel Button (shown during execution) -->
                     <Button x:Name="CancelButton"
                             Visibility="Collapsed"
-                            ToolTipService.ToolTip="Cancel execution">
+                            ToolTipService.ToolTip="Cancel execution (Escape)"
+                            AutomationProperties.Name="Cancel"
+                            AutomationProperties.HelpText="Cancel the current inference operation">
                         <StackPanel Orientation="Horizontal" Spacing="6">
                             <FontIcon Glyph="&#xE711;" FontSize="12" />
                             <TextBlock Text="Cancel" />
@@ -205,7 +216,11 @@
                     <!-- Run Button -->
                     <Button x:Name="RunButton"
                             ToolTipService.ToolTip="Select a model to enable"
-                            IsEnabled="False">
+                            IsEnabled="False"
+                            TabIndex="2"
+                            AutomationProperties.Name="Run"
+                            AutomationProperties.HelpText="Run inference with the selected model"
+                            AccessKey="R">
                         <StackPanel Orientation="Horizontal" Spacing="6">
                             <FontIcon Glyph="&#xE768;" FontSize="14" />
                             <TextBlock Text="Run" />

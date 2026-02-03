@@ -17,7 +17,10 @@
                  FontSize="16"
                  Padding="12"
                  BorderThickness="0"
-                 Background="Transparent" />
+                 Background="Transparent"
+                 AutomationProperties.Name="Command search"
+                 AutomationProperties.HelpText="Type to filter commands. Use arrow keys to navigate, Enter to execute."
+                 TabIndex="0" />
 
         <!-- Commands List -->
         <ListView x:Name="CommandsList"
@@ -25,7 +28,9 @@
                   Margin="0,8,0,0"
                   MaxHeight="400"
                   SelectionMode="Single"
-                  IsItemClickEnabled="True">
+                  IsItemClickEnabled="True"
+                  AutomationProperties.Name="Available commands"
+                  TabIndex="1">
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <Setter Property="Padding" Value="12,10" />
