@@ -7,14 +7,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+---
+
+## [0.9.0-rc.1] - 2026-02-03
+
+> **Release Candidate** - Pre-release for testing. Not recommended for production use.
+
+### Highlights
+- Full Ollama integration for local AI model management
+- Complete UI framework with 15+ pages and controls
+- Phase 12 release candidate preparation
+
 ### Added
-- Personal assistant system with local-first design
-- Conversation management with multi-session support
-- Memory system for persistent context
-- Tool execution framework with approval controls
-- Offline-first connectivity architecture
-- Update management with operator control
-- Audit logging for all network activity
+- **Ollama Integration**: Direct connection to local Ollama instance
+  - Live model list with metadata (size, family, parameters)
+  - Pull models directly from Ollama library
+  - Quick-pull buttons for popular models (llama3.2, mistral, codegemma)
+  - Connection status indicator with version display
+- **Personal Assistant System**: Local-first assistant with context memory
+- **Conversation Management**: Multi-session support with sidebar navigation
+- **Memory System**: Persistent context across sessions
+- **Tool Execution Framework**: With approval controls and sandboxing
+- **Offline-First Architecture**: Complete air-gap capability
+- **Update Management**: Operator-controlled update policies
+- **Audit Logging**: Full network activity tracking
+- **Command Palette**: Ctrl+K quick access to all functions
+- **Inspector Panel**: Real-time inference statistics
+- **Support Bundle**: One-click diagnostic export
+
+### Changed
+- Welcome text updated from "RTX GPU" to "Ollama-powered"
+- Model Manager redesigned for Ollama-native workflow
+- Improved theme resource organization
+
+### Fixed
+- Resource dictionary not merged causing page crashes
+- DateTime nullable handling in model info display
 
 ### Security
 - All network access disabled by default (OfflineOnly mode)
@@ -22,7 +50,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Per-endpoint permission rules
 - Complete audit trail for network requests
 
-## [0.1.0] - Initial Release
+### Known Issues
+- Branch protection requires manual GitHub admin configuration
+- MSIX signing requires certificate setup for production
+
+---
+
+## [0.1.0] - 2026-01-15 - Initial Release
 
 ### Added
 - Core chat interface with streaming responses

@@ -47,13 +47,23 @@
 ## Commit 02: Release Candidate Versioning
 
 ### What Changed
-*(To be completed)*
+- Created `docs/RELEASE_PROCESS.md` with complete versioning guide
+- Updated `InControl.App.csproj` with version properties:
+  - Version: `0.9.0-rc.1`
+  - AssemblyVersion: `0.9.0.0`
+  - FileVersion: `0.9.0.0`
+  - InformationalVersion: `0.9.0-rc.1`
+- Updated `Package.appxmanifest` version to `0.9.0.0`
+- Updated `CHANGELOG.md` with RC1 release notes
 
 ### Test Evidence
-*(To be completed)*
+- Version properties compile successfully
+- GitHub Actions release workflow exists and parses RC versions
+- Changelog follows Keep a Changelog format
 
 ### Screenshots
-*(To be completed)*
+- `docs/phase12/screenshots/commit-02/changelog-rc1.png`
+- `docs/phase12/screenshots/commit-02/release-process-doc.png`
 
 ---
 
