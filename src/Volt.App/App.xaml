@@ -8,9 +8,10 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
+                <ResourceDictionary Source="Resources/VoltTheme.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
-            <!-- App-wide resources -->
+            <!-- Legacy keys for backward compatibility (prefer VoltTheme.xaml keys) -->
             <Thickness x:Key="PagePadding">24,24,24,24</Thickness>
             <Thickness x:Key="SmallPadding">8,8,8,8</Thickness>
             <Thickness x:Key="MediumPadding">16,16,16,16</Thickness>
@@ -18,7 +19,6 @@
             <x:Double x:Key="SidebarWidth">280</x:Double>
             <x:Double x:Key="InspectorWidth">320</x:Double>
             <x:Double x:Key="MessageMaxWidth">800</x:Double>
-            <x:Double x:Key="AppBarHeight">48</x:Double>
 
             <!-- Message card colors (renamed from bubble per UX contract) -->
             <SolidColorBrush x:Key="UserIntentBackgroundBrush" Color="{ThemeResource SystemAccentColor}" Opacity="0.1" />
