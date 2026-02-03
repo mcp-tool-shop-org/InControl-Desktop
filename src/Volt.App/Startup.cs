@@ -3,6 +3,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using Volt.Core.Configuration;
+using Volt.Inference.Extensions;
+using Volt.Services.Extensions;
 using Volt.ViewModels;
 
 namespace Volt.App;
@@ -18,28 +20,34 @@ public static class Startup
     public static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
     {
         // Configuration options
+        ConfigureOptions(services, configuration);
+
+        // Logging
+        ConfigureLogging(services, configuration);
+
+        // Layer services (extension methods for clean registration)
+        services.AddInferenceServices();
+        services.AddOllamaBackend();
+        services.AddApplicationServices();
+
+        // ViewModels
+        ConfigureViewModels(services);
+    }
+
+    private static void ConfigureOptions(IServiceCollection services, IConfiguration configuration)
+    {
         services.Configure<AppOptions>(configuration.GetSection(AppOptions.SectionName));
         services.Configure<ChatOptions>(configuration.GetSection(ChatOptions.SectionName));
         services.Configure<InferenceOptions>(configuration.GetSection(InferenceOptions.SectionName));
         services.Configure<OllamaOptions>(configuration.GetSection(OllamaOptions.SectionName));
         services.Configure<LoggingOptions>(configuration.GetSection(LoggingOptions.SectionName));
+    }
 
-        // Logging
-        ConfigureLogging(services, configuration);
-
-        // ViewModels
+    private static void ConfigureViewModels(IServiceCollection services)
+    {
         services.AddTransient<ChatViewModel>();
         services.AddTransient<SettingsViewModel>();
         services.AddTransient<ConversationListViewModel>();
-
-        // Services will be registered here in Phase 2
-        // services.AddSingleton<IChatService, ChatService>();
-        // services.AddSingleton<ISettingsService, SettingsService>();
-        // services.AddSingleton<IConversationStorage, JsonConversationStorage>();
-
-        // Inference clients will be registered here in Phase 2
-        // services.AddSingleton<IInferenceClientFactory, InferenceClientFactory>();
-        // services.AddSingleton<IModelManager, OllamaModelManager>();
     }
 
     private static void ConfigureLogging(IServiceCollection services, IConfiguration configuration)
