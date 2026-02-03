@@ -16,11 +16,18 @@
             <Thickness x:Key="MediumPadding">16,16,16,16</Thickness>
 
             <x:Double x:Key="SidebarWidth">280</x:Double>
+            <x:Double x:Key="InspectorWidth">320</x:Double>
             <x:Double x:Key="MessageMaxWidth">800</x:Double>
+            <x:Double x:Key="AppBarHeight">48</x:Double>
 
-            <!-- Message bubble colors -->
-            <SolidColorBrush x:Key="UserMessageBackgroundBrush" Color="{ThemeResource SystemAccentColor}" Opacity="0.1" />
-            <SolidColorBrush x:Key="AssistantMessageBackgroundBrush" Color="{ThemeResource SolidBackgroundFillColorTertiary}" />
+            <!-- Message card colors (renamed from bubble per UX contract) -->
+            <SolidColorBrush x:Key="UserIntentBackgroundBrush" Color="{ThemeResource SystemAccentColor}" Opacity="0.1" />
+            <SolidColorBrush x:Key="ModelOutputBackgroundBrush" Color="{ThemeResource SolidBackgroundFillColorTertiary}" />
+
+            <!-- Status colors -->
+            <SolidColorBrush x:Key="StatusIdleBrush" Color="{ThemeResource SystemFillColorNeutralBrush}" />
+            <SolidColorBrush x:Key="StatusRunningBrush" Color="{ThemeResource SystemFillColorSuccessBrush}" />
+            <SolidColorBrush x:Key="StatusIssueBrush" Color="{ThemeResource SystemFillColorCriticalBrush}" />
 
         </ResourceDictionary>
     </Application.Resources>
