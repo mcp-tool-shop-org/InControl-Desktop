@@ -34,6 +34,7 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
             <!-- Control Bar (Top) - Model & Options -->
@@ -117,8 +118,47 @@
                 </TextBox>
             </Grid>
 
+            <!-- Disabled State Explanation Banner -->
+            <Border x:Name="DisabledBanner"
+                    Grid.Row="2"
+                    Background="{ThemeResource SystemFillColorCautionBackgroundBrush}"
+                    CornerRadius="4"
+                    Padding="12,8"
+                    Margin="0,8,0,8"
+                    Visibility="Collapsed">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <FontIcon Grid.Column="0"
+                              Glyph="&#xE7BA;"
+                              FontSize="14"
+                              Foreground="{ThemeResource SystemFillColorCautionBrush}"
+                              Margin="0,0,12,0"
+                              VerticalAlignment="Center" />
+
+                    <TextBlock Grid.Column="1"
+                               x:Name="DisabledReasonText"
+                               Text="Select a model to enable Run"
+                               Style="{StaticResource CaptionTextBlockStyle}"
+                               VerticalAlignment="Center"
+                               TextWrapping="Wrap" />
+
+                    <Button Grid.Column="2"
+                            x:Name="DisabledActionButton"
+                            Content="Open Model Manager"
+                            Padding="8,4"
+                            FontSize="12"
+                            VerticalAlignment="Center"
+                            Visibility="Collapsed" />
+                </Grid>
+            </Border>
+
             <!-- Action Bar (Bottom) -->
-            <Grid Grid.Row="2" Margin="0,8,0,0">
+            <Grid Grid.Row="3" Margin="0,8,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
@@ -136,7 +176,8 @@
                                Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
 
                     <!-- Keyboard Hint -->
-                    <TextBlock Text="Ctrl+Enter to run"
+                    <TextBlock x:Name="KeyboardHint"
+                               Text="Ctrl+Enter to run"
                                Style="{StaticResource CaptionTextBlockStyle}"
                                Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
                 </StackPanel>
@@ -160,7 +201,7 @@
 
                     <!-- Run Button -->
                     <Button x:Name="RunButton"
-                            Style="{StaticResource AccentButtonStyle}"
+                            
                             IsEnabled="False">
                         <StackPanel Orientation="Horizontal" Spacing="6">
                             <FontIcon Glyph="&#xE768;" FontSize="14" />

@@ -7,16 +7,20 @@ namespace InControl.App.Controls;
 /// <summary>
 /// Input composer control panel for entering prompts and managing execution.
 /// Follows the control panel metaphor - this is a command interface, not a chat box.
+/// Provides disabled state explanations so users always know what to do next.
 /// </summary>
 public sealed partial class InputComposer : UserControl
 {
     private ExecutionState _executionState = ExecutionState.Idle;
+    private bool _isOfflineBlocked;
 
     public InputComposer()
     {
         this.InitializeComponent();
         SetupEventHandlers();
     }
+
+    #region Properties
 
     /// <summary>
     /// The current execution state.
@@ -49,6 +53,23 @@ public sealed partial class InputComposer : UserControl
     public string? SelectedModel => ModelSelector.SelectedItem as string;
 
     /// <summary>
+    /// Whether the Run button is blocked due to offline policy.
+    /// </summary>
+    public bool IsOfflineBlocked
+    {
+        get => _isOfflineBlocked;
+        set
+        {
+            _isOfflineBlocked = value;
+            UpdateDisabledState();
+        }
+    }
+
+    #endregion
+
+    #region Events
+
+    /// <summary>
     /// Event raised when the user initiates a run.
     /// </summary>
     public event EventHandler<RunRequestedEventArgs>? RunRequested;
@@ -62,6 +83,15 @@ public sealed partial class InputComposer : UserControl
     /// Event raised when a file attachment is requested.
     /// </summary>
     public event EventHandler? AttachFileRequested;
+
+    /// <summary>
+    /// Event raised when Model Manager should open (from disabled banner).
+    /// </summary>
+    public event EventHandler? ModelManagerRequested;
+
+    #endregion
+
+    #region Public Methods
 
     /// <summary>
     /// Sets the available models for selection.
@@ -78,6 +108,8 @@ public sealed partial class InputComposer : UserControl
         {
             ModelSelector.SelectedIndex = 0;
         }
+
+        UpdateDisabledState();
     }
 
     /// <summary>
@@ -115,6 +147,10 @@ public sealed partial class InputComposer : UserControl
         IntentInput.Focus(FocusState.Programmatic);
     }
 
+    #endregion
+
+    #region Private Methods
+
     private void SetupEventHandlers()
     {
         IntentInput.TextChanged += OnIntentTextChanged;
@@ -122,6 +158,7 @@ public sealed partial class InputComposer : UserControl
         CancelButton.Click += OnCancelButtonClick;
         AttachFileButton.Click += OnAttachFileButtonClick;
         ModelSelector.SelectionChanged += OnModelSelectionChanged;
+        DisabledActionButton.Click += OnDisabledActionClick;
     }
 
     private void OnIntentTextChanged(object sender, TextChangedEventArgs e)
@@ -129,6 +166,7 @@ public sealed partial class InputComposer : UserControl
         var text = IntentInput.Text;
         CharacterCount.Text = $"{text.Length} characters";
         UpdateRunButtonState();
+        UpdateDisabledState();
     }
 
     private void OnRunButtonClick(object sender, RoutedEventArgs e)
@@ -153,6 +191,12 @@ public sealed partial class InputComposer : UserControl
     private void OnModelSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         UpdateRunButtonState();
+        UpdateDisabledState();
+    }
+
+    private void OnDisabledActionClick(object sender, RoutedEventArgs e)
+    {
+        ModelManagerRequested?.Invoke(this, EventArgs.Empty);
     }
 
     private void UpdateUIForState()
@@ -175,6 +219,7 @@ public sealed partial class InputComposer : UserControl
         ContextMenuButton.IsEnabled = allowsInput;
 
         UpdateRunButtonState();
+        UpdateDisabledState();
     }
 
     private void UpdateRunButtonState()
@@ -183,15 +228,73 @@ public sealed partial class InputComposer : UserControl
         var hasModel = ModelSelector.SelectedItem != null;
         var allowsInput = _executionState.AllowsInput();
 
-        RunButton.IsEnabled = hasText && hasModel && allowsInput;
+        RunButton.IsEnabled = hasText && hasModel && allowsInput && !_isOfflineBlocked;
+    }
+
+    private void UpdateDisabledState()
+    {
+        var hasText = !string.IsNullOrWhiteSpace(IntentInput.Text);
+        var hasModel = ModelSelector.SelectedItem != null;
+        var allowsInput = _executionState.AllowsInput();
+
+        // Determine the disabled reason (priority order)
+        string? reason = null;
+        string? actionText = null;
+        bool showAction = false;
+
+        if (_isOfflineBlocked)
+        {
+            reason = "Run is blocked by connectivity policy";
+            actionText = "View Policy";
+            showAction = false; // Policy can't be changed from here
+        }
+        else if (!hasModel && ModelSelector.Items.Count == 0)
+        {
+            reason = "No models available. Add a model to get started.";
+            actionText = "Open Model Manager";
+            showAction = true;
+        }
+        else if (!hasModel)
+        {
+            reason = "Select a model from the dropdown to enable Run";
+            showAction = false;
+        }
+        else if (!hasText && hasModel)
+        {
+            reason = "Type a prompt to enable Run";
+            showAction = false;
+        }
+        else if (!allowsInput)
+        {
+            reason = "Wait for the current operation to complete";
+            showAction = false;
+        }
+
+        // Show or hide the disabled banner
+        if (reason != null && !RunButton.IsEnabled)
+        {
+            DisabledBanner.Visibility = Visibility.Visible;
+            DisabledReasonText.Text = reason;
+            DisabledActionButton.Content = actionText;
+            DisabledActionButton.Visibility = showAction ? Visibility.Visible : Visibility.Collapsed;
+            KeyboardHint.Visibility = Visibility.Collapsed;
+        }
+        else
+        {
+            DisabledBanner.Visibility = Visibility.Collapsed;
+            KeyboardHint.Visibility = Visibility.Visible;
+        }
     }
 
     private bool CanRun()
     {
         return !string.IsNullOrWhiteSpace(IntentInput.Text)
             && ModelSelector.SelectedItem != null
-            && _executionState.AllowsInput();
+            && _executionState.AllowsInput()
+            && !_isOfflineBlocked;
     }
+
+    #endregion
 }
 
 /// <summary>
