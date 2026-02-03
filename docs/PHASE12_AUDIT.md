@@ -13,7 +13,7 @@
 | 05 - Crash Reporting + Recovery UX | Pending | | |
 | 06 - Button Coverage Tests | Pending | | |
 | 07 - Help Center → Troubleshooting | Complete | 2026-02-03 | [Screenshots](#commit-07) |
-| 08 - Light/Dark Theme Audit | Pending | | |
+| 08 - Light/Dark Theme Audit | Complete | 2026-02-03 | [Screenshots](#commit-08) |
 | 09 - Release Artifact Proof Pack | Pending | | |
 | 10 - RC1 Cut + Beta Gate | Pending | | |
 
@@ -246,10 +246,35 @@
 ## Commit 08: Theme Consistency Audit
 
 ### What Changed
-*(To be completed)*
+- Created `docs/THEME_AUDIT.md` with complete audit documentation
+- Fixed **App.xaml**:
+  - `ModelOutputBackgroundBrush` now uses `CardBackgroundFillColorDefault`
+  - `UserIntentBackgroundBrush` uses `SystemAccentColor` with opacity
+- Fixed **WelcomePanel.xaml**:
+  - Step indicator circles now use `AccentFillColorDefaultBrush` (active)
+  - Inactive steps use `ControlFillColorDisabledBrush`
+  - Text on colored backgrounds uses `TextOnAccentFillColorPrimaryBrush`
+  - Updated code-behind to get brushes from Application.Current.Resources
+- Fixed **ConnectivityPage.xaml**:
+  - Icon background now uses `ControlFillColorSecondaryBrush`
+- Fixed **MainWindow.xaml**:
+  - Command Palette overlay now uses `SmokeFillColorDefaultBrush`
+- All hardcoded hex colors (`#0078D4`, `#888888`, `#F3F3F3`, `#80000000`) replaced
+- All `Foreground="White"` replaced with theme-aware resources
+
+### Issues Found
+| Location | Issue | Fix |
+|----------|-------|-----|
+| App.xaml | `#F3F3F3` invisible in dark mode | Use CardBackgroundFillColorDefault |
+| WelcomePanel | Hardcoded step colors | Use AccentFillColorDefaultBrush |
+| WelcomePanel | `Foreground="White"` | Use TextOnAccentFillColorPrimaryBrush |
+| ConnectivityPage | `#1A0078D4` hardcoded | Use ControlFillColorSecondaryBrush |
+| MainWindow | `#80000000` overlay | Use SmokeFillColorDefaultBrush |
 
 ### Test Evidence
-*(To be completed)*
+- Build succeeds with x64 platform
+- All ThemeResource references are valid WinUI 3 resources
+- Code-behind dynamically retrieves brushes from Application.Current.Resources
 
 ### Screenshots (Mandatory Set)
 - `docs/phase12/screenshots/commit-08/main-shell-dark.png`

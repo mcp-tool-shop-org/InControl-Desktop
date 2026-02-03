@@ -46,7 +46,7 @@
         <Grid x:Name="CommandPaletteOverlay"
               Grid.RowSpan="3"
               Visibility="Collapsed"
-              Background="#80000000">
+              Background="{ThemeResource SmokeFillColorDefaultBrush}">
             <Border HorizontalAlignment="Center"
                     VerticalAlignment="Top"
                     Margin="0,100,0,0"

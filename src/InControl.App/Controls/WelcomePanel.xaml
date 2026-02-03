@@ -37,24 +37,23 @@
                         </Grid.ColumnDefinitions>
 
                         <Border Grid.Column="0"
+                                x:Name="Step1Circle"
                                 Width="36" Height="36"
                                 CornerRadius="18"
                                 Margin="0,0,16,0"
-                                VerticalAlignment="Top">
-                            <Border.Background>
-                                <SolidColorBrush x:Name="Step1Background" Color="#0078D4" />
-                            </Border.Background>
+                                VerticalAlignment="Top"
+                                Background="{ThemeResource AccentFillColorDefaultBrush}">
                             <Grid>
                                 <TextBlock x:Name="Step1Number"
                                            Text="1"
                                            FontWeight="SemiBold"
-                                           Foreground="White"
+                                           Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
                                            HorizontalAlignment="Center"
                                            VerticalAlignment="Center" />
                                 <FontIcon x:Name="Step1Check"
                                           Glyph="&#xE73E;"
                                           FontSize="16"
-                                          Foreground="White"
+                                          Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
                                           HorizontalAlignment="Center"
                                           VerticalAlignment="Center"
                                           Visibility="Collapsed" />
@@ -93,24 +92,23 @@
                         </Grid.ColumnDefinitions>
 
                         <Border Grid.Column="0"
+                                x:Name="Step2Circle"
                                 Width="36" Height="36"
                                 CornerRadius="18"
                                 Margin="0,0,16,0"
-                                VerticalAlignment="Top">
-                            <Border.Background>
-                                <SolidColorBrush x:Name="Step2Background" Color="#888888" />
-                            </Border.Background>
+                                VerticalAlignment="Top"
+                                Background="{ThemeResource ControlFillColorDisabledBrush}">
                             <Grid>
                                 <TextBlock x:Name="Step2Number"
                                            Text="2"
                                            FontWeight="SemiBold"
-                                           Foreground="White"
+                                           Foreground="{ThemeResource TextFillColorPrimaryBrush}"
                                            HorizontalAlignment="Center"
                                            VerticalAlignment="Center" />
                                 <FontIcon x:Name="Step2Check"
                                           Glyph="&#xE73E;"
                                           FontSize="16"
-                                          Foreground="White"
+                                          Foreground="{ThemeResource TextFillColorPrimaryBrush}"
                                           HorizontalAlignment="Center"
                                           VerticalAlignment="Center"
                                           Visibility="Collapsed" />
@@ -148,16 +146,15 @@
                         </Grid.ColumnDefinitions>
 
                         <Border Grid.Column="0"
+                                x:Name="Step3Circle"
                                 Width="36" Height="36"
                                 CornerRadius="18"
                                 Margin="0,0,16,0"
-                                VerticalAlignment="Top">
-                            <Border.Background>
-                                <SolidColorBrush x:Name="Step3Background" Color="#888888" />
-                            </Border.Background>
+                                VerticalAlignment="Top"
+                                Background="{ThemeResource ControlFillColorDisabledBrush}">
                             <TextBlock Text="3"
                                        FontWeight="SemiBold"
-                                       Foreground="White"
+                                       Foreground="{ThemeResource TextFillColorPrimaryBrush}"
                                        HorizontalAlignment="Center"
                                        VerticalAlignment="Center" />
                         </Border>

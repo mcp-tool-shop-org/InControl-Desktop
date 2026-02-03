@@ -82,34 +82,39 @@ public sealed partial class WelcomePanel : UserControl
     {
         _hasModel = isReady && !string.IsNullOrEmpty(modelName);
 
+        // Get theme-aware brushes
+        var accentBrush = (Microsoft.UI.Xaml.Media.SolidColorBrush)Application.Current.Resources["AccentFillColorDefaultBrush"];
+        var successBrush = (Microsoft.UI.Xaml.Media.SolidColorBrush)Application.Current.Resources["SystemFillColorSuccessBrush"];
+        var disabledBrush = (Microsoft.UI.Xaml.Media.SolidColorBrush)Application.Current.Resources["ControlFillColorDisabledBrush"];
+
         if (_hasModel)
         {
             ModelStatusPanel.Visibility = Visibility.Visible;
             ModelStatusText.Text = $"{modelName} ready";
             NoModelWarning.Visibility = Visibility.Collapsed;
 
-            // Update Quick Start step 1
+            // Update Quick Start step 1 - completed (green)
             Step1Check.Visibility = Visibility.Visible;
             Step1Number.Visibility = Visibility.Collapsed;
-            Step1Background.Color = Colors.Green;
+            Step1Circle.Background = successBrush;
             Step1Description.Text = $"Using {modelName}";
 
-            // Activate step 2
-            Step2Background.Color = Windows.UI.Color.FromArgb(255, 0, 120, 212); // Accent blue
+            // Activate step 2 (accent color)
+            Step2Circle.Background = accentBrush;
         }
         else
         {
             ModelStatusPanel.Visibility = Visibility.Collapsed;
             NoModelWarning.Visibility = Visibility.Visible;
 
-            // Reset Quick Start step 1
+            // Reset Quick Start step 1 (accent color - active)
             Step1Check.Visibility = Visibility.Collapsed;
             Step1Number.Visibility = Visibility.Visible;
-            Step1Background.Color = Windows.UI.Color.FromArgb(255, 0, 120, 212); // Accent blue
+            Step1Circle.Background = accentBrush;
             Step1Description.Text = "Select or download an AI model to power your conversations.";
 
-            // Dim step 2
-            Step2Background.Color = Windows.UI.Color.FromArgb(255, 136, 136, 136); // Gray
+            // Dim step 2 (disabled/gray)
+            Step2Circle.Background = disabledBrush;
         }
 
         UpdateQuickStartVisibility();
@@ -124,13 +129,17 @@ public sealed partial class WelcomePanel : UserControl
 
         if (hasSession && _hasModel)
         {
-            // Mark step 2 complete
+            // Get theme-aware brushes
+            var accentBrush = (Microsoft.UI.Xaml.Media.SolidColorBrush)Application.Current.Resources["AccentFillColorDefaultBrush"];
+            var successBrush = (Microsoft.UI.Xaml.Media.SolidColorBrush)Application.Current.Resources["SystemFillColorSuccessBrush"];
+
+            // Mark step 2 complete (green)
             Step2Check.Visibility = Visibility.Visible;
             Step2Number.Visibility = Visibility.Collapsed;
-            Step2Background.Color = Colors.Green;
+            Step2Circle.Background = successBrush;
 
-            // Activate step 3
-            Step3Background.Color = Windows.UI.Color.FromArgb(255, 0, 120, 212); // Accent blue
+            // Activate step 3 (accent color)
+            Step3Circle.Background = accentBrush;
         }
 
         UpdateQuickStartVisibility();
