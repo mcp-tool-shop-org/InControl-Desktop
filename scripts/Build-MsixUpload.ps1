@@ -98,7 +98,7 @@ $manifestTemplate = @"
 
   <Properties>
     <DisplayName>InControl</DisplayName>
-    <PublisherDisplayName>MCP Tool Shop</PublisherDisplayName>
+    <PublisherDisplayName>mcp-tool-shop</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
 
