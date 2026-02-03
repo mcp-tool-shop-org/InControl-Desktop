@@ -44,6 +44,11 @@ public sealed partial class StatusStrip : UserControl
     /// </summary>
     public event EventHandler? AssistantClicked;
 
+    /// <summary>
+    /// Event raised when Memory status is clicked.
+    /// </summary>
+    public event EventHandler? MemoryClicked;
+
     #endregion
 
     #region Public Methods
@@ -132,6 +137,7 @@ public sealed partial class StatusStrip : UserControl
         ConnectivityButton.Click += (s, e) => ConnectivityClicked?.Invoke(this, EventArgs.Empty);
         PolicyButton.Click += (s, e) => PolicyClicked?.Invoke(this, EventArgs.Empty);
         AssistantButton.Click += (s, e) => AssistantClicked?.Invoke(this, EventArgs.Empty);
+        MemoryButton.Click += (s, e) => MemoryClicked?.Invoke(this, EventArgs.Empty);
     }
 
     #endregion

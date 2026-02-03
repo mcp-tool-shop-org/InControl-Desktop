@@ -51,6 +51,10 @@ public sealed partial class MainWindow : Window
         StatusStrip.ConnectivityClicked += (s, e) => NavigateToPage<ConnectivityPage>();
         StatusStrip.PolicyClicked += (s, e) => NavigateToPage<PolicyPage>();
         StatusStrip.AssistantClicked += (s, e) => NavigateToPage<AssistantPage>();
+        StatusStrip.MemoryClicked += (s, e) => NavigateToPage<SettingsPage>();
+
+        // SessionSidebar events
+        SessionSidebar.NewSessionRequested += OnNewSessionRequested;
 
         // Global keyboard shortcuts
         this.Content.KeyDown += OnGlobalKeyDown;
@@ -219,6 +223,14 @@ public sealed partial class MainWindow : Window
     {
         AppBar.SetSelectedModel(modelName);
         StatusStrip.SetModelStatus(modelName, true);
+    }
+
+    private void OnNewSessionRequested(object? sender, EventArgs e)
+    {
+        // Navigate home to show empty conversation
+        NavigateHome();
+        // Clear conversation view for a new session
+        // ConversationView.Clear(); // To be implemented when conversation logic is added
     }
 
     private void NavigateHome()

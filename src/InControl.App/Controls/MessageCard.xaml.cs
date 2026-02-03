@@ -1,5 +1,6 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Windows.ApplicationModel.DataTransfer;
 using InControl.Core.Models;
 using InControl.ViewModels;
 
@@ -14,6 +15,47 @@ public sealed partial class MessageCard : UserControl
     public MessageCard()
     {
         this.InitializeComponent();
+        SetupEventHandlers();
+    }
+
+    private void SetupEventHandlers()
+    {
+        CopyMenuItem.Click += OnCopyClick;
+        CopyAsMarkdownMenuItem.Click += OnCopyAsMarkdownClick;
+        AddToContextMenuItem.Click += OnAddToContextClick;
+    }
+
+    private void OnCopyClick(object sender, RoutedEventArgs e)
+    {
+        if (Message?.Content != null)
+        {
+            var dataPackage = new DataPackage();
+            dataPackage.SetText(Message.Content);
+            Clipboard.SetContent(dataPackage);
+        }
+    }
+
+    private void OnCopyAsMarkdownClick(object sender, RoutedEventArgs e)
+    {
+        if (Message?.Content != null)
+        {
+            // For now, just copy as-is (content may already be markdown)
+            var dataPackage = new DataPackage();
+            dataPackage.SetText(Message.Content);
+            Clipboard.SetContent(dataPackage);
+        }
+    }
+
+    private async void OnAddToContextClick(object sender, RoutedEventArgs e)
+    {
+        var dialog = new ContentDialog
+        {
+            Title = "Coming Soon",
+            Content = "Add to Context will be available in a future update.",
+            CloseButtonText = "OK",
+            XamlRoot = this.XamlRoot
+        };
+        await dialog.ShowAsync();
     }
 
     /// <summary>

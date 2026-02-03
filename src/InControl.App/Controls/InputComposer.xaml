@@ -85,9 +85,11 @@
                         </StackPanel>
                         <Button.Flyout>
                             <MenuFlyout>
-                                <MenuFlyoutItem Text="Add previous output"
+                                <MenuFlyoutItem x:Name="AddPreviousOutputMenuItem"
+                                                Text="Add previous output"
                                                 Icon="Copy" />
-                                <MenuFlyoutItem Text="Add file"
+                                <MenuFlyoutItem x:Name="AddFileMenuItem"
+                                                Text="Add file"
                                                 Icon="OpenFile" />
                                 <MenuFlyoutSeparator />
                                 <MenuFlyoutItem x:Name="ClearContextMenuItem"

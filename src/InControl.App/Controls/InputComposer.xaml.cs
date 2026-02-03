@@ -159,6 +159,11 @@ public sealed partial class InputComposer : UserControl
         AttachFileButton.Click += OnAttachFileButtonClick;
         ModelSelector.SelectionChanged += OnModelSelectionChanged;
         DisabledActionButton.Click += OnDisabledActionClick;
+
+        // Context menu items
+        AddPreviousOutputMenuItem.Click += OnAddPreviousOutputClick;
+        AddFileMenuItem.Click += OnAddFileClick;
+        ClearContextMenuItem.Click += OnClearContextClick;
     }
 
     private void OnIntentTextChanged(object sender, TextChangedEventArgs e)
@@ -197,6 +202,34 @@ public sealed partial class InputComposer : UserControl
     private void OnDisabledActionClick(object sender, RoutedEventArgs e)
     {
         ModelManagerRequested?.Invoke(this, EventArgs.Empty);
+    }
+
+    private async void OnAddPreviousOutputClick(object sender, RoutedEventArgs e)
+    {
+        await ShowNotImplementedDialog("Add Previous Output");
+    }
+
+    private void OnAddFileClick(object sender, RoutedEventArgs e)
+    {
+        AttachFileRequested?.Invoke(this, EventArgs.Empty);
+    }
+
+    private void OnClearContextClick(object sender, RoutedEventArgs e)
+    {
+        // Clear context logic - will reset context count
+        SetContextCount(0);
+    }
+
+    private async System.Threading.Tasks.Task ShowNotImplementedDialog(string feature)
+    {
+        var dialog = new ContentDialog
+        {
+            Title = "Coming Soon",
+            Content = $"{feature} will be available in a future update.",
+            CloseButtonText = "OK",
+            XamlRoot = this.XamlRoot
+        };
+        await dialog.ShowAsync();
     }
 
     private void UpdateUIForState()
