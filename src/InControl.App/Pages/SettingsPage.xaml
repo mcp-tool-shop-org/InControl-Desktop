@@ -11,7 +11,7 @@
         </Grid.RowDefinitions>
 
         <!-- Header -->
-        <Grid Grid.Row="0" Padding="24,16" Background="{ThemeResource SolidBackgroundFillColorBaseBrush}">
+        <Grid Grid.Row="0" Padding="{StaticResource PageHeaderPadding}" Background="{ThemeResource SolidBackgroundFillColorBaseBrush}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
@@ -20,24 +20,16 @@
 
             <Button x:Name="BackButton"
                     Grid.Column="0"
-                    Padding="8"
-                    Background="Transparent"
-                    BorderThickness="0"
-                    ToolTipService.ToolTip="Back (Escape)"
-                    VerticalAlignment="Center"
-                    Margin="0,0,12,0"
-                    AutomationProperties.Name="Go back"
-                    AccessKey="B">
-                <FontIcon Glyph="&#xE72B;" FontSize="16" />
+                    Style="{StaticResource PageBackButtonStyle}"
+                    VerticalAlignment="Center">
+                <FontIcon Glyph="&#xE72B;" FontSize="{StaticResource IconSizeMD}" />
             </Button>
 
             <StackPanel Grid.Column="1" VerticalAlignment="Center">
                 <TextBlock Text="Settings"
-                           Style="{StaticResource TitleTextBlockStyle}"
-                           AutomationProperties.HeadingLevel="Level1" />
+                           Style="{StaticResource PageTitleStyle}" />
                 <TextBlock Text="Configure InControl preferences"
-                           Style="{StaticResource CaptionTextBlockStyle}"
-                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                           Style="{StaticResource PageSubtitleStyle}" />
             </StackPanel>
 
             <!-- Search Box -->
@@ -52,19 +44,16 @@
         </Grid>
 
         <!-- Settings Content -->
-        <ScrollViewer Grid.Row="1" Padding="24">
-            <StackPanel Spacing="24" MaxWidth="800">
+        <ScrollViewer Grid.Row="1" Padding="{StaticResource PageContentPadding}">
+            <StackPanel Spacing="{StaticResource SectionSpacing}" MaxWidth="{StaticResource ContentMaxWidth}">
 
                 <!-- General Section -->
-                <StackPanel x:Name="GeneralSection" Spacing="8" Tag="theme light dark system startup launch minimize tray background">
+                <StackPanel x:Name="GeneralSection" Spacing="{StaticResource InlineSpacing}" Tag="theme light dark system startup launch minimize tray background">
                     <TextBlock Text="General"
-                               Style="{StaticResource SubtitleTextBlockStyle}"
-                               AutomationProperties.HeadingLevel="Level2" />
+                               Style="{StaticResource SectionHeaderStyle}" />
 
-                    <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                            CornerRadius="8"
-                            Padding="16">
-                        <StackPanel Spacing="16">
+                    <Border Style="{StaticResource CardBorderStyle}">
+                        <StackPanel Spacing="{StaticResource ItemSpacing}">
                             <!-- Theme -->
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -123,15 +112,12 @@
                 </StackPanel>
 
                 <!-- Models Section -->
-                <StackPanel x:Name="ModelsSection" Spacing="8" Tag="model default gpu cuda directml acceleration context length tokens">
+                <StackPanel x:Name="ModelsSection" Spacing="{StaticResource InlineSpacing}" Tag="model default gpu cuda directml acceleration context length tokens">
                     <TextBlock Text="Models"
-                               Style="{StaticResource SubtitleTextBlockStyle}"
-                               AutomationProperties.HeadingLevel="Level2" />
+                               Style="{StaticResource SectionHeaderStyle}" />
 
-                    <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                            CornerRadius="8"
-                            Padding="16">
-                        <StackPanel Spacing="16">
+                    <Border Style="{StaticResource CardBorderStyle}">
+                        <StackPanel Spacing="{StaticResource ItemSpacing}">
                             <!-- Default Model -->
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -195,15 +181,12 @@
                 </StackPanel>
 
                 <!-- Assistant Section -->
-                <StackPanel x:Name="AssistantSection" Spacing="8" Tag="assistant memory context sessions tool extensions">
+                <StackPanel x:Name="AssistantSection" Spacing="{StaticResource InlineSpacing}" Tag="assistant memory context sessions tool extensions">
                     <TextBlock Text="Assistant"
-                               Style="{StaticResource SubtitleTextBlockStyle}"
-                               AutomationProperties.HeadingLevel="Level2" />
+                               Style="{StaticResource SectionHeaderStyle}" />
 
-                    <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                            CornerRadius="8"
-                            Padding="16">
-                        <StackPanel Spacing="16">
+                    <Border Style="{StaticResource CardBorderStyle}">
+                        <StackPanel Spacing="{StaticResource ItemSpacing}">
                             <!-- Memory -->
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -240,15 +223,12 @@
                 </StackPanel>
 
                 <!-- Memory Section -->
-                <StackPanel x:Name="MemorySection" Spacing="8" Tag="memory storage location clear history data">
+                <StackPanel x:Name="MemorySection" Spacing="{StaticResource InlineSpacing}" Tag="memory storage location clear history data">
                     <TextBlock Text="Memory"
-                               Style="{StaticResource SubtitleTextBlockStyle}"
-                               AutomationProperties.HeadingLevel="Level2" />
+                               Style="{StaticResource SectionHeaderStyle}" />
 
-                    <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                            CornerRadius="8"
-                            Padding="16">
-                        <StackPanel Spacing="16">
+                    <Border Style="{StaticResource CardBorderStyle}">
+                        <StackPanel Spacing="{StaticResource ItemSpacing}">
                             <!-- Storage Location -->
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -286,15 +266,12 @@
                 </StackPanel>
 
                 <!-- Extensions Section -->
-                <StackPanel x:Name="ExtensionsSection" Spacing="8" Tag="extensions plugins tools integrations install">
+                <StackPanel x:Name="ExtensionsSection" Spacing="{StaticResource InlineSpacing}" Tag="extensions plugins tools integrations install">
                     <TextBlock Text="Extensions"
-                               Style="{StaticResource SubtitleTextBlockStyle}"
-                               AutomationProperties.HeadingLevel="Level2" />
+                               Style="{StaticResource SectionHeaderStyle}" />
 
-                    <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                            CornerRadius="8"
-                            Padding="16">
-                        <StackPanel Spacing="16">
+                    <Border Style="{StaticResource CardBorderStyle}">
+                        <StackPanel Spacing="{StaticResource ItemSpacing}">
                             <!-- Manage Extensions -->
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -319,15 +296,12 @@
                 </StackPanel>
 
                 <!-- Connectivity Section -->
-                <StackPanel x:Name="ConnectivitySection" Spacing="8" Tag="connectivity network offline policy connections internet">
+                <StackPanel x:Name="ConnectivitySection" Spacing="{StaticResource InlineSpacing}" Tag="connectivity network offline policy connections internet">
                     <TextBlock Text="Connectivity"
-                               Style="{StaticResource SubtitleTextBlockStyle}"
-                               AutomationProperties.HeadingLevel="Level2" />
+                               Style="{StaticResource SectionHeaderStyle}" />
 
-                    <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                            CornerRadius="8"
-                            Padding="16">
-                        <StackPanel Spacing="16">
+                    <Border Style="{StaticResource CardBorderStyle}">
+                        <StackPanel Spacing="{StaticResource ItemSpacing}">
                             <!-- Offline Mode -->
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -364,15 +338,12 @@
                 </StackPanel>
 
                 <!-- Updates Section -->
-                <StackPanel x:Name="UpdatesSection" Spacing="8" Tag="updates automatic version check download">
+                <StackPanel x:Name="UpdatesSection" Spacing="{StaticResource InlineSpacing}" Tag="updates automatic version check download">
                     <TextBlock Text="Updates"
-                               Style="{StaticResource SubtitleTextBlockStyle}"
-                               AutomationProperties.HeadingLevel="Level2" />
+                               Style="{StaticResource SectionHeaderStyle}" />
 
-                    <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                            CornerRadius="8"
-                            Padding="16">
-                        <StackPanel Spacing="16">
+                    <Border Style="{StaticResource CardBorderStyle}">
+                        <StackPanel Spacing="{StaticResource ItemSpacing}">
                             <!-- Auto Update -->
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -409,15 +380,12 @@
                 </StackPanel>
 
                 <!-- Diagnostics Section -->
-                <StackPanel x:Name="DiagnosticsSection" Spacing="8" Tag="diagnostics logs export reset defaults troubleshooting support">
+                <StackPanel x:Name="DiagnosticsSection" Spacing="{StaticResource InlineSpacing}" Tag="diagnostics logs export reset defaults troubleshooting support">
                     <TextBlock Text="Diagnostics"
-                               Style="{StaticResource SubtitleTextBlockStyle}"
-                               AutomationProperties.HeadingLevel="Level2" />
+                               Style="{StaticResource SectionHeaderStyle}" />
 
-                    <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                            CornerRadius="8"
-                            Padding="16">
-                        <StackPanel Spacing="16">
+                    <Border Style="{StaticResource CardBorderStyle}">
+                        <StackPanel Spacing="{StaticResource ItemSpacing}">
                             <!-- Export Logs -->
                             <Grid>
                                 <Grid.ColumnDefinitions>

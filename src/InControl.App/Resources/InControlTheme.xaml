@@ -145,7 +145,60 @@
         <Setter Property="CornerRadius" Value="{StaticResource RadiusSM}" />
     </Style>
 
+    <!-- =================== PAGE LAYOUT =================== -->
+
+    <!-- Standard page header padding (24px horizontal, 16px vertical) -->
+    <Thickness x:Key="PageHeaderPadding">24,16</Thickness>
+    <Thickness x:Key="PageContentPadding">24</Thickness>
+
+    <!-- Section spacing (vertical rhythm between sections) -->
+    <x:Double x:Key="SectionSpacing">24</x:Double>
+    <x:Double x:Key="ItemSpacing">16</x:Double>
+    <x:Double x:Key="InlineSpacing">8</x:Double>
+
+    <!-- Standard back button margin -->
+    <Thickness x:Key="BackButtonMargin">0,0,12,0</Thickness>
+
+    <!-- Card internal spacing -->
+    <Thickness x:Key="CardPadding">16</Thickness>
+    <x:Double x:Key="CardItemSpacing">16</x:Double>
+
     <!-- =================== SEMANTIC STYLES =================== -->
+
+    <!-- Page header title style -->
+    <Style x:Key="PageTitleStyle" TargetType="TextBlock" BasedOn="{StaticResource TitleTextBlockStyle}">
+        <Setter Property="AutomationProperties.HeadingLevel" Value="Level1" />
+    </Style>
+
+    <!-- Page subtitle/description style -->
+    <Style x:Key="PageSubtitleStyle" TargetType="TextBlock" BasedOn="{StaticResource CaptionTextBlockStyle}">
+        <Setter Property="Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}" />
+    </Style>
+
+    <!-- Section header style -->
+    <Style x:Key="SectionHeaderStyle" TargetType="TextBlock" BasedOn="{StaticResource SubtitleTextBlockStyle}">
+        <Setter Property="AutomationProperties.HeadingLevel" Value="Level2" />
+    </Style>
+
+    <!-- Page back button style -->
+    <Style x:Key="PageBackButtonStyle" TargetType="Button" BasedOn="{StaticResource GhostButtonStyle}">
+        <Setter Property="ToolTipService.ToolTip" Value="Back (Escape)" />
+        <Setter Property="Margin" Value="{StaticResource BackButtonMargin}" />
+        <Setter Property="AutomationProperties.Name" Value="Go back" />
+        <Setter Property="AccessKey" Value="B" />
+    </Style>
+
+    <!-- Status strip button style -->
+    <Style x:Key="StatusStripButtonStyle" TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
+        <Setter Property="Padding" Value="4,2" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+
+    <!-- AppBar icon button style -->
+    <Style x:Key="AppBarIconButtonStyle" TargetType="Button" BasedOn="{StaticResource GhostButtonStyle}">
+        <Setter Property="Padding" Value="8" />
+    </Style>
 
     <!-- Monospace text for code/technical content -->
     <Style x:Key="MonospaceTextStyle" TargetType="TextBlock" BasedOn="{StaticResource BodyTextBlockStyle}">

@@ -12,7 +12,7 @@
         </Grid.RowDefinitions>
 
         <!-- Header -->
-        <Grid Grid.Row="0" Padding="24,16" Background="{ThemeResource SolidBackgroundFillColorBaseBrush}">
+        <Grid Grid.Row="0" Padding="{StaticResource PageHeaderPadding}" Background="{ThemeResource SolidBackgroundFillColorBaseBrush}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
@@ -21,24 +21,16 @@
 
             <Button x:Name="BackButton"
                     Grid.Column="0"
-                    Padding="8"
-                    Background="Transparent"
-                    BorderThickness="0"
-                    ToolTipService.ToolTip="Back (Escape)"
-                    VerticalAlignment="Center"
-                    Margin="0,0,12,0"
-                    AutomationProperties.Name="Go back"
-                    AccessKey="B">
-                <FontIcon Glyph="&#xE72B;" FontSize="16" />
+                    Style="{StaticResource PageBackButtonStyle}"
+                    VerticalAlignment="Center">
+                <FontIcon Glyph="&#xE72B;" FontSize="{StaticResource IconSizeMD}" />
             </Button>
 
             <StackPanel Grid.Column="1" VerticalAlignment="Center">
                 <TextBlock Text="Model Manager"
-                           Style="{StaticResource TitleTextBlockStyle}"
-                           AutomationProperties.HeadingLevel="Level1" />
+                           Style="{StaticResource PageTitleStyle}" />
                 <TextBlock Text="Install, configure, and manage AI models"
-                           Style="{StaticResource CaptionTextBlockStyle}"
-                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                           Style="{StaticResource PageSubtitleStyle}" />
             </StackPanel>
 
             <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
@@ -62,7 +54,7 @@
         </Grid>
 
         <!-- Content Area -->
-        <Grid Grid.Row="1" Padding="24">
+        <Grid Grid.Row="1" Padding="{StaticResource PageContentPadding}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="320" />
@@ -82,7 +74,7 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="Installed Models"
-                               Style="{StaticResource SubtitleTextBlockStyle}"
+                               Style="{StaticResource SectionHeaderStyle}"
                                VerticalAlignment="Center" />
                     <TextBlock x:Name="ModelCountText"
                                Grid.Column="1"
@@ -212,17 +204,15 @@
 
             <!-- Info Panel (Right Side) -->
             <Border Grid.Column="1"
-                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                    CornerRadius="8"
+                    Style="{StaticResource CardBorderStyle}"
                     Padding="20">
                 <ScrollViewer>
                     <StackPanel Spacing="20">
 
                         <!-- Default Model Section -->
-                        <StackPanel Spacing="8">
+                        <StackPanel Spacing="{StaticResource InlineSpacing}">
                             <TextBlock Text="Default Model"
-                                       Style="{StaticResource SubtitleTextBlockStyle}"
-                                       AutomationProperties.HeadingLevel="Level2" />
+                                       Style="{StaticResource SectionHeaderStyle}" />
                             <TextBlock Text="Select a model to use for new sessions"
                                        Style="{StaticResource CaptionTextBlockStyle}"
                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
@@ -236,10 +226,9 @@
                         <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
 
                         <!-- GPU Info Section -->
-                        <StackPanel Spacing="8">
+                        <StackPanel Spacing="{StaticResource InlineSpacing}">
                             <TextBlock Text="GPU Status"
-                                       Style="{StaticResource SubtitleTextBlockStyle}"
-                                       AutomationProperties.HeadingLevel="Level2" />
+                                       Style="{StaticResource SectionHeaderStyle}" />
 
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -296,10 +285,9 @@
                         <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
 
                         <!-- Compatibility Info -->
-                        <StackPanel Spacing="8">
+                        <StackPanel Spacing="{StaticResource InlineSpacing}">
                             <TextBlock Text="Compatibility"
-                                       Style="{StaticResource SubtitleTextBlockStyle}"
-                                       AutomationProperties.HeadingLevel="Level2" />
+                                       Style="{StaticResource SectionHeaderStyle}" />
 
                             <InfoBar x:Name="CompatibilityInfo"
                                      IsOpen="True"
@@ -312,10 +300,9 @@
                         <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
 
                         <!-- VRAM Estimation -->
-                        <StackPanel Spacing="8">
+                        <StackPanel Spacing="{StaticResource InlineSpacing}">
                             <TextBlock Text="VRAM Estimation"
-                                       Style="{StaticResource SubtitleTextBlockStyle}"
-                                       AutomationProperties.HeadingLevel="Level2" />
+                                       Style="{StaticResource SectionHeaderStyle}" />
 
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -358,10 +345,9 @@
                         <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
 
                         <!-- Quick Actions -->
-                        <StackPanel Spacing="8">
+                        <StackPanel Spacing="{StaticResource InlineSpacing}">
                             <TextBlock Text="Quick Actions"
-                                       Style="{StaticResource SubtitleTextBlockStyle}"
-                                       AutomationProperties.HeadingLevel="Level2" />
+                                       Style="{StaticResource SectionHeaderStyle}" />
 
                             <Button x:Name="OpenModelsFolderButton"
                                     HorizontalAlignment="Stretch"
