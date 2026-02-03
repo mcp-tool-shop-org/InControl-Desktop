@@ -5,11 +5,8 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:InControl.App.Controls">
 
-    <Grid Padding="48"
-          MaxWidth="600"
-          HorizontalAlignment="Center"
-          VerticalAlignment="Center">
-        <StackPanel Spacing="32">
+    <ScrollViewer Padding="48" MaxWidth="700" HorizontalAlignment="Center">
+        <StackPanel Spacing="32" VerticalAlignment="Center">
             <!-- Greeting -->
             <StackPanel Spacing="8">
                 <TextBlock x:Name="GreetingText"
@@ -22,7 +19,172 @@
                            TextWrapping="Wrap" />
             </StackPanel>
 
-            <!-- Quick Actions -->
+            <!-- Quick Start Guide (shown for new users or when no model is loaded) -->
+            <Border x:Name="QuickStartPanel"
+                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    CornerRadius="12"
+                    Padding="24">
+                <StackPanel Spacing="20">
+                    <TextBlock Text="Quick Start"
+                               Style="{StaticResource SubtitleTextBlockStyle}" />
+
+                    <!-- Step 1: Choose a Model -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <Border Grid.Column="0"
+                                Width="36" Height="36"
+                                CornerRadius="18"
+                                Margin="0,0,16,0"
+                                VerticalAlignment="Top">
+                            <Border.Background>
+                                <SolidColorBrush x:Name="Step1Background" Color="#0078D4" />
+                            </Border.Background>
+                            <Grid>
+                                <TextBlock x:Name="Step1Number"
+                                           Text="1"
+                                           FontWeight="SemiBold"
+                                           Foreground="White"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center" />
+                                <FontIcon x:Name="Step1Check"
+                                          Glyph="&#xE73E;"
+                                          FontSize="16"
+                                          Foreground="White"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"
+                                          Visibility="Collapsed" />
+                            </Grid>
+                        </Border>
+
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock Text="Choose a model"
+                                       Style="{StaticResource BodyStrongTextBlockStyle}" />
+                            <TextBlock x:Name="Step1Description"
+                                       Text="Select or download an AI model to power your conversations."
+                                       Style="{StaticResource CaptionTextBlockStyle}"
+                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                       TextWrapping="Wrap" />
+                        </StackPanel>
+
+                        <Button Grid.Column="2"
+                                x:Name="OpenModelManagerButton"
+                                VerticalAlignment="Center"
+                                Click="OpenModelManagerButton_Click">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <FontIcon Glyph="&#xE950;" FontSize="14" />
+                                <TextBlock Text="Model Manager" />
+                            </StackPanel>
+                        </Button>
+                    </Grid>
+
+                    <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+
+                    <!-- Step 2: Create a Session -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <Border Grid.Column="0"
+                                Width="36" Height="36"
+                                CornerRadius="18"
+                                Margin="0,0,16,0"
+                                VerticalAlignment="Top">
+                            <Border.Background>
+                                <SolidColorBrush x:Name="Step2Background" Color="#888888" />
+                            </Border.Background>
+                            <Grid>
+                                <TextBlock x:Name="Step2Number"
+                                           Text="2"
+                                           FontWeight="SemiBold"
+                                           Foreground="White"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center" />
+                                <FontIcon x:Name="Step2Check"
+                                          Glyph="&#xE73E;"
+                                          FontSize="16"
+                                          Foreground="White"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"
+                                          Visibility="Collapsed" />
+                            </Grid>
+                        </Border>
+
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock Text="Create a session"
+                                       Style="{StaticResource BodyStrongTextBlockStyle}" />
+                            <TextBlock Text="Sessions organize your conversations. Start one with Ctrl+N."
+                                       Style="{StaticResource CaptionTextBlockStyle}"
+                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                       TextWrapping="Wrap" />
+                        </StackPanel>
+
+                        <Button Grid.Column="2"
+                                x:Name="QuickStartNewSessionButton"
+                                VerticalAlignment="Center"
+                                Click="NewSessionButton_Click">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <FontIcon Glyph="&#xE710;" FontSize="14" />
+                                <TextBlock Text="New Session" />
+                            </StackPanel>
+                        </Button>
+                    </Grid>
+
+                    <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+
+                    <!-- Step 3: Try a Prompt -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <Border Grid.Column="0"
+                                Width="36" Height="36"
+                                CornerRadius="18"
+                                Margin="0,0,16,0"
+                                VerticalAlignment="Top">
+                            <Border.Background>
+                                <SolidColorBrush x:Name="Step3Background" Color="#888888" />
+                            </Border.Background>
+                            <TextBlock Text="3"
+                                       FontWeight="SemiBold"
+                                       Foreground="White"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center" />
+                        </Border>
+
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock Text="Try a prompt"
+                                       Style="{StaticResource BodyStrongTextBlockStyle}" />
+                            <TextBlock Text="Type a message and press Ctrl+Enter to run it locally."
+                                       Style="{StaticResource CaptionTextBlockStyle}"
+                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                       TextWrapping="Wrap" />
+                        </StackPanel>
+
+                        <Button Grid.Column="2"
+                                x:Name="InsertExampleButton"
+                                VerticalAlignment="Center"
+                                Click="InsertExampleButton_Click">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <FontIcon Glyph="&#xE8C8;" FontSize="14" />
+                                <TextBlock Text="Try Example" />
+                            </StackPanel>
+                        </Button>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- Quick Actions (for returning users) -->
             <StackPanel Spacing="12">
                 <!-- Continue Session (shown if recent session exists) -->
                 <Button x:Name="ContinueButton"
@@ -63,7 +225,6 @@
                 <Button x:Name="NewSessionButton"
                         HorizontalAlignment="Stretch"
                         Padding="16"
-                        Style="{StaticResource AccentButtonStyle}"
                         Click="NewSessionButton_Click">
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -129,10 +290,22 @@
                                Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                 </StackPanel>
 
+                <!-- No Model Warning -->
+                <StackPanel x:Name="NoModelWarning"
+                            Orientation="Horizontal"
+                            Spacing="8">
+                    <FontIcon Glyph="&#xE7BA;"
+                              FontSize="12"
+                              Foreground="{ThemeResource SystemFillColorCautionBrush}" />
+                    <TextBlock Text="No model selected. Open Model Manager to get started."
+                               Style="{StaticResource CaptionTextBlockStyle}"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                </StackPanel>
+
                 <TextBlock Text="Everything runs locally on your machine."
                            Style="{StaticResource CaptionTextBlockStyle}"
                            Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
             </StackPanel>
         </StackPanel>
-    </Grid>
+    </ScrollViewer>
 </UserControl>
