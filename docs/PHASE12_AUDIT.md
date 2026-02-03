@@ -165,13 +165,37 @@
 ## Commit 06: Button Coverage Tests
 
 ### What Changed
-*(To be completed)*
+- Created `docs/BUTTON_COVERAGE_MATRIX.md`:
+  - 58 controls documented across 8 sections
+  - AppBar, StatusStrip, Settings, Model Manager, Help, Command Palette, Sidebar, Input
+  - Each control has expected result and test name
+  - Keyboard shortcuts included
+- Created `tests/InControl.UITests` project:
+  - xUnit test framework
+  - Structural tests for all button/control existence
+  - Tests organized by category (AppBar, StatusStrip, etc.)
+  - 30+ individual test cases
+
+### Coverage Summary
+| Section | Controls | Status |
+|---------|----------|--------|
+| AppBar | 8 | ✅ |
+| StatusStrip | 6 | ✅ |
+| Settings Page | 12 | ✅ |
+| Model Manager | 10 | ✅ |
+| Help Page | 4 | ✅ |
+| Command Palette | 10 | ✅ |
+| Session Sidebar | 4 | ✅ |
+| Input Composer | 4 | ✅ |
+| **Total** | **58** | ✅ |
 
 ### Test Evidence
-*(To be completed)*
+- All tests pass: `dotnet test tests/InControl.UITests`
+- Button matrix document complete
 
 ### Screenshots
-*(To be completed)*
+- `docs/phase12/screenshots/commit-06/button-matrix-doc.png`
+- `docs/phase12/screenshots/commit-06/test-output.png`
 
 ---
 
