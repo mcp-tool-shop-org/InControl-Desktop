@@ -1,5 +1,6 @@
 using FluentAssertions;
 using Volt.Core.Models;
+using Xunit;
 
 namespace Volt.Core.Tests.Models;
 

@@ -10,8 +10,7 @@
 
   <ItemGroup Label="MVVM">
     <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.0" />
-    <PackageVersion Include="CommunityToolkit.WinUI.Controls.SettingsControls" Version="8.2.250106" />
-    <PackageVersion Include="CommunityToolkit.WinUI.Controls.Markdown" Version="8.2.250106" />
+    <PackageVersion Include="CommunityToolkit.WinUI.Controls.SettingsControls" Version="8.2.250402" />
   </ItemGroup>
 
   <ItemGroup Label="Microsoft Extensions">
@@ -34,7 +33,7 @@
 
   <ItemGroup Label="Logging">
     <PackageVersion Include="Serilog" Version="4.2.0" />
-    <PackageVersion Include="Serilog.Extensions.Logging" Version="8.0.1" />
+    <PackageVersion Include="Serilog.Extensions.Logging" Version="9.0.0" />
     <PackageVersion Include="Serilog.Sinks.File" Version="6.0.0" />
     <PackageVersion Include="Serilog.Sinks.Console" Version="6.0.0" />
   </ItemGroup>

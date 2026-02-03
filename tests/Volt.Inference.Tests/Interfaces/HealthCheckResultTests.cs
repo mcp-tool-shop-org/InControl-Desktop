@@ -1,5 +1,6 @@
 using FluentAssertions;
 using Volt.Inference.Interfaces;
+using Xunit;
 
 namespace Volt.Inference.Tests.Interfaces;
 
