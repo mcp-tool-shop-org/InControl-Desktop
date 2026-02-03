@@ -124,8 +124,64 @@ jobs:
         run: |
           $exe = Get-Item ./publish-check/InControl.App.exe -ErrorAction SilentlyContinue
           if ($exe) {
-            Write-Host "✅ Executable created: $($exe.Name) ($([math]::Round($exe.Length / 1MB, 2)) MB)"
+            Write-Host "Executable created: $($exe.Name) ($([math]::Round($exe.Length / 1MB, 2)) MB)"
           } else {
-            Write-Error "❌ Executable not found"
+            Write-Error "Executable not found"
             exit 1
           }
+
+  proof-pack:
+    name: Generate Proof Pack
+    runs-on: windows-latest
+    needs: build-and-test
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Publish
+        run: |
+          dotnet publish src/InControl.App/InControl.App.csproj `
+            --configuration Release `
+            --runtime win-x64 `
+            --self-contained true `
+            --output ./publish
+
+      - name: Extract Version
+        id: version
+        shell: pwsh
+        run: |
+          [xml]$csproj = Get-Content src/InControl.App/InControl.App.csproj
+          $version = $csproj.Project.PropertyGroup.Version | Where-Object { $_ } | Select-Object -First 1
+          if (-not $version) { $version = "0.0.0-dev" }
+          echo "version=$version" >> $env:GITHUB_OUTPUT
+
+      - name: Generate Proof Pack
+        shell: pwsh
+        run: |
+          .\scripts\Generate-ProofPack.ps1 `
+            -OutputPath ./artifacts `
+            -Version ${{ steps.version.outputs.version }} `
+            -PublishPath ./publish `
+            -SolutionPath .
+
+      - name: Upload Proof Pack
+        uses: actions/upload-artifact@v4
+        with:
+          name: proof-pack-${{ steps.version.outputs.version }}
+          path: |
+            artifacts/proof-pack-*.zip
+            artifacts/proof-pack-*/*.json
+            artifacts/proof-pack-*/*.txt
+          retention-days: 30

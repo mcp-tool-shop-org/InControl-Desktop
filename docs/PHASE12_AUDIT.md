@@ -14,7 +14,7 @@
 | 06 - Button Coverage Tests | Pending | | |
 | 07 - Help Center → Troubleshooting | Complete | 2026-02-03 | [Screenshots](#commit-07) |
 | 08 - Light/Dark Theme Audit | Complete | 2026-02-03 | [Screenshots](#commit-08) |
-| 09 - Release Artifact Proof Pack | Pending | | |
+| 09 - Release Artifact Proof Pack | Complete | 2026-02-03 | [Screenshots](#commit-09) |
 | 10 - RC1 Cut + Beta Gate | Pending | | |
 
 ---
@@ -292,13 +292,35 @@
 ## Commit 09: Release Artifact Proof Pack
 
 ### What Changed
-*(To be completed)*
+- Created `scripts/Generate-ProofPack.ps1`:
+  - Generates SHA256 checksums for all published files
+  - Creates dependency manifest from all .csproj PackageReference items
+  - Captures git information (commit, branch, dirty status)
+  - Generates build provenance (machine, environment, timestamps)
+  - Creates file manifest with sizes and statistics
+  - Outputs ZIP archive for distribution
+- Updated `.github/workflows/ci.yml`:
+  - Added `proof-pack` job that runs on main branch
+  - Generates proof pack after successful build
+  - Uploads as artifact with 30-day retention
+
+### Proof Pack Contents
+| File | Description |
+|------|-------------|
+| `checksums-sha256.txt` | SHA256 hashes for all published files |
+| `dependencies.json` | NuGet package manifest |
+| `git-info.json` | Repository, commit, branch info |
+| `provenance.json` | Build environment and timestamps |
+| `file-manifest.json` | Complete file list with sizes |
 
 ### Test Evidence
-*(To be completed)*
+- Script runs locally without errors
+- CI workflow validates syntax
+- Artifact upload configured
 
 ### Screenshots
-*(To be completed)*
+- `docs/phase12/screenshots/commit-09/proof-pack-contents.png`
+- `docs/phase12/screenshots/commit-09/ci-proof-pack-job.png`
 
 ---
 
