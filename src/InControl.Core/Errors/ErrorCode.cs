@@ -52,5 +52,11 @@ public enum ErrorCode
     // Validation (500-599)
     ValidationFailed = 500,
     RequiredFieldMissing = 501,
-    ValueOutOfRange = 502
+    ValueOutOfRange = 502,
+
+    // Assistant Tools (600-699)
+    ToolExecutionFailed = 600,
+    ToolNotFound = 601,
+    ToolPermissionDenied = 602,
+    ToolParameterMissing = 603
 }
