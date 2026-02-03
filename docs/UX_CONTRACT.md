@@ -1,10 +1,10 @@
-# Volt UX Contract
+# InControl UX Contract
 
 **Version:** 1.0
 **Phase:** 3 — UX/UI & Human Experience
 **Theme:** Make power legible, calm, and trustworthy
 
-This document defines how Volt speaks, behaves, and presents itself. All UI text, states, and interactions must align with these principles.
+This document defines how InControl speaks, behaves, and presents itself. All UI text, states, and interactions must align with these principles.
 
 ---
 
@@ -18,7 +18,7 @@ An operator:
 - Manages sessions and artifacts
 - Expects transparency and control
 
-Volt is a **local execution environment**, not a chatbot.
+InControl is a **local execution environment**, not a chatbot.
 
 ---
 
@@ -221,9 +221,9 @@ Use relative time for recent, absolute for older:
 
 ---
 
-## What Volt Is Not
+## What InControl Is Not
 
-Volt does not:
+InControl does not:
 - Pretend to be human
 - Use first-person ("I think...", "I can help...")
 - Apologize or express emotions

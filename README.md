@@ -1,10 +1,10 @@
-# Volt
+# InControl
 
 **Local AI Chat Assistant for Windows**
 
 A privacy-first, GPU-accelerated chat application that runs large language models entirely on your machine. No cloud required.
 
-## Why Volt?
+## Why InControl?
 
 - **Private by default** - Your conversations never leave your computer
 - **RTX-optimized** - Built for NVIDIA GPUs with CUDA acceleration
@@ -25,29 +25,29 @@ A privacy-first, GPU-accelerated chat application that runs large language model
 
 ```bash
 # Clone and build
-git clone https://github.com/mcp-tool-shop-org/Volt.git
-cd Volt
+git clone https://github.com/mcp-tool-shop-org/InControl.git
+cd InControl
 dotnet build
 
 # Run (requires Ollama running locally)
-dotnet run --project src/Volt.App
+dotnet run --project src/InControl.App
 ```
 
 ## Architecture
 
-Volt follows a clean, layered architecture:
+InControl follows a clean, layered architecture:
 
 ```
 ┌─────────────────────────────────────────┐
-│            Volt.App (WinUI 3)           │  UI Layer
+│            InControl.App (WinUI 3)           │  UI Layer
 ├─────────────────────────────────────────┤
-│           Volt.ViewModels               │  Presentation
+│           InControl.ViewModels               │  Presentation
 ├─────────────────────────────────────────┤
-│           Volt.Services                 │  Business Logic
+│           InControl.Services                 │  Business Logic
 ├─────────────────────────────────────────┤
-│           Volt.Inference                │  LLM Backends
+│           InControl.Inference                │  LLM Backends
 ├─────────────────────────────────────────┤
-│           Volt.Core                     │  Shared Types
+│           InControl.Core                     │  Shared Types
 └─────────────────────────────────────────┘
 ```
 

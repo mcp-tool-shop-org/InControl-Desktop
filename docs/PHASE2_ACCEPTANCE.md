@@ -1,9 +1,9 @@
-# Volt — Phase 2 Acceptance Gates
+# InControl — Phase 2 Acceptance Gates
 
 **Phase 2 Theme: Execution integrity + user-visible trust**
 
-Phase 1 proved Volt is real.
-Phase 2 must prove Volt is safe to operate.
+Phase 1 proved InControl is real.
+Phase 2 must prove InControl is safe to operate.
 
 No new "big features."
 Only things that make the system reliable, inspectable, and bounded.
@@ -43,14 +43,14 @@ Only things that make the system reliable, inspectable, and bounded.
 
 **Verified: 2026-02-02**
 
-- **Build**: All projects compile (Volt.Core, Volt.Inference, Volt.Services, Volt.ViewModels, Volt.App + 3 test projects)
+- **Build**: All projects compile (InControl.Core, InControl.Inference, InControl.Services, InControl.ViewModels, InControl.App + 3 test projects)
 - **Tests**: 185 tests pass across 3 test projects
 - **Verify scripts**: `scripts/verify.ps1` and `scripts/verify.sh` clean, restore, build, and test
 - **Clean repo**: `.gitignore` properly excludes build artifacts
 
 ### Why This Gate Exists
 
-Volt cannot earn trust if it can't be rebuilt by a stranger.
+InControl cannot earn trust if it can't be rebuilt by a stranger.
 
 ---
 
@@ -73,13 +73,13 @@ Volt cannot earn trust if it can't be rebuilt by a stranger.
 
 | Project | Tests | Key Coverage Areas |
 |---------|-------|-------------------|
-| Volt.Core.Tests | 98 | Errors, State, Models, Serialization, Trust |
-| Volt.Services.Tests | 68 | Storage, Health (6 files, 42 tests) |
-| Volt.Inference.Tests | 19 | FakeInferenceClient, HealthCheckResult |
+| InControl.Core.Tests | 98 | Errors, State, Models, Serialization, Trust |
+| InControl.Services.Tests | 68 | Storage, Health (6 files, 42 tests) |
+| InControl.Inference.Tests | 19 | FakeInferenceClient, HealthCheckResult |
 
 Key tested areas:
 - Result<T> pattern with Map/Bind/Match operations
-- VoltError taxonomy (30+ error codes)
+- InControlError taxonomy (30+ error codes)
 - StateSerializer round-trip (Message, Conversation, AppState)
 - FileStore path boundary enforcement
 - HealthService probe aggregation
@@ -95,7 +95,7 @@ Phase 2 is where regressions start to matter.
 
 **Status:** ✅ PASSED
 
-**Goal:** Volt must not perform uncontrolled side effects.
+**Goal:** InControl must not perform uncontrolled side effects.
 
 ### Acceptance Criteria
 
@@ -109,12 +109,12 @@ Phase 2 is where regressions start to matter.
 
 **Verified: 2026-02-02**
 
-**FileStore (Volt.Services.Storage)**
+**FileStore (InControl.Services.Storage)**
 - Path validation rejects `..` traversal and absolute paths
 - All operations return `Result<T>` for safe error handling
 - Tests verify path blocking (9 boundary tests)
 
-**IInferenceClient (Volt.Inference.Interfaces)**
+**IInferenceClient (InControl.Inference.Interfaces)**
 - All network calls go through this interface
 - FakeInferenceClient provides complete test double
 - No direct HttpClient usage outside inference layer
@@ -129,7 +129,7 @@ This is what separates "app" from "safe system."
 
 **Status:** ✅ PASSED
 
-**Goal:** Volt state is predictable and inspectable.
+**Goal:** InControl state is predictable and inspectable.
 
 ### Acceptance Criteria
 
@@ -143,7 +143,7 @@ This is what separates "app" from "safe system."
 
 **Verified: 2026-02-02**
 
-**State Models (Volt.Core.State)**
+**State Models (InControl.Core.State)**
 - `AppState` — root container with `WithConversation()`, `WithUpdatedConversation()`, `WithoutConversation()`
 - `ModelSelectionState` — selected model, backend, available models
 - All use `required` properties and immutable collections
@@ -178,13 +178,13 @@ Debugging without state determinism is a dead end.
 
 **Verified: 2026-02-02**
 
-**Error Taxonomy (Volt.Core.Errors)**
+**Error Taxonomy (InControl.Core.Errors)**
 - `ErrorCode` enum with 30+ categorized codes
-- `VoltError` record with Code, Message, Detail, Suggestions, Severity
+- `InControlError` record with Code, Message, Detail, Suggestions, Severity
 - Factory methods: `ConnectionFailed`, `ModelNotFound`, `PathNotAllowed`, `Timeout`
 - `Result<T>` with Map/Bind/Match for monadic error handling
 
-**Health System (Volt.Services.Health)**
+**Health System (InControl.Services.Health)**
 - `IHealthCheck` interface with Name, Category, CheckAsync
 - `HealthProbeResult` with Healthy/Degraded/Unhealthy status
 - `HealthReport` aggregates probes with overall status
@@ -225,7 +225,7 @@ Most projects die here. This gate prevents that.
 
 **Status:** ✅ PASSED
 
-**Goal:** Users can tell Volt is behaving correctly.
+**Goal:** Users can tell InControl is behaving correctly.
 
 ### Acceptance Criteria
 
@@ -239,7 +239,7 @@ Most projects die here. This gate prevents that.
 
 **Verified: 2026-02-02**
 
-**Trust Infrastructure (Volt.Core.Trust)**
+**Trust Infrastructure (InControl.Core.Trust)**
 - `BuildInfo` — version, informational version, commit hash, build timestamp, configuration
 - `RuntimeInfo` — framework, OS, architecture, process details
 - `SecurityConfig` — path boundary enforced, inference isolated, telemetry enabled
@@ -262,7 +262,7 @@ Phase 2 is complete when:
 2. All **HUMAN-VERIFIED** gates are signed off ⏳
 3. No new features were added unless required to satisfy a gate ✅
 
-At that point, Volt becomes:
+At that point, InControl becomes:
 
 > **Operationally credible**
 >
@@ -294,7 +294,7 @@ At that point, Volt becomes:
 |---|--------|-------------|
 | 1 | verify scripts | `scripts/verify.ps1` and `scripts/verify.sh` for CI-like local runs |
 | 2 | coverage infrastructure | `scripts/coverage.ps1`, `scripts/coverage.sh`, tests/Directory.Build.props |
-| 3 | error taxonomy | `ErrorCode`, `VoltError`, `Result<T>` with Map/Bind/Match |
+| 3 | error taxonomy | `ErrorCode`, `InControlError`, `Result<T>` with Map/Bind/Match |
 | 4 | state model | `AppState`, `ModelSelectionState`, `StateSerializer` |
 | 5 | filesystem boundary | `IFileStore`, `FileStore` with path allowlist |
 | 6 | inference isolation | `FakeInferenceClient` for testing without network |
@@ -307,9 +307,9 @@ At that point, Volt becomes:
 
 | Project | Tests |
 |---------|-------|
-| Volt.Core.Tests | 98 |
-| Volt.Services.Tests | 68 |
-| Volt.Inference.Tests | 19 |
+| InControl.Core.Tests | 98 |
+| InControl.Services.Tests | 68 |
+| InControl.Inference.Tests | 19 |
 | **Total** | **185** |
 
 ---

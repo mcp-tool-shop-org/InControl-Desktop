@@ -1,8 +1,8 @@
-# Volt Architecture
+# InControl Architecture
 
 ## Overview
 
-Volt is a Windows desktop application for local LLM chat, built with WinUI 3 and designed for RTX GPUs. This document describes the architectural decisions and layer responsibilities.
+InControl is a Windows desktop application for local LLM chat, built with WinUI 3 and designed for RTX GPUs. This document describes the architectural decisions and layer responsibilities.
 
 ## Design Principles
 
@@ -17,7 +17,7 @@ Volt is a Windows desktop application for local LLM chat, built with WinUI 3 and
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                        Volt.App                             │
+│                        InControl.App                             │
 │  WinUI 3 Application Host                                   │
 │  - App.xaml / MainWindow                                    │
 │  - DI Container Setup                                       │
@@ -26,7 +26,7 @@ Volt is a Windows desktop application for local LLM chat, built with WinUI 3 and
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                     Volt.ViewModels                         │
+│                     InControl.ViewModels                         │
 │  MVVM Presentation Layer                                    │
 │  - ChatViewModel                                            │
 │  - SettingsViewModel                                        │
@@ -35,7 +35,7 @@ Volt is a Windows desktop application for local LLM chat, built with WinUI 3 and
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                      Volt.Services                          │
+│                      InControl.Services                          │
 │  Business Logic & Orchestration                             │
 │  - IChatService / ChatService                               │
 │  - IFileStore / FileStore (path boundaries)                 │
@@ -44,7 +44,7 @@ Volt is a Windows desktop application for local LLM chat, built with WinUI 3 and
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                     Volt.Inference                          │
+│                     InControl.Inference                          │
 │  LLM Backend Abstraction                                    │
 │  - IInferenceClient (abstraction)                           │
 │  - FakeInferenceClient (testing)                            │
@@ -53,10 +53,10 @@ Volt is a Windows desktop application for local LLM chat, built with WinUI 3 and
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                        Volt.Core                            │
+│                        InControl.Core                            │
 │  Shared Types & Contracts                                   │
 │  - Message, Conversation, AppState (immutable)              │
-│  - VoltError, Result<T> (error handling)                    │
+│  - InControlError, Result<T> (error handling)                    │
 │  - BuildInfo, TrustReport (trust signals)                   │
 │  - StateSerializer (deterministic JSON)                     │
 └─────────────────────────────────────────────────────────────┘
@@ -65,42 +65,42 @@ Volt is a Windows desktop application for local LLM chat, built with WinUI 3 and
 ## Project Structure
 
 ```
-Volt/
+InControl/
 ├── src/
-│   ├── Volt.App/                 # WinUI 3 Application
+│   ├── InControl.App/                 # WinUI 3 Application
 │   │   ├── App.xaml(.cs)
 │   │   ├── MainWindow.xaml(.cs)
 │   │   ├── Views/
 │   │   ├── Controls/
-│   │   └── Volt.App.csproj
+│   │   └── InControl.App.csproj
 │   │
-│   ├── Volt.ViewModels/          # MVVM ViewModels
+│   ├── InControl.ViewModels/          # MVVM ViewModels
 │   │   ├── ChatViewModel.cs
 │   │   ├── SettingsViewModel.cs
-│   │   └── Volt.ViewModels.csproj
+│   │   └── InControl.ViewModels.csproj
 │   │
-│   ├── Volt.Services/            # Business Logic
+│   ├── InControl.Services/            # Business Logic
 │   │   ├── Interfaces/
 │   │   ├── Storage/              # IFileStore, FileStore
 │   │   ├── Health/               # IHealthCheck, HealthService
-│   │   └── Volt.Services.csproj
+│   │   └── InControl.Services.csproj
 │   │
-│   ├── Volt.Inference/           # LLM Backends
+│   ├── InControl.Inference/           # LLM Backends
 │   │   ├── Interfaces/
 │   │   ├── Fakes/                # FakeInferenceClient
-│   │   └── Volt.Inference.csproj
+│   │   └── InControl.Inference.csproj
 │   │
-│   └── Volt.Core/                # Shared Types
+│   └── InControl.Core/                # Shared Types
 │       ├── Models/               # Message, Conversation, etc.
-│       ├── Errors/               # VoltError, Result<T>
+│       ├── Errors/               # InControlError, Result<T>
 │       ├── State/                # AppState, StateSerializer
 │       ├── Trust/                # BuildInfo, TrustReport
-│       └── Volt.Core.csproj
+│       └── InControl.Core.csproj
 │
 ├── tests/
-│   ├── Volt.Core.Tests/          # 98 tests
-│   ├── Volt.Services.Tests/      # 68 tests
-│   └── Volt.Inference.Tests/     # 19 tests
+│   ├── InControl.Core.Tests/          # 98 tests
+│   ├── InControl.Services.Tests/      # 68 tests
+│   └── InControl.Inference.Tests/     # 19 tests
 │
 ├── scripts/
 │   ├── verify.ps1                # CI-like verification (Windows)
@@ -114,7 +114,7 @@ Volt/
 │
 ├── Directory.Build.props         # Shared MSBuild properties
 ├── Directory.Packages.props      # Central package management
-├── Volt.sln
+├── InControl.sln
 ├── LICENSE                       # MIT License
 └── README.md
 ```
@@ -122,16 +122,16 @@ Volt/
 ## Dependency Flow
 
 ```
-Volt.App ──────► Volt.ViewModels
+InControl.App ──────► InControl.ViewModels
     │                 │
     │                 ▼
-    │           Volt.Services
+    │           InControl.Services
     │                 │
     │                 ▼
-    └──────────► Volt.Inference
+    └──────────► InControl.Inference
                       │
                       ▼
-                 Volt.Core ◄────── (all projects reference)
+                 InControl.Core ◄────── (all projects reference)
 ```
 
 ## Key Abstractions
@@ -179,11 +179,11 @@ public readonly struct Result<T>
     public bool IsSuccess { get; }
     public bool IsFailure { get; }
     public T? Value { get; }
-    public VoltError? Error { get; }
+    public InControlError? Error { get; }
 
     public Result<TNew> Map<TNew>(Func<T, TNew> mapper);
     public Result<TNew> Bind<TNew>(Func<T, Result<TNew>> binder);
-    public TResult Match<TResult>(Func<T, TResult> onSuccess, Func<VoltError, TResult> onFailure);
+    public TResult Match<TResult>(Func<T, TResult> onSuccess, Func<InControlError, TResult> onFailure);
 }
 ```
 
@@ -204,15 +204,15 @@ public interface IHealthCheck
 
 Phase 2 introduced structured error handling:
 
-1. **VoltError** - Immutable error record with code, message, suggestions
+1. **InControlError** - Immutable error record with code, message, suggestions
 2. **Result<T>** - Either success value or error (no exceptions for expected failures)
 3. **ErrorCode** - 30+ categorized error codes
 4. **ErrorSeverity** - Info, Warning, Error, Critical
 
 Error flow:
-- Volt.Inference returns `Result<T>` from operations
-- Volt.Services uses `Map`/`Bind` for composition
-- Volt.ViewModels uses `Match` for UI presentation
+- InControl.Inference returns `Result<T>` from operations
+- InControl.Services uses `Map`/`Bind` for composition
+- InControl.ViewModels uses `Match` for UI presentation
 - Exceptions reserved for truly exceptional conditions
 
 ## State Management
@@ -304,7 +304,7 @@ These interfaces allow future extension without architectural changes:
 
 ## Non-Goals
 
-These are explicitly not goals for Volt:
+These are explicitly not goals for InControl:
 
 - Cross-platform support (Windows App SDK is Windows-only)
 - Web interface (desktop-first design)
