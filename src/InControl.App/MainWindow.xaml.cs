@@ -2,6 +2,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using InControl.App.Pages;
+using InControl.App.Services;
 
 namespace InControl.App;
 
@@ -18,8 +19,19 @@ public sealed partial class MainWindow : Window
     {
         InitializeComponent();
         SetupWindow();
+        InitializeTheme();
         SetupEventHandlers();
         InitializeStatusStrip();
+    }
+
+    private void InitializeTheme()
+    {
+        // Initialize theme service with the root content element
+        if (this.Content is FrameworkElement rootElement)
+        {
+            // Load saved theme preference (default to System)
+            ThemeService.Instance.Initialize(rootElement, "System");
+        }
     }
 
     private void SetupWindow()

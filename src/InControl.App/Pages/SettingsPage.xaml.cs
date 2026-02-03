@@ -1,5 +1,6 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using InControl.App.Services;
 
 namespace InControl.App.Pages;
 
@@ -14,6 +15,13 @@ public sealed partial class SettingsPage : UserControl
     {
         this.InitializeComponent();
         SetupEventHandlers();
+        InitializeThemeComboBox();
+    }
+
+    private void InitializeThemeComboBox()
+    {
+        // Set initial selection based on current theme
+        ThemeComboBox.SelectedIndex = ThemeService.Instance.GetThemeIndex();
     }
 
     /// <summary>
@@ -36,6 +44,11 @@ public sealed partial class SettingsPage : UserControl
     /// </summary>
     public event EventHandler? PolicyRequested;
 
+    /// <summary>
+    /// Event raised when theme changes.
+    /// </summary>
+    public event EventHandler<string>? ThemeChanged;
+
     private void SetupEventHandlers()
     {
         BackButton.Click += (s, e) => BackRequested?.Invoke(this, EventArgs.Empty);
@@ -43,8 +56,17 @@ public sealed partial class SettingsPage : UserControl
         OpenExtensionsButton.Click += (s, e) => ExtensionsRequested?.Invoke(this, EventArgs.Empty);
         OpenPolicyButton.Click += (s, e) => PolicyRequested?.Invoke(this, EventArgs.Empty);
 
+        // Theme selection
+        ThemeComboBox.SelectionChanged += OnThemeSelectionChanged;
+
         // Settings search functionality
         SettingsSearch.TextChanged += OnSearchTextChanged;
+    }
+
+    private void OnThemeSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        ThemeService.Instance.SetThemeFromIndex(ThemeComboBox.SelectedIndex);
+        ThemeChanged?.Invoke(this, ThemeService.Instance.CurrentThemeString);
     }
 
     private void OnSearchTextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)

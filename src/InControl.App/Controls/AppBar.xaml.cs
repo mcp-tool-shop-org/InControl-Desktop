@@ -2,6 +2,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using InControl.Core.UX;
+using InControl.App.Services;
 
 namespace InControl.App.Controls;
 
@@ -138,12 +139,17 @@ public sealed partial class AppBar : UserControl
         CancelButton.Click += OnCancelClick;
         SearchButton.Click += OnSearchClick;
         ModelManagerButton.Click += OnModelManagerClick;
+        ThemeToggleButton.Click += OnThemeToggleClick;
         SettingsButton.Click += OnSettingsClick;
         AssistantButton.Click += OnAssistantClick;
         ExtensionsButton.Click += OnExtensionsClick;
         PolicyButton.Click += OnPolicyClick;
         ConnectivityButton.Click += OnConnectivityClick;
         HelpButton.Click += OnHelpClick;
+
+        // Subscribe to theme changes
+        ThemeService.Instance.ThemeChanged += OnThemeChanged;
+        UpdateThemeIcon();
     }
 
     private void UpdateStatusDisplay()
@@ -240,6 +246,25 @@ public sealed partial class AppBar : UserControl
     private void OnHelpClick(object sender, RoutedEventArgs e)
     {
         HelpRequested?.Invoke(this, EventArgs.Empty);
+    }
+
+    private void OnThemeToggleClick(object sender, RoutedEventArgs e)
+    {
+        ThemeService.Instance.ToggleTheme();
+    }
+
+    private void OnThemeChanged(object? sender, ElementTheme theme)
+    {
+        UpdateThemeIcon();
+    }
+
+    private void UpdateThemeIcon()
+    {
+        ThemeIcon.Glyph = ThemeService.Instance.GetThemeIcon();
+
+        // Update tooltip to show current state
+        var themeText = ThemeService.Instance.CurrentThemeString;
+        ToolTipService.SetToolTip(ThemeToggleButton, $"Toggle theme (current: {themeText})");
     }
 
     #endregion

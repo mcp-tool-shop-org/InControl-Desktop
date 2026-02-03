@@ -71,7 +71,7 @@
                                                Style="{StaticResource CaptionTextBlockStyle}"
                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                 </StackPanel>
-                                <ComboBox Grid.Column="1" SelectedIndex="2" MinWidth="150">
+                                <ComboBox Grid.Column="1" x:Name="ThemeComboBox" SelectedIndex="2" MinWidth="150">
                                     <ComboBoxItem Content="Light" />
                                     <ComboBoxItem Content="Dark" />
                                     <ComboBoxItem Content="System" />

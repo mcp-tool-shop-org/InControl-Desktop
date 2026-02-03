@@ -144,6 +144,15 @@
                     Margin="0,0,12,0"
                     VerticalAlignment="Center">
 
+            <!-- Theme Toggle Button -->
+            <Button x:Name="ThemeToggleButton"
+                    Padding="8"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    ToolTipService.ToolTip="Toggle theme">
+                <FontIcon x:Name="ThemeIcon" Glyph="&#xE706;" FontSize="16" />
+            </Button>
+
             <!-- Settings Button -->
             <Button x:Name="SettingsButton"
                     Padding="8"
