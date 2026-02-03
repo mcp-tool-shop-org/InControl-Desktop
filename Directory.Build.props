@@ -10,12 +10,21 @@
     <AnalysisLevel>latest</AnalysisLevel>
   </PropertyGroup>
 
+  <!-- Version: SemVer 2.0 -->
+  <PropertyGroup>
+    <VersionPrefix>0.4.0</VersionPrefix>
+    <VersionSuffix Condition="'$(VersionSuffix)' == ''">alpha</VersionSuffix>
+    <AssemblyVersion>0.4.0.0</AssemblyVersion>
+    <FileVersion>0.4.0.0</FileVersion>
+    <InformationalVersion>0.4.0-alpha</InformationalVersion>
+  </PropertyGroup>
+
   <PropertyGroup>
     <Authors>mcp-tool-shop</Authors>
     <Company>mcp-tool-shop-org</Company>
-    <Product>Volt</Product>
-    <Copyright>Copyright (c) 2026 mcp-tool-shop-org</Copyright>
-    <RepositoryUrl>https://github.com/mcp-tool-shop-org/Volt</RepositoryUrl>
+    <Product>InControl</Product>
+    <Copyright>Copyright (c) 2025 mcp-tool-shop-org</Copyright>
+    <RepositoryUrl>https://github.com/mcp-tool-shop-org/InControl-Desktop</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 

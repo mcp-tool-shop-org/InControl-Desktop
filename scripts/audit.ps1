@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Phase 2 audit harness for Volt.
+    Phase 2 audit harness for InControl.
 .DESCRIPTION
     Verifies all Phase 2 acceptance gates are satisfied.
     Runs build, tests, coverage, and validates architecture.
@@ -79,9 +79,9 @@ function Test-Gate2-TestCoverage {
     Write-Gate "tests/Directory.Build.props exists" $testsBuildProps "Coverlet configuration"
 
     # Count tests
-    $coreTests = (Get-ChildItem -Path "tests/Volt.Core.Tests" -Filter "*.cs" -Recurse | Select-String -Pattern "\[Fact\]" | Measure-Object).Count
-    $servicesTests = (Get-ChildItem -Path "tests/Volt.Services.Tests" -Filter "*.cs" -Recurse | Select-String -Pattern "\[Fact\]" | Measure-Object).Count
-    $inferenceTests = (Get-ChildItem -Path "tests/Volt.Inference.Tests" -Filter "*.cs" -Recurse | Select-String -Pattern "\[Fact\]" | Measure-Object).Count
+    $coreTests = (Get-ChildItem -Path "tests/InControl.Core.Tests" -Filter "*.cs" -Recurse | Select-String -Pattern "\[Fact\]" | Measure-Object).Count
+    $servicesTests = (Get-ChildItem -Path "tests/InControl.Services.Tests" -Filter "*.cs" -Recurse | Select-String -Pattern "\[Fact\]" | Measure-Object).Count
+    $inferenceTests = (Get-ChildItem -Path "tests/InControl.Inference.Tests" -Filter "*.cs" -Recurse | Select-String -Pattern "\[Fact\]" | Measure-Object).Count
     $totalTests = $coreTests + $servicesTests + $inferenceTests
 
     Write-Gate "Substantial test coverage" ($totalTests -ge 100) "Found $totalTests tests (Core=$coreTests, Services=$servicesTests, Inference=$inferenceTests)"
@@ -91,22 +91,22 @@ function Test-Gate3-ExecutionBoundary {
     Write-Host "`n=== Gate 3: Execution Boundary Enforcement ===" -ForegroundColor Cyan
 
     # Check IFileStore exists
-    $fileStoreInterface = Test-Path "src/Volt.Services/Storage/IFileStore.cs"
+    $fileStoreInterface = Test-Path "src/InControl.Services/Storage/IFileStore.cs"
     Write-Gate "IFileStore interface exists" $fileStoreInterface "Path boundary abstraction"
 
     # Check FileStore implementation
-    $fileStoreImpl = Test-Path "src/Volt.Services/Storage/FileStore.cs"
+    $fileStoreImpl = Test-Path "src/InControl.Services/Storage/FileStore.cs"
     Write-Gate "FileStore implementation exists" $fileStoreImpl "Path boundary enforcement"
 
     # Check path validation in FileStore
     if ($fileStoreImpl) {
-        $fileStoreContent = Get-Content "src/Volt.Services/Storage/FileStore.cs" -Raw
+        $fileStoreContent = Get-Content "src/InControl.Services/Storage/FileStore.cs" -Raw
         $hasPathValidation = $fileStoreContent -match "\.\..*PathNotAllowed|IsPathAllowed"
         Write-Gate "Path traversal blocked" $hasPathValidation "Validates paths contain no .."
     }
 
     # Check FakeInferenceClient exists
-    $fakeClient = Test-Path "src/Volt.Inference/Fakes/FakeInferenceClient.cs"
+    $fakeClient = Test-Path "src/InControl.Inference/Fakes/FakeInferenceClient.cs"
     Write-Gate "FakeInferenceClient exists" $fakeClient "Testing without network"
 }
 
@@ -114,20 +114,20 @@ function Test-Gate4-DeterministicState {
     Write-Host "`n=== Gate 4: Deterministic State & Persistence ===" -ForegroundColor Cyan
 
     # Check AppState exists
-    $appState = Test-Path "src/Volt.Core/State/AppState.cs"
+    $appState = Test-Path "src/InControl.Core/State/AppState.cs"
     Write-Gate "AppState exists" $appState "Root state container"
 
     # Check StateSerializer exists
-    $serializer = Test-Path "src/Volt.Core/State/StateSerializer.cs"
+    $serializer = Test-Path "src/InControl.Core/State/StateSerializer.cs"
     Write-Gate "StateSerializer exists" $serializer "Deterministic JSON"
 
     # Check serialization tests
-    $serializationTests = Test-Path "tests/Volt.Core.Tests/State/SerializationTests.cs"
+    $serializationTests = Test-Path "tests/InControl.Core.Tests/State/SerializationTests.cs"
     Write-Gate "Serialization tests exist" $serializationTests "Round-trip verification"
 
     # Check immutability (sealed record pattern)
     if ($appState) {
-        $appStateContent = Get-Content "src/Volt.Core/State/AppState.cs" -Raw
+        $appStateContent = Get-Content "src/InControl.Core/State/AppState.cs" -Raw
         $isImmutable = $appStateContent -match "sealed record.*AppState"
         Write-Gate "AppState is immutable" $isImmutable "sealed record pattern"
     }
@@ -136,30 +136,30 @@ function Test-Gate4-DeterministicState {
 function Test-Gate5-HealthAndErrors {
     Write-Host "`n=== Gate 5: Health, Errors, and Failure Clarity ===" -ForegroundColor Cyan
 
-    # Check VoltError exists
-    $voltError = Test-Path "src/Volt.Core/Errors/VoltError.cs"
-    Write-Gate "VoltError exists" $voltError "Structured error type"
+    # Check InControlError exists
+    $voltError = Test-Path "src/InControl.Core/Errors/InControlError.cs"
+    Write-Gate "InControlError exists" $voltError "Structured error type"
 
     # Check Result<T> exists
-    $result = Test-Path "src/Volt.Core/Errors/Result.cs"
+    $result = Test-Path "src/InControl.Core/Errors/Result.cs"
     Write-Gate "Result<T> exists" $result "Monadic error handling"
 
     # Check ErrorCode enum
-    $errorCode = Test-Path "src/Volt.Core/Errors/ErrorCode.cs"
+    $errorCode = Test-Path "src/InControl.Core/Errors/ErrorCode.cs"
     Write-Gate "ErrorCode enum exists" $errorCode "Error taxonomy"
 
     # Check IHealthCheck exists
-    $healthCheck = Test-Path "src/Volt.Services/Health/IHealthCheck.cs"
+    $healthCheck = Test-Path "src/InControl.Services/Health/IHealthCheck.cs"
     Write-Gate "IHealthCheck exists" $healthCheck "Health probe interface"
 
     # Check HealthService exists
-    $healthService = Test-Path "src/Volt.Services/Health/HealthService.cs"
+    $healthService = Test-Path "src/InControl.Services/Health/HealthService.cs"
     Write-Gate "HealthService exists" $healthService "Probe aggregation"
 
     # Check health checks
-    $inferenceHealth = Test-Path "src/Volt.Services/Health/InferenceHealthCheck.cs"
-    $storageHealth = Test-Path "src/Volt.Services/Health/StorageHealthCheck.cs"
-    $appHealth = Test-Path "src/Volt.Services/Health/AppHealthCheck.cs"
+    $inferenceHealth = Test-Path "src/InControl.Services/Health/InferenceHealthCheck.cs"
+    $storageHealth = Test-Path "src/InControl.Services/Health/StorageHealthCheck.cs"
+    $appHealth = Test-Path "src/InControl.Services/Health/AppHealthCheck.cs"
     Write-Gate "Concrete health checks exist" ($inferenceHealth -and $storageHealth -and $appHealth) "Inference, Storage, App"
 }
 
@@ -192,22 +192,22 @@ function Test-Gate7-TrustSignals {
     Write-Host "`n=== Gate 7: User-Visible Trust Signals ===" -ForegroundColor Cyan
 
     # Check BuildInfo exists
-    $buildInfo = Test-Path "src/Volt.Core/Trust/BuildInfo.cs"
+    $buildInfo = Test-Path "src/InControl.Core/Trust/BuildInfo.cs"
     Write-Gate "BuildInfo exists" $buildInfo "Version and commit info"
 
     # Check TrustReport exists
-    $trustReport = Test-Path "src/Volt.Core/Trust/TrustReport.cs"
+    $trustReport = Test-Path "src/InControl.Core/Trust/TrustReport.cs"
     Write-Gate "TrustReport exists" $trustReport "Self-audit capability"
 
     # Check trust tests
-    $buildInfoTests = Test-Path "tests/Volt.Core.Tests/Trust/BuildInfoTests.cs"
-    $trustReportTests = Test-Path "tests/Volt.Core.Tests/Trust/TrustReportTests.cs"
+    $buildInfoTests = Test-Path "tests/InControl.Core.Tests/Trust/BuildInfoTests.cs"
+    $trustReportTests = Test-Path "tests/InControl.Core.Tests/Trust/TrustReportTests.cs"
     Write-Gate "Trust tests exist" ($buildInfoTests -and $trustReportTests) "Verification tests"
 }
 
 # Main execution
 Write-Host "============================================" -ForegroundColor Cyan
-Write-Host "       Volt Phase 2 Audit Harness          " -ForegroundColor Cyan
+Write-Host "       InControl Phase 2 Audit Harness          " -ForegroundColor Cyan
 Write-Host "============================================" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "Running from: $(Get-Location)"

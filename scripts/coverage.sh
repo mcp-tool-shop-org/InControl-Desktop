@@ -54,7 +54,7 @@ fail() {
 }
 
 # Header
-echo -e "\n${YELLOW}Volt Coverage Script${NC}"
+echo -e "\n${YELLOW}InControl Coverage Script${NC}"
 echo -e "${YELLOW}====================${NC}"
 
 # Clean previous coverage
@@ -113,7 +113,7 @@ reportgenerator \
     "-reports:$REPORTS_PATTERN" \
     "-targetdir:$REPORT_DIR" \
     "-reporttypes:Html;TextSummary;Cobertura" \
-    "-title:Volt Coverage Report"
+    "-title:InControl Coverage Report"
 
 if [ $? -eq 0 ]; then
     pass "Report generated at: $REPORT_DIR/index.html"

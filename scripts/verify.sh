@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Verifies Volt builds and tests cleanly from a fresh clone.
+# Verifies InControl builds and tests cleanly from a fresh clone.
 #
 # Usage: ./scripts/verify.sh [--skip-tests]
 #
@@ -41,7 +41,7 @@ fail() {
 }
 
 # Header
-echo -e "\n${YELLOW}Volt Verification Script${NC}"
+echo -e "\n${YELLOW}InControl Verification Script${NC}"
 echo -e "${YELLOW}========================${NC}"
 
 # Step 1: Environment

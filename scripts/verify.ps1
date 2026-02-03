@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Verifies Volt builds and tests cleanly from a fresh clone.
+    Verifies InControl builds and tests cleanly from a fresh clone.
 
 .DESCRIPTION
     This script runs the complete build and test pipeline to ensure
@@ -36,7 +36,7 @@ function Write-Failure {
 }
 
 # Header
-Write-Host "`nVolt Verification Script" -ForegroundColor Yellow
+Write-Host "`nInControl Verification Script" -ForegroundColor Yellow
 Write-Host "========================" -ForegroundColor Yellow
 
 # Step 1: Environment info

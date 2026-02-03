@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Phase 2 audit harness for Volt.
+# Phase 2 audit harness for InControl.
 # Verifies all Phase 2 acceptance gates are satisfied.
 #
 
@@ -83,9 +83,9 @@ test_gate2_test_coverage() {
     write_gate "tests/Directory.Build.props exists" "$tests_build_props" "Coverlet configuration"
 
     # Count tests
-    core_tests=$(grep -r "\[Fact\]" tests/Volt.Core.Tests --include="*.cs" 2>/dev/null | wc -l || echo 0)
-    services_tests=$(grep -r "\[Fact\]" tests/Volt.Services.Tests --include="*.cs" 2>/dev/null | wc -l || echo 0)
-    inference_tests=$(grep -r "\[Fact\]" tests/Volt.Inference.Tests --include="*.cs" 2>/dev/null | wc -l || echo 0)
+    core_tests=$(grep -r "\[Fact\]" tests/InControl.Core.Tests --include="*.cs" 2>/dev/null | wc -l || echo 0)
+    services_tests=$(grep -r "\[Fact\]" tests/InControl.Services.Tests --include="*.cs" 2>/dev/null | wc -l || echo 0)
+    inference_tests=$(grep -r "\[Fact\]" tests/InControl.Inference.Tests --include="*.cs" 2>/dev/null | wc -l || echo 0)
     total_tests=$((core_tests + services_tests + inference_tests))
 
     write_gate "Substantial test coverage" $([ "$total_tests" -ge 100 ] && echo "true" || echo "false") "Found $total_tests tests (Core=$core_tests, Services=$services_tests, Inference=$inference_tests)"
@@ -95,21 +95,21 @@ test_gate3_execution_boundary() {
     echo -e "\n${CYAN}=== Gate 3: Execution Boundary Enforcement ===${NC}"
 
     # Check IFileStore exists
-    file_store_interface=$([ -f "src/Volt.Services/Storage/IFileStore.cs" ] && echo "true" || echo "false")
+    file_store_interface=$([ -f "src/InControl.Services/Storage/IFileStore.cs" ] && echo "true" || echo "false")
     write_gate "IFileStore interface exists" "$file_store_interface" "Path boundary abstraction"
 
     # Check FileStore implementation
-    file_store_impl=$([ -f "src/Volt.Services/Storage/FileStore.cs" ] && echo "true" || echo "false")
+    file_store_impl=$([ -f "src/InControl.Services/Storage/FileStore.cs" ] && echo "true" || echo "false")
     write_gate "FileStore implementation exists" "$file_store_impl" "Path boundary enforcement"
 
     # Check path validation in FileStore
     if [ "$file_store_impl" = "true" ]; then
-        has_path_validation=$(grep -E "\.\.|PathNotAllowed|IsPathAllowed" src/Volt.Services/Storage/FileStore.cs 2>/dev/null && echo "true" || echo "false")
+        has_path_validation=$(grep -E "\.\.|PathNotAllowed|IsPathAllowed" src/InControl.Services/Storage/FileStore.cs 2>/dev/null && echo "true" || echo "false")
         write_gate "Path traversal blocked" "$has_path_validation" "Validates paths contain no .."
     fi
 
     # Check FakeInferenceClient exists
-    fake_client=$([ -f "src/Volt.Inference/Fakes/FakeInferenceClient.cs" ] && echo "true" || echo "false")
+    fake_client=$([ -f "src/InControl.Inference/Fakes/FakeInferenceClient.cs" ] && echo "true" || echo "false")
     write_gate "FakeInferenceClient exists" "$fake_client" "Testing without network"
 }
 
@@ -117,20 +117,20 @@ test_gate4_deterministic_state() {
     echo -e "\n${CYAN}=== Gate 4: Deterministic State & Persistence ===${NC}"
 
     # Check AppState exists
-    app_state=$([ -f "src/Volt.Core/State/AppState.cs" ] && echo "true" || echo "false")
+    app_state=$([ -f "src/InControl.Core/State/AppState.cs" ] && echo "true" || echo "false")
     write_gate "AppState exists" "$app_state" "Root state container"
 
     # Check StateSerializer exists
-    serializer=$([ -f "src/Volt.Core/State/StateSerializer.cs" ] && echo "true" || echo "false")
+    serializer=$([ -f "src/InControl.Core/State/StateSerializer.cs" ] && echo "true" || echo "false")
     write_gate "StateSerializer exists" "$serializer" "Deterministic JSON"
 
     # Check serialization tests
-    serialization_tests=$([ -f "tests/Volt.Core.Tests/State/SerializationTests.cs" ] && echo "true" || echo "false")
+    serialization_tests=$([ -f "tests/InControl.Core.Tests/State/SerializationTests.cs" ] && echo "true" || echo "false")
     write_gate "Serialization tests exist" "$serialization_tests" "Round-trip verification"
 
     # Check immutability (sealed record pattern)
     if [ "$app_state" = "true" ]; then
-        is_immutable=$(grep -E "sealed record.*AppState" src/Volt.Core/State/AppState.cs 2>/dev/null && echo "true" || echo "false")
+        is_immutable=$(grep -E "sealed record.*AppState" src/InControl.Core/State/AppState.cs 2>/dev/null && echo "true" || echo "false")
         write_gate "AppState is immutable" "$is_immutable" "sealed record pattern"
     fi
 }
@@ -138,30 +138,30 @@ test_gate4_deterministic_state() {
 test_gate5_health_and_errors() {
     echo -e "\n${CYAN}=== Gate 5: Health, Errors, and Failure Clarity ===${NC}"
 
-    # Check VoltError exists
-    volt_error=$([ -f "src/Volt.Core/Errors/VoltError.cs" ] && echo "true" || echo "false")
-    write_gate "VoltError exists" "$volt_error" "Structured error type"
+    # Check InControlError exists
+    volt_error=$([ -f "src/InControl.Core/Errors/InControlError.cs" ] && echo "true" || echo "false")
+    write_gate "InControlError exists" "$volt_error" "Structured error type"
 
     # Check Result<T> exists
-    result=$([ -f "src/Volt.Core/Errors/Result.cs" ] && echo "true" || echo "false")
+    result=$([ -f "src/InControl.Core/Errors/Result.cs" ] && echo "true" || echo "false")
     write_gate "Result<T> exists" "$result" "Monadic error handling"
 
     # Check ErrorCode enum
-    error_code=$([ -f "src/Volt.Core/Errors/ErrorCode.cs" ] && echo "true" || echo "false")
+    error_code=$([ -f "src/InControl.Core/Errors/ErrorCode.cs" ] && echo "true" || echo "false")
     write_gate "ErrorCode enum exists" "$error_code" "Error taxonomy"
 
     # Check IHealthCheck exists
-    health_check=$([ -f "src/Volt.Services/Health/IHealthCheck.cs" ] && echo "true" || echo "false")
+    health_check=$([ -f "src/InControl.Services/Health/IHealthCheck.cs" ] && echo "true" || echo "false")
     write_gate "IHealthCheck exists" "$health_check" "Health probe interface"
 
     # Check HealthService exists
-    health_service=$([ -f "src/Volt.Services/Health/HealthService.cs" ] && echo "true" || echo "false")
+    health_service=$([ -f "src/InControl.Services/Health/HealthService.cs" ] && echo "true" || echo "false")
     write_gate "HealthService exists" "$health_service" "Probe aggregation"
 
     # Check health checks
-    inference_health=$([ -f "src/Volt.Services/Health/InferenceHealthCheck.cs" ] && echo "true" || echo "false")
-    storage_health=$([ -f "src/Volt.Services/Health/StorageHealthCheck.cs" ] && echo "true" || echo "false")
-    app_health=$([ -f "src/Volt.Services/Health/AppHealthCheck.cs" ] && echo "true" || echo "false")
+    inference_health=$([ -f "src/InControl.Services/Health/InferenceHealthCheck.cs" ] && echo "true" || echo "false")
+    storage_health=$([ -f "src/InControl.Services/Health/StorageHealthCheck.cs" ] && echo "true" || echo "false")
+    app_health=$([ -f "src/InControl.Services/Health/AppHealthCheck.cs" ] && echo "true" || echo "false")
     all_health=$([ "$inference_health" = "true" ] && [ "$storage_health" = "true" ] && [ "$app_health" = "true" ] && echo "true" || echo "false")
     write_gate "Concrete health checks exist" "$all_health" "Inference, Storage, App"
 }
@@ -194,23 +194,23 @@ test_gate7_trust_signals() {
     echo -e "\n${CYAN}=== Gate 7: User-Visible Trust Signals ===${NC}"
 
     # Check BuildInfo exists
-    build_info=$([ -f "src/Volt.Core/Trust/BuildInfo.cs" ] && echo "true" || echo "false")
+    build_info=$([ -f "src/InControl.Core/Trust/BuildInfo.cs" ] && echo "true" || echo "false")
     write_gate "BuildInfo exists" "$build_info" "Version and commit info"
 
     # Check TrustReport exists
-    trust_report=$([ -f "src/Volt.Core/Trust/TrustReport.cs" ] && echo "true" || echo "false")
+    trust_report=$([ -f "src/InControl.Core/Trust/TrustReport.cs" ] && echo "true" || echo "false")
     write_gate "TrustReport exists" "$trust_report" "Self-audit capability"
 
     # Check trust tests
-    build_info_tests=$([ -f "tests/Volt.Core.Tests/Trust/BuildInfoTests.cs" ] && echo "true" || echo "false")
-    trust_report_tests=$([ -f "tests/Volt.Core.Tests/Trust/TrustReportTests.cs" ] && echo "true" || echo "false")
+    build_info_tests=$([ -f "tests/InControl.Core.Tests/Trust/BuildInfoTests.cs" ] && echo "true" || echo "false")
+    trust_report_tests=$([ -f "tests/InControl.Core.Tests/Trust/TrustReportTests.cs" ] && echo "true" || echo "false")
     all_trust_tests=$([ "$build_info_tests" = "true" ] && [ "$trust_report_tests" = "true" ] && echo "true" || echo "false")
     write_gate "Trust tests exist" "$all_trust_tests" "Verification tests"
 }
 
 # Main execution
 echo -e "${CYAN}============================================${NC}"
-echo -e "${CYAN}       Volt Phase 2 Audit Harness          ${NC}"
+echo -e "${CYAN}       InControl Phase 2 Audit Harness          ${NC}"
 echo -e "${CYAN}============================================${NC}"
 echo ""
 echo "Running from: $(pwd)"

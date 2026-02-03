@@ -49,7 +49,7 @@ function Write-Failure {
 }
 
 # Header
-Write-Host "`nVolt Coverage Script" -ForegroundColor Yellow
+Write-Host "`nInControl Coverage Script" -ForegroundColor Yellow
 Write-Host "====================" -ForegroundColor Yellow
 
 # Clean previous coverage
@@ -114,7 +114,7 @@ reportgenerator `
     "-reports:$coveragePattern" `
     "-targetdir:$reportDir" `
     "-reporttypes:Html;TextSummary;Cobertura" `
-    "-title:Volt Coverage Report"
+    "-title:InControl Coverage Report"
 
 if ($LASTEXITCODE -eq 0) {
     Write-Success "Report generated at: $reportDir\index.html"
@@ -127,7 +127,7 @@ Write-Step "Coverage Summary"
 $summaryFile = Join-Path $reportDir "Summary.txt"
 if (Test-Path $summaryFile) {
     Get-Content $summaryFile | ForEach-Object {
-        if ($_ -match "Line coverage|Volt\.") {
+        if ($_ -match "Line coverage|InControl\.") {
             Write-Host $_ -ForegroundColor White
         } else {
             Write-Host $_
