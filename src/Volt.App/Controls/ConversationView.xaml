@@ -61,12 +61,53 @@
             <!-- Message List (shown when session has messages) -->
             <ScrollViewer x:Name="MessageScrollViewer"
                           Visibility="Collapsed">
-                <ItemsControl x:Name="MessageList"
-                              Padding="24"
-                              MaxWidth="{StaticResource MessageMaxWidth}"
-                              HorizontalAlignment="Center">
-                    <!-- Messages will be populated dynamically -->
-                </ItemsControl>
+                <Grid>
+                    <!-- Execution Status Bar (shown during runs) -->
+                    <Border x:Name="ExecutionStatusBar"
+                            VerticalAlignment="Top"
+                            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                            BorderThickness="0,0,0,1"
+                            Padding="16,8"
+                            Visibility="Collapsed">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <ProgressRing Grid.Column="0"
+                                          IsActive="True"
+                                          Width="16"
+                                          Height="16" />
+
+                            <TextBlock Grid.Column="1"
+                                       x:Name="ExecutionStatusText"
+                                       Text="Running inference..."
+                                       Margin="12,0,0,0"
+                                       VerticalAlignment="Center" />
+
+                            <TextBlock Grid.Column="2"
+                                       x:Name="ElapsedTimeText"
+                                       Style="{StaticResource CaptionTextBlockStyle}"
+                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                       VerticalAlignment="Center" />
+                        </Grid>
+                    </Border>
+
+                    <!-- Message Items -->
+                    <ItemsControl x:Name="MessageList"
+                                  Padding="24"
+                                  MaxWidth="{StaticResource MessageMaxWidth}"
+                                  HorizontalAlignment="Center">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <local:MessageCard Message="{Binding}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Grid>
             </ScrollViewer>
         </Grid>
 
