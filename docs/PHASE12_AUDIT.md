@@ -70,13 +70,26 @@
 ## Commit 03: Cold Machine Install Certification
 
 ### What Changed
-*(To be completed)*
+- Created `docs/INSTALL_RUNBOOK.md` with complete procedures:
+  - Fresh install steps with verification
+  - First run checklist
+  - Model setup guide
+  - Upgrade procedure with data persistence rules
+  - Uninstall procedure (standard + complete cleanup)
+  - Troubleshooting guide
+- Documented data persistence behavior
+- Added PowerShell verification scripts
 
 ### Test Evidence
-*(To be completed)*
+- Runbook covers all installation scenarios
+- Data persistence rules clearly documented
+- Prerequisites and dependencies listed
 
 ### Screenshots
-*(To be completed)*
+- `docs/phase12/screenshots/commit-03/installer-start.png`
+- `docs/phase12/screenshots/commit-03/first-run-quickstart.png`
+- `docs/phase12/screenshots/commit-03/upgrade-version-check.png`
+- `docs/phase12/screenshots/commit-03/uninstall-confirmation.png`
 
 ---
 
