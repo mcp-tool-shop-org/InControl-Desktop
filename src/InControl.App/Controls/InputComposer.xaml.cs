@@ -164,6 +164,9 @@ public sealed partial class InputComposer : UserControl
         AddPreviousOutputMenuItem.Click += OnAddPreviousOutputClick;
         AddFileMenuItem.Click += OnAddFileClick;
         ClearContextMenuItem.Click += OnClearContextClick;
+
+        // Initial tooltip state
+        UpdateTooltips();
     }
 
     private void OnIntentTextChanged(object sender, TextChangedEventArgs e)
@@ -316,6 +319,50 @@ public sealed partial class InputComposer : UserControl
         {
             DisabledBanner.Visibility = Visibility.Collapsed;
             KeyboardHint.Visibility = Visibility.Visible;
+        }
+
+        // Update tooltips to reflect current state
+        UpdateTooltips();
+    }
+
+    private void UpdateTooltips()
+    {
+        // Update Run button tooltip based on enabled state
+        if (RunButton.IsEnabled)
+        {
+            ToolTipService.SetToolTip(RunButton, "Run inference (Ctrl+Enter)");
+        }
+        else
+        {
+            var hasModel = ModelSelector.SelectedItem != null;
+            var hasText = !string.IsNullOrWhiteSpace(IntentInput.Text);
+
+            if (_isOfflineBlocked)
+            {
+                ToolTipService.SetToolTip(RunButton, "Blocked by connectivity policy");
+            }
+            else if (!hasModel)
+            {
+                ToolTipService.SetToolTip(RunButton, "Select a model to enable");
+            }
+            else if (!hasText)
+            {
+                ToolTipService.SetToolTip(RunButton, "Type a prompt to enable");
+            }
+            else
+            {
+                ToolTipService.SetToolTip(RunButton, "Waiting for current operation");
+            }
+        }
+
+        // Update Clear Context tooltip based on enabled state
+        if (ClearContextMenuItem.IsEnabled)
+        {
+            ToolTipService.SetToolTip(ClearContextMenuItem, "Remove all context items");
+        }
+        else
+        {
+            ToolTipService.SetToolTip(ClearContextMenuItem, "No context items to clear");
         }
     }
 

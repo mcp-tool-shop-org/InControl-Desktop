@@ -95,7 +95,8 @@
                                 <MenuFlyoutItem x:Name="ClearContextMenuItem"
                                                 Text="Clear all context"
                                                 Icon="Delete"
-                                                IsEnabled="False" />
+                                                IsEnabled="False"
+                                                ToolTipService.ToolTip="No context items to clear" />
                             </MenuFlyout>
                         </Button.Flyout>
                     </Button>
@@ -203,7 +204,7 @@
 
                     <!-- Run Button -->
                     <Button x:Name="RunButton"
-                            
+                            ToolTipService.ToolTip="Select a model to enable"
                             IsEnabled="False">
                         <StackPanel Orientation="Horizontal" Spacing="6">
                             <FontIcon Glyph="&#xE768;" FontSize="14" />
