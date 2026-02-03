@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window
+    x:Class="Volt.App.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Volt.App"
+    Title="Volt">
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="{StaticResource SidebarWidth}" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Sidebar placeholder -->
+        <Border Grid.Column="0"
+                Background="{ThemeResource LayerFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
+                BorderThickness="0,0,1,0">
+            <StackPanel Padding="16" Spacing="8">
+                <TextBlock Text="Volt"
+                           Style="{StaticResource TitleTextBlockStyle}"
+                           Margin="0,0,0,16" />
+
+                <Button Content="New Chat"
+                        HorizontalAlignment="Stretch"
+                        Style="{StaticResource AccentButtonStyle}" />
+
+                <TextBlock Text="Conversations"
+                           Style="{StaticResource CaptionTextBlockStyle}"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                           Margin="0,16,0,8" />
+
+                <TextBlock Text="No conversations yet"
+                           Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                           TextWrapping="Wrap" />
+            </StackPanel>
+        </Border>
+
+        <!-- Main content placeholder -->
+        <Grid Grid.Column="1"
+              Background="{ThemeResource SolidBackgroundFillColorBaseBrush}">
+            <StackPanel HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Spacing="16">
+                <FontIcon Glyph="&#xE8BD;"
+                          FontSize="48"
+                          Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+
+                <TextBlock Text="Welcome to Volt"
+                           Style="{StaticResource SubtitleTextBlockStyle}"
+                           HorizontalAlignment="Center" />
+
+                <TextBlock Text="Start a new conversation or select one from the sidebar"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                           HorizontalAlignment="Center" />
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>
