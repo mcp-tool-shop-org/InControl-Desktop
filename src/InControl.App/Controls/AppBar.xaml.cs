@@ -6,17 +6,71 @@ using InControl.Core.UX;
 namespace InControl.App.Controls;
 
 /// <summary>
-/// Top application bar with app name, model selector, status capsule, and global search.
+/// Top application bar with app name, model selector, status capsule, global search, and control bar.
+/// Provides one-click access to all major subsystems.
 /// </summary>
 public sealed partial class AppBar : UserControl
 {
     private ExecutionState _executionState = ExecutionState.Idle;
+    private string? _selectedModel;
+    private bool _isOffline;
 
     public AppBar()
     {
         this.InitializeComponent();
-        CancelButton.Click += OnCancelClick;
+        SetupEventHandlers();
     }
+
+    #region Events
+
+    /// <summary>
+    /// Event raised when cancel is requested.
+    /// </summary>
+    public event EventHandler? CancelRequested;
+
+    /// <summary>
+    /// Event raised when command palette (Ctrl+K) is requested.
+    /// </summary>
+    public event EventHandler? CommandPaletteRequested;
+
+    /// <summary>
+    /// Event raised when Model Manager should be opened.
+    /// </summary>
+    public event EventHandler? ModelManagerRequested;
+
+    /// <summary>
+    /// Event raised when Settings should be opened.
+    /// </summary>
+    public event EventHandler? SettingsRequested;
+
+    /// <summary>
+    /// Event raised when Assistant panel should be opened.
+    /// </summary>
+    public event EventHandler? AssistantRequested;
+
+    /// <summary>
+    /// Event raised when Extensions panel should be opened.
+    /// </summary>
+    public event EventHandler? ExtensionsRequested;
+
+    /// <summary>
+    /// Event raised when Policy panel should be opened.
+    /// </summary>
+    public event EventHandler? PolicyRequested;
+
+    /// <summary>
+    /// Event raised when Connectivity panel should be opened.
+    /// </summary>
+    public event EventHandler? ConnectivityRequested;
+
+    /// <summary>
+    /// Event raised when Help should be opened.
+    /// </summary>
+    public event EventHandler? HelpRequested;
+
+    #endregion
+
+    #region Properties
 
     /// <summary>
     /// The current execution state.
@@ -35,30 +89,37 @@ public sealed partial class AppBar : UserControl
     }
 
     /// <summary>
-    /// Event raised when cancel is requested.
+    /// Gets the currently selected model.
     /// </summary>
-    public event EventHandler? CancelRequested;
+    public string? SelectedModel => _selectedModel;
 
     /// <summary>
-    /// Sets the available models in the selector.
+    /// Gets or sets whether the app is in offline mode.
     /// </summary>
-    public void SetAvailableModels(IEnumerable<string> models)
+    public bool IsOffline
     {
-        ModelSelector.Items.Clear();
-        foreach (var model in models)
+        get => _isOffline;
+        set
         {
-            ModelSelector.Items.Add(model);
-        }
-        if (ModelSelector.Items.Count > 0)
-        {
-            ModelSelector.SelectedIndex = 0;
+            _isOffline = value;
+            UpdateConnectivityIcon();
         }
     }
 
+    #endregion
+
+    #region Public Methods
+
     /// <summary>
-    /// Gets the currently selected model.
+    /// Sets the selected model display.
     /// </summary>
-    public string? SelectedModel => ModelSelector.SelectedItem as string;
+    public void SetSelectedModel(string? modelName)
+    {
+        _selectedModel = modelName;
+        ModelDisplayText.Text = string.IsNullOrEmpty(modelName)
+            ? "Open Model Manager..."
+            : modelName;
+    }
 
     /// <summary>
     /// Updates the elapsed time display.
@@ -66,6 +127,23 @@ public sealed partial class AppBar : UserControl
     public void UpdateElapsedTime(string elapsedTimeText)
     {
         ElapsedTimeText.Text = elapsedTimeText;
+    }
+
+    #endregion
+
+    #region Private Methods
+
+    private void SetupEventHandlers()
+    {
+        CancelButton.Click += OnCancelClick;
+        SearchButton.Click += OnSearchClick;
+        ModelManagerButton.Click += OnModelManagerClick;
+        SettingsButton.Click += OnSettingsClick;
+        AssistantButton.Click += OnAssistantClick;
+        ExtensionsButton.Click += OnExtensionsClick;
+        PolicyButton.Click += OnPolicyClick;
+        ConnectivityButton.Click += OnConnectivityClick;
+        HelpButton.Click += OnHelpClick;
     }
 
     private void UpdateStatusDisplay()
@@ -93,6 +171,12 @@ public sealed partial class AppBar : UserControl
         }
     }
 
+    private void UpdateConnectivityIcon()
+    {
+        // E701 = Globe (online), E8CD = Airplane (offline)
+        ConnectivityIcon.Glyph = _isOffline ? "\uE8CD" : "\uE701";
+    }
+
     private Brush GetStatusBrush(ExecutionState state)
     {
         var resourceKey = state switch
@@ -109,8 +193,54 @@ public sealed partial class AppBar : UserControl
         return new SolidColorBrush(Microsoft.UI.Colors.Green);
     }
 
+    #endregion
+
+    #region Event Handlers
+
     private void OnCancelClick(object sender, RoutedEventArgs e)
     {
         CancelRequested?.Invoke(this, EventArgs.Empty);
     }
+
+    private void OnSearchClick(object sender, RoutedEventArgs e)
+    {
+        CommandPaletteRequested?.Invoke(this, EventArgs.Empty);
+    }
+
+    private void OnModelManagerClick(object sender, RoutedEventArgs e)
+    {
+        ModelManagerRequested?.Invoke(this, EventArgs.Empty);
+    }
+
+    private void OnSettingsClick(object sender, RoutedEventArgs e)
+    {
+        SettingsRequested?.Invoke(this, EventArgs.Empty);
+    }
+
+    private void OnAssistantClick(object sender, RoutedEventArgs e)
+    {
+        AssistantRequested?.Invoke(this, EventArgs.Empty);
+    }
+
+    private void OnExtensionsClick(object sender, RoutedEventArgs e)
+    {
+        ExtensionsRequested?.Invoke(this, EventArgs.Empty);
+    }
+
+    private void OnPolicyClick(object sender, RoutedEventArgs e)
+    {
+        PolicyRequested?.Invoke(this, EventArgs.Empty);
+    }
+
+    private void OnConnectivityClick(object sender, RoutedEventArgs e)
+    {
+        ConnectivityRequested?.Invoke(this, EventArgs.Empty);
+    }
+
+    private void OnHelpClick(object sender, RoutedEventArgs e)
+    {
+        HelpRequested?.Invoke(this, EventArgs.Empty);
+    }
+
+    #endregion
 }

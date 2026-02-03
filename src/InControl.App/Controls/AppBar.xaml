@@ -11,6 +11,7 @@
           BorderThickness="0,0,0,1">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="Auto" />
@@ -23,22 +24,30 @@
                    VerticalAlignment="Center"
                    Margin="16,0,24,0" />
 
-        <!-- Model Selector -->
-        <ComboBox Grid.Column="1"
-                  x:Name="ModelSelector"
-                  PlaceholderText="Select model"
-                  VerticalAlignment="Center"
-                  MinWidth="200"
-                  MaxWidth="300">
-            <!-- Models will be populated dynamically -->
-        </ComboBox>
+        <!-- Model Selector (now opens Model Manager) -->
+        <Button Grid.Column="1"
+                x:Name="ModelManagerButton"
+                VerticalAlignment="Center"
+                MinWidth="200"
+                HorizontalContentAlignment="Left"
+                ToolTipService.ToolTip="Open Model Manager">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <FontIcon Glyph="&#xE950;" FontSize="14" />
+                <TextBlock x:Name="ModelDisplayText"
+                           Text="Open Model Manager..."
+                           VerticalAlignment="Center" />
+                <FontIcon Glyph="&#xE70D;" FontSize="10"
+                          Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+            </StackPanel>
+        </Button>
 
-        <!-- Status Capsule -->
+        <!-- Status Capsule (center) -->
         <Border Grid.Column="2"
                 x:Name="StatusCapsule"
                 CornerRadius="4"
                 Padding="12,4"
                 VerticalAlignment="Center"
+                HorizontalAlignment="Left"
                 Margin="16,0"
                 Background="{ThemeResource SubtleFillColorSecondaryBrush}">
             <Grid>
@@ -105,12 +114,12 @@
             </Grid>
         </Border>
 
-        <!-- Global Search (Ctrl+K placeholder) -->
+        <!-- Global Search (Ctrl+K) -->
         <Button Grid.Column="3"
                 x:Name="SearchButton"
                 VerticalAlignment="Center"
-                Margin="0,0,16,0"
-                ToolTipService.ToolTip="Search (Ctrl+K)">
+                Margin="0,0,8,0"
+                ToolTipService.ToolTip="Command Palette (Ctrl+K)">
             <StackPanel Orientation="Horizontal" Spacing="8">
                 <FontIcon Glyph="&#xE721;" FontSize="14" />
                 <TextBlock Text="Search"
@@ -123,6 +132,77 @@
                                Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
                 </Border>
             </StackPanel>
+            <Button.KeyboardAccelerators>
+                <KeyboardAccelerator Key="K" Modifiers="Control" />
+            </Button.KeyboardAccelerators>
         </Button>
+
+        <!-- Global Control Bar (Right Side) -->
+        <StackPanel Grid.Column="4"
+                    Orientation="Horizontal"
+                    Spacing="2"
+                    Margin="0,0,12,0"
+                    VerticalAlignment="Center">
+
+            <!-- Settings Button -->
+            <Button x:Name="SettingsButton"
+                    Padding="8"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    ToolTipService.ToolTip="Settings (Ctrl+,)">
+                <FontIcon Glyph="&#xE713;" FontSize="16" />
+                <Button.KeyboardAccelerators>
+                    <KeyboardAccelerator Key="Number9" Modifiers="Control" />
+                </Button.KeyboardAccelerators>
+            </Button>
+
+            <!-- Assistant Button -->
+            <Button x:Name="AssistantButton"
+                    Padding="8"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    ToolTipService.ToolTip="Assistant">
+                <FontIcon Glyph="&#xE99A;" FontSize="16" />
+            </Button>
+
+            <!-- Extensions Button -->
+            <Button x:Name="ExtensionsButton"
+                    Padding="8"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    ToolTipService.ToolTip="Extensions">
+                <FontIcon Glyph="&#xEA86;" FontSize="16" />
+            </Button>
+
+            <!-- Policy Button -->
+            <Button x:Name="PolicyButton"
+                    Padding="8"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    ToolTipService.ToolTip="Policy &amp; Governance">
+                <FontIcon Glyph="&#xE72E;" FontSize="16" />
+            </Button>
+
+            <!-- Connectivity Button -->
+            <Button x:Name="ConnectivityButton"
+                    Padding="8"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    ToolTipService.ToolTip="Connectivity">
+                <FontIcon x:Name="ConnectivityIcon" Glyph="&#xE701;" FontSize="16" />
+            </Button>
+
+            <!-- Help Button -->
+            <Button x:Name="HelpButton"
+                    Padding="8"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    ToolTipService.ToolTip="Help (F1)">
+                <FontIcon Glyph="&#xE897;" FontSize="16" />
+                <Button.KeyboardAccelerators>
+                    <KeyboardAccelerator Key="F1" />
+                </Button.KeyboardAccelerators>
+            </Button>
+        </StackPanel>
     </Grid>
 </UserControl>
