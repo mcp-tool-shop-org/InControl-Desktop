@@ -32,6 +32,7 @@ public sealed partial class MessageCard : UserControl
             var dataPackage = new DataPackage();
             dataPackage.SetText(Message.Content);
             Clipboard.SetContent(dataPackage);
+            CopyFeedback.ShowCopied();
         }
     }
 
@@ -43,6 +44,7 @@ public sealed partial class MessageCard : UserControl
             var dataPackage = new DataPackage();
             dataPackage.SetText(Message.Content);
             Clipboard.SetContent(dataPackage);
+            CopyFeedback.ShowSuccess("Copied as Markdown");
         }
     }
 

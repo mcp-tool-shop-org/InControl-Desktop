@@ -73,6 +73,13 @@
     <!-- Streaming state: subtle pulse indicator -->
     <SolidColorBrush x:Key="StreamingIndicatorBrush" Color="{ThemeResource SystemAccentColor}" Opacity="0.6" />
 
+    <!-- =================== FEEDBACK COLORS =================== -->
+    <!-- Success feedback backgrounds -->
+    <SolidColorBrush x:Key="SuccessFeedbackBackground" Color="{ThemeResource SystemFillColorSuccessBackground}" />
+    <SolidColorBrush x:Key="ErrorFeedbackBackground" Color="{ThemeResource SystemFillColorCriticalBackground}" />
+    <SolidColorBrush x:Key="WarningFeedbackBackground" Color="{ThemeResource SystemFillColorCautionBackground}" />
+    <SolidColorBrush x:Key="InfoFeedbackBackground" Color="{ThemeResource SubtleFillColorSecondary}" />
+
     <!-- =================== TYPOGRAPHY =================== -->
     <x:Double x:Key="FontSizeCaption">12</x:Double>
     <x:Double x:Key="FontSizeBody">14</x:Double>

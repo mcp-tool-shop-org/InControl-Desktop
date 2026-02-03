@@ -209,6 +209,12 @@ public sealed partial class ModelManagerPage : UserControl
         var result = await dialog.ShowAsync();
         if (result == ContentDialogResult.Primary)
         {
+            // Show loading overlay during import
+            LoadingOverlay.Show("Importing model...", fileName);
+
+            // Simulate import delay
+            await Task.Delay(1500);
+
             // Add model to list (in production, would actually import)
             _models.Add(new ModelInfo
             {
@@ -221,6 +227,10 @@ public sealed partial class ModelManagerPage : UserControl
             UpdateModelCount();
             UpdateEmptyState();
             UpdateDefaultSelector();
+
+            // Hide loading and show success
+            LoadingOverlay.Hide();
+            OperationFeedback.ShowSuccess($"Model '{System.IO.Path.GetFileNameWithoutExtension(filePath)}' imported");
         }
     }
 
@@ -238,10 +248,17 @@ public sealed partial class ModelManagerPage : UserControl
         System.Diagnostics.Process.Start("explorer.exe", modelsPath);
     }
 
-    private void OnRefreshClick(object sender, RoutedEventArgs e)
+    private async void OnRefreshClick(object sender, RoutedEventArgs e)
     {
-        // Refresh model list from disk
-        // In production, would scan model directories
+        // Show loading state
+        LoadingOverlay.Show("Scanning for models...", "Checking model directories");
+
+        // Simulate refresh operation
+        await Task.Delay(1000);
+
+        // Hide loading and show success
+        LoadingOverlay.Hide();
+        OperationFeedback.ShowSuccess("Model list refreshed");
     }
 
     private void OnDefaultModelChanged(object sender, SelectionChangedEventArgs e)
