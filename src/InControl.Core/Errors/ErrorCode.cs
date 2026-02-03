@@ -37,6 +37,13 @@ public enum ErrorCode
     SerializationFailed = 304,
     DeserializationFailed = 305,
     CorruptedData = 306,
+    FileOperationFailed = 307,
+
+    // Recovery (350-399)
+    RecoveryFailed = 350,
+    BackupFailed = 351,
+    RestoreFailed = 352,
+    InvalidOperation = 353,
 
     // Configuration (400-499)
     ConfigurationInvalid = 400,
