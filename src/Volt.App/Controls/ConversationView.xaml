@@ -70,39 +70,7 @@
             </ScrollViewer>
         </Grid>
 
-        <!-- Input Composer Area -->
-        <Border Grid.Row="1"
-                Background="{ThemeResource LayerFillColorDefaultBrush}"
-                BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
-                BorderThickness="0,1,0,0"
-                Padding="24,16">
-            <Grid MaxWidth="{StaticResource MessageMaxWidth}"
-                  HorizontalAlignment="Center">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-
-                <!-- Input TextBox (placeholder for InputComposer control) -->
-                <TextBox Grid.Column="0"
-                         x:Name="InputTextBox"
-                         PlaceholderText="Enter a prompt..."
-                         AcceptsReturn="True"
-                         TextWrapping="Wrap"
-                         MaxHeight="200" />
-
-                <!-- Send Button -->
-                <Button Grid.Column="1"
-                        x:Name="SendButton"
-                        Style="{StaticResource AccentButtonStyle}"
-                        Margin="12,0,0,0"
-                        VerticalAlignment="Bottom">
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <FontIcon Glyph="&#xE724;" FontSize="14" />
-                        <TextBlock Text="Send" />
-                    </StackPanel>
-                </Button>
-            </Grid>
-        </Border>
+        <!-- Input Composer Control Panel -->
+        <local:InputComposer Grid.Row="1" x:Name="InputComposer" />
     </Grid>
 </UserControl>

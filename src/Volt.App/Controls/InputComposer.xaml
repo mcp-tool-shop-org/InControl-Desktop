@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="Volt.App.Controls.InputComposer"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Volt.App.Controls">
+
+    <UserControl.Resources>
+        <!-- Model Selector Item Template -->
+        <DataTemplate x:Key="ModelItemTemplate">
+            <Grid Padding="4,6" ColumnSpacing="8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <FontIcon Grid.Column="0"
+                          Glyph="&#xE950;"
+                          FontSize="14"
+                          Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+
+                <TextBlock Grid.Column="1"
+                           Text="{Binding}"
+                           TextTrimming="CharacterEllipsis" />
+            </Grid>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <Border Background="{ThemeResource LayerFillColorDefaultBrush}"
+            BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
+            BorderThickness="0,1,0,0">
+        <Grid Padding="16,12">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!-- Control Bar (Top) - Model & Options -->
+            <Grid Grid.Row="0" Margin="0,0,0,8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Model Selector -->
+                <ComboBox Grid.Column="0"
+                          x:Name="ModelSelector"
+                          PlaceholderText="Select model"
+                          MinWidth="180"
+                          ItemTemplate="{StaticResource ModelItemTemplate}">
+                    <ComboBox.Header>
+                        <TextBlock Text="Model"
+                                   Style="{StaticResource CaptionTextBlockStyle}"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    </ComboBox.Header>
+                </ComboBox>
+
+                <!-- Context Attachments (Right side of control bar) -->
+                <StackPanel Grid.Column="2"
+                            Orientation="Horizontal"
+                            Spacing="4">
+                    <!-- Attach File Button -->
+                    <Button x:Name="AttachFileButton"
+                            ToolTipService.ToolTip="Attach file"
+                            Padding="8">
+                        <FontIcon Glyph="&#xE723;" FontSize="14" />
+                        <Button.KeyboardAccelerators>
+                            <KeyboardAccelerator Key="O" Modifiers="Control,Shift" />
+                        </Button.KeyboardAccelerators>
+                    </Button>
+
+                    <!-- Context Menu -->
+                    <Button x:Name="ContextMenuButton"
+                            ToolTipService.ToolTip="Context options">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <FontIcon Glyph="&#xE8F1;" FontSize="14" />
+                            <TextBlock x:Name="ContextCountText"
+                                       Text="0"
+                                       Style="{StaticResource CaptionTextBlockStyle}"
+                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                       Visibility="Collapsed" />
+                        </StackPanel>
+                        <Button.Flyout>
+                            <MenuFlyout>
+                                <MenuFlyoutItem Text="Add previous output"
+                                                Icon="Copy" />
+                                <MenuFlyoutItem Text="Add file"
+                                                Icon="OpenFile" />
+                                <MenuFlyoutSeparator />
+                                <MenuFlyoutItem x:Name="ClearContextMenuItem"
+                                                Text="Clear all context"
+                                                Icon="Delete"
+                                                IsEnabled="False" />
+                            </MenuFlyout>
+                        </Button.Flyout>
+                    </Button>
+                </StackPanel>
+            </Grid>
+
+            <!-- Intent Input Area -->
+            <Grid Grid.Row="1" MinHeight="60">
+                <TextBox x:Name="IntentInput"
+                         PlaceholderText="Enter your prompt..."
+                         AcceptsReturn="True"
+                         TextWrapping="Wrap"
+                         ScrollViewer.VerticalScrollBarVisibility="Auto"
+                         MaxHeight="200"
+                         Padding="12"
+                         BorderThickness="1"
+                         BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
+                         CornerRadius="4">
+                    <TextBox.KeyboardAccelerators>
+                        <KeyboardAccelerator Key="Enter" Modifiers="Control" />
+                    </TextBox.KeyboardAccelerators>
+                </TextBox>
+            </Grid>
+
+            <!-- Action Bar (Bottom) -->
+            <Grid Grid.Row="2" Margin="0,8,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Status / Hints -->
+                <StackPanel Grid.Column="0"
+                            Orientation="Horizontal"
+                            Spacing="16"
+                            VerticalAlignment="Center">
+                    <!-- Character Count -->
+                    <TextBlock x:Name="CharacterCount"
+                               Text="0 characters"
+                               Style="{StaticResource CaptionTextBlockStyle}"
+                               Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+
+                    <!-- Keyboard Hint -->
+                    <TextBlock Text="Ctrl+Enter to run"
+                               Style="{StaticResource CaptionTextBlockStyle}"
+                               Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+                </StackPanel>
+
+                <!-- Action Buttons -->
+                <StackPanel Grid.Column="1"
+                            Orientation="Horizontal"
+                            Spacing="8">
+                    <!-- Cancel Button (shown during execution) -->
+                    <Button x:Name="CancelButton"
+                            Visibility="Collapsed"
+                            ToolTipService.ToolTip="Cancel execution">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <FontIcon Glyph="&#xE711;" FontSize="12" />
+                            <TextBlock Text="Cancel" />
+                        </StackPanel>
+                        <Button.KeyboardAccelerators>
+                            <KeyboardAccelerator Key="Escape" />
+                        </Button.KeyboardAccelerators>
+                    </Button>
+
+                    <!-- Run Button -->
+                    <Button x:Name="RunButton"
+                            Style="{StaticResource AccentButtonStyle}"
+                            IsEnabled="False">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <FontIcon Glyph="&#xE768;" FontSize="14" />
+                            <TextBlock Text="Run" />
+                        </StackPanel>
+                        <Button.KeyboardAccelerators>
+                            <KeyboardAccelerator Key="Enter" Modifiers="Control" />
+                        </Button.KeyboardAccelerators>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </Border>
+</UserControl>
