@@ -43,12 +43,9 @@ public class TrustReportTests
             Security = security
         };
 
-        // In release mode, should be High; in debug, Medium
-#if DEBUG
-        report.TrustLevel.Should().Be(TrustLevel.Medium);
-#else
+        // TrustLevel is based on the BuildInfo.Configuration we provide, not the actual build mode
+        // Since we're passing Configuration = "Release", it should always be High
         report.TrustLevel.Should().Be(TrustLevel.High);
-#endif
     }
 
     [Fact]
