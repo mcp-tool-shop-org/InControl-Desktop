@@ -93,16 +93,37 @@
 
 ---
 
-## Commit 04: 2-Hour Soak Test
+## Commit 04: 2-Hour Soak Test Harness
 
 ### What Changed
-*(To be completed)*
+- Created `tests/InControl.SoakTests` project with:
+  - `SoakTestHarness.cs` - Core test runner with scenario execution
+  - `SoakTestConfig` - Configurable duration, memory thresholds
+  - `SoakTestReport` - Detailed results with pass/fail determination
+- Test scenarios:
+  - NavigatePanels: Navigate between Settings, Model Manager, Help, Home
+  - SwitchSessions: Create and switch between sessions
+  - ToggleTheme: Cycle through Light/Dark/System themes
+  - OpenCloseDialogs: Command Palette, About dialog
+  - ModelManagerRefresh: Open, refresh, close Model Manager
+  - ToggleOfflineMode: Enable/disable offline mode
+- Failure conditions:
+  - Memory growth exceeds threshold (default 500 MB)
+  - Any unhandled exceptions
+  - UI thread hangs (not yet implemented)
+- Command-line options:
+  - `--quick`: 5-minute quick validation
+  - `--full`: 2-hour full soak test
+  - (default): 30-minute standard test
 
 ### Test Evidence
-*(To be completed)*
+- Harness compiles and runs
+- Memory tracking via Process.WorkingSet64
+- JSON report output to `%LOCALAPPDATA%\InControl\SoakTests`
 
 ### Evidence
 - Screen recording: `docs/phase12/recordings/soak-test.mp4`
+- Memory chart screenshot at start/end
 
 ---
 
