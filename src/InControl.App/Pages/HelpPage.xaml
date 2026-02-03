@@ -405,70 +405,140 @@
 
                     <!-- Troubleshooting Section (hidden by default) -->
                     <StackPanel x:Name="TroubleshootingSection" Visibility="Collapsed" Spacing="16">
-                        <TextBlock Text="Troubleshooting"
+                        <TextBlock Text="Troubleshooting Assistant"
                                    Style="{StaticResource TitleTextBlockStyle}" />
 
+                        <!-- Run Diagnostics Card -->
+                        <Border Background="{ThemeResource AccentFillColorDefaultBrush}"
+                                CornerRadius="8"
+                                Padding="20">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Spacing="4">
+                                    <TextBlock Text="Quick Diagnosis"
+                                               Style="{StaticResource SubtitleTextBlockStyle}"
+                                               Foreground="White" />
+                                    <TextBlock Text="Check Ollama connection, system resources, and storage."
+                                               Foreground="White"
+                                               Opacity="0.9"
+                                               TextWrapping="Wrap" />
+                                </StackPanel>
+                                <Button Grid.Column="1"
+                                        x:Name="RunDiagnosticsButton"
+                                        VerticalAlignment="Center">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <FontIcon Glyph="&#xE9D9;" FontSize="16" />
+                                        <TextBlock Text="Run Diagnostics" />
+                                    </StackPanel>
+                                </Button>
+                            </Grid>
+                        </Border>
+
+                        <!-- Common Issues -->
+                        <TextBlock Text="Common Issues"
+                                   Style="{StaticResource SubtitleTextBlockStyle}"
+                                   Margin="0,8,0,0" />
+
+                        <!-- Ollama Not Running -->
                         <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                                 CornerRadius="8"
                                 Padding="20">
                             <StackPanel Spacing="12">
-                                <TextBlock Text="Run button is disabled"
-                                           Style="{StaticResource SubtitleTextBlockStyle}" />
-                                <TextBlock Text="The Run button requires both a model and text input. Check that:"
-                                           Style="{StaticResource BodyTextBlockStyle}"
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <FontIcon Glyph="&#xE7BA;" FontSize="16"
+                                              Foreground="{ThemeResource SystemFillColorCautionBrush}" />
+                                    <TextBlock Text="Ollama not running"
+                                               Style="{StaticResource SubtitleTextBlockStyle}" />
+                                </StackPanel>
+                                <TextBlock Text="InControl requires Ollama to be running for model inference."
                                            TextWrapping="Wrap"
                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                <StackPanel Spacing="4" Margin="0,8,0,0">
-                                    <StackPanel Orientation="Horizontal" Spacing="8">
-                                        <FontIcon Glyph="&#xE73E;" FontSize="12" />
-                                        <TextBlock Text="A model is selected in the Model Manager" />
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Spacing="8">
-                                        <FontIcon Glyph="&#xE73E;" FontSize="12" />
-                                        <TextBlock Text="You've typed something in the input area" />
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Spacing="8">
-                                        <FontIcon Glyph="&#xE73E;" FontSize="12" />
-                                        <TextBlock Text="No other generation is currently running" />
-                                    </StackPanel>
+                                <StackPanel Spacing="4">
+                                    <TextBlock Text="1. Open a terminal and run: ollama serve" FontFamily="Consolas" />
+                                    <TextBlock Text="2. Or start Ollama from the system tray" />
+                                    <TextBlock Text="3. Click Refresh in Model Manager" />
                                 </StackPanel>
+                                <HyperlinkButton Content="Download Ollama" NavigateUri="https://ollama.com" />
                             </StackPanel>
                         </Border>
 
+                        <!-- No Models -->
                         <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                                 CornerRadius="8"
                                 Padding="20">
                             <StackPanel Spacing="12">
-                                <TextBlock Text="Model won't load"
-                                           Style="{StaticResource SubtitleTextBlockStyle}" />
-                                <TextBlock Text="If a model fails to load, check these common issues:"
-                                           Style="{StaticResource BodyTextBlockStyle}"
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <FontIcon Glyph="&#xE7BA;" FontSize="16"
+                                              Foreground="{ThemeResource SystemFillColorCautionBrush}" />
+                                    <TextBlock Text="No models found"
+                                               Style="{StaticResource SubtitleTextBlockStyle}" />
+                                </StackPanel>
+                                <TextBlock Text="No models showing in Model Manager?"
                                            TextWrapping="Wrap"
                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                <StackPanel Spacing="4" Margin="0,8,0,0">
-                                    <StackPanel Orientation="Horizontal" Spacing="8">
-                                        <FontIcon Glyph="&#xE73E;" FontSize="12" />
-                                        <TextBlock Text="File is not corrupted (re-download if needed)" />
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Spacing="8">
-                                        <FontIcon Glyph="&#xE73E;" FontSize="12" />
-                                        <TextBlock Text="You have enough VRAM for the model size" />
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Spacing="8">
-                                        <FontIcon Glyph="&#xE73E;" FontSize="12" />
-                                        <TextBlock Text="GPU drivers are up to date" />
-                                    </StackPanel>
+                                <StackPanel Spacing="4">
+                                    <TextBlock Text="1. Ensure Ollama is running" />
+                                    <TextBlock Text="2. Pull a model: ollama pull llama3.2" FontFamily="Consolas" />
+                                    <TextBlock Text="3. Click Refresh in Model Manager" />
                                 </StackPanel>
                             </StackPanel>
                         </Border>
 
+                        <!-- Slow Performance -->
+                        <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                CornerRadius="8"
+                                Padding="20">
+                            <StackPanel Spacing="12">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <FontIcon Glyph="&#xE7BA;" FontSize="16"
+                                              Foreground="{ThemeResource SystemFillColorCautionBrush}" />
+                                    <TextBlock Text="Slow performance"
+                                               Style="{StaticResource SubtitleTextBlockStyle}" />
+                                </StackPanel>
+                                <TextBlock Text="Models run faster on NVIDIA GPUs with CUDA support."
+                                           TextWrapping="Wrap"
+                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                <StackPanel Spacing="4">
+                                    <TextBlock Text="• Update your NVIDIA drivers" />
+                                    <TextBlock Text="• Ensure CUDA is installed with Ollama" />
+                                    <TextBlock Text="• Try a smaller model (7B instead of 13B+)" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Offline Mode -->
+                        <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                CornerRadius="8"
+                                Padding="20">
+                            <StackPanel Spacing="12">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <FontIcon Glyph="&#xEB5E;" FontSize="16" />
+                                    <TextBlock Text="Offline mode"
+                                               Style="{StaticResource SubtitleTextBlockStyle}" />
+                                </StackPanel>
+                                <TextBlock Text="InControl works entirely offline. Internet is only needed to:"
+                                           TextWrapping="Wrap"
+                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                <StackPanel Spacing="4">
+                                    <TextBlock Text="• Download new models from Ollama library" />
+                                    <TextBlock Text="• Check for app updates (optional)" />
+                                </StackPanel>
+                                <TextBlock Text="All inference happens locally on your machine."
+                                           FontWeight="SemiBold" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Need More Help -->
                         <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                                 CornerRadius="8"
                                 Padding="20">
                             <StackPanel Spacing="12">
                                 <TextBlock Text="Need more help?"
                                            Style="{StaticResource SubtitleTextBlockStyle}" />
-                                <TextBlock Text="Export a support bundle to share diagnostic information."
+                                <TextBlock Text="Export a support bundle to share diagnostic information when reporting issues."
                                            Style="{StaticResource BodyTextBlockStyle}"
                                            TextWrapping="Wrap"
                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}" />

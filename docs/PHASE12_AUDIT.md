@@ -12,7 +12,7 @@
 | 04 - 2-Hour Soak Test | Pending | | |
 | 05 - Crash Reporting + Recovery UX | Pending | | |
 | 06 - Button Coverage Tests | Pending | | |
-| 07 - Help Center → Troubleshooting | Pending | | |
+| 07 - Help Center → Troubleshooting | Complete | 2026-02-03 | [Screenshots](#commit-07) |
 | 08 - Light/Dark Theme Audit | Pending | | |
 | 09 - Release Artifact Proof Pack | Pending | | |
 | 10 - RC1 Cut + Beta Gate | Pending | | |
@@ -199,16 +199,47 @@
 
 ---
 
-## Commit 07: Help Center Upgrade
+## Commit 07: Help Center Upgrade to Troubleshooting Assistant
 
 ### What Changed
-*(To be completed)*
+- Created `DiagnosticsService.cs`:
+  - Live diagnostics runner with concurrent checks
+  - Ollama Connection check (running, response status, timeout)
+  - System Resources check (memory usage with thresholds)
+  - Storage check (disk space with warnings)
+  - Network check (optional, works offline)
+  - Text report generation for clipboard/export
+  - Singleton pattern for app-wide access
+- Updated `HelpPage.xaml`:
+  - Added "Run Diagnostics" accent-colored button in prominent card
+  - Expandable "Common Issues" decision tree with 4 scenarios:
+    - Ollama Not Running (symptoms, solutions, links)
+    - No Models Available (pull instructions, quick links)
+    - Slow Performance (hardware check, model recommendations)
+    - Offline Mode (local-only operation guidance)
+  - "Export Support Bundle" button for full diagnostics
+  - Improved navigation with 7 sections
+- Updated `HelpPage.xaml.cs`:
+  - `OnRunDiagnosticsClick()` - Shows diagnostic results in dialog
+  - `OnCopyDiagnosticsClick()` - Copies report to clipboard
+  - `OnExportSupportBundleClick()` - Exports full bundle with system info
+  - `NavigateToSection(string deepLink)` - Deep-link navigation support
+  - Dialog with Pass/Warning/Fail status icons and colors
+- Diagnostic checks include:
+  - Status: Pass, Warning, Fail, Info
+  - Category grouping (Model Engine, System, Connectivity)
+  - HelpLink for deep navigation to specific help sections
 
 ### Test Evidence
-*(To be completed)*
+- DiagnosticsService compiles and runs all checks
+- Results dialog shows proper status icons (✓, ⚠, ✗)
+- Support bundle exports include system info
+- Deep links navigate to correct sections
 
 ### Screenshots
-*(To be completed)*
+- `docs/phase12/screenshots/commit-07/diagnostics-dialog.png`
+- `docs/phase12/screenshots/commit-07/common-issues-expanded.png`
+- `docs/phase12/screenshots/commit-07/support-bundle-export.png`
 
 ---
 
