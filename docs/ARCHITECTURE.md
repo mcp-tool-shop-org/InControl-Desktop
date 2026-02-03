@@ -98,7 +98,7 @@ InControl/
 │       └── InControl.Core.csproj
 │
 ├── tests/
-│   ├── InControl.Core.Tests/          # 98 tests
+│   ├── InControl.Core.Tests/          # 1,343 tests
 │   ├── InControl.Services.Tests/      # 68 tests
 │   └── InControl.Inference.Tests/     # 19 tests
 │
@@ -312,6 +312,115 @@ These are explicitly not goals for InControl:
 - Model fine-tuning or training
 - Multi-user or team features
 - Cloud deployment
+
+---
+
+## Phase 9: Policy, Governance & Enterprise Controls
+
+Phase 9 introduced a comprehensive policy layer for enterprise governance:
+
+### Policy Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                      Policy Sources                         │
+│  Organization > Team > User > Session > Default            │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│                      PolicyEngine                           │
+│  - Load/merge policies by precedence                       │
+│  - EvaluateTool/Plugin/Memory/Connectivity/Update          │
+│  - Deterministic decisions with explanations               │
+└─────────────────────────────────────────────────────────────┘
+                              │
+              ┌───────────────┼───────────────┐
+              │               │               │
+              ▼               ▼               ▼
+┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐
+│ PolicyGoverned  │ │ PolicyGoverned  │ │ PolicyGoverned  │
+│ ToolRegistry    │ │ PluginHost      │ │ MemoryManager   │
+└─────────────────┘ └─────────────────┘ └─────────────────┘
+              │               │               │
+              ▼               ▼               ▼
+┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐
+│ PolicyGoverned  │ │ PolicyDiagnostics│ │ PolicyViewer    │
+│ Connectivity    │ │ (Tracing/Debug)  │ │ (Admin UX)      │
+│ Manager         │ └─────────────────┘ └─────────────────┘
+└─────────────────┘
+```
+
+### Key Policy Types
+
+| Type | Purpose |
+|------|---------|
+| `PolicyDocument` | JSON schema for policy files |
+| `PolicyEngine` | Loads, merges, and evaluates policies |
+| `PolicyEvaluationResult` | Decision with source, reason, constraints |
+| `PolicyGovernedToolRegistry` | Wraps ToolRegistry with policy checks |
+| `PolicyGovernedPluginHost` | Wraps PluginHost with approval flow |
+| `PolicyGovernedMemoryManager` | Enforces retention and capacity limits |
+| `PolicyGovernedConnectivityManager` | Mode and domain restrictions |
+| `PolicyGovernedUpdateManager` | Channel and deferral enforcement |
+| `PolicyDiagnostics` | Tracing, explanation, and validation |
+| `PolicyViewer` | Human-readable views for admin UX |
+
+### Policy Decision Types
+
+```csharp
+public enum PolicyDecision
+{
+    Allow,              // Permitted without restrictions
+    Deny,               // Blocked by policy
+    AllowWithApproval,  // Requires operator approval
+    AllowWithConstraints // Permitted with constraints (e.g., rate limits)
+}
+```
+
+### Policy File Locations
+
+```
+Organization: %ProgramData%/InControl/policy.json    (IT-deployed)
+Team:         %APPDATA%/InControl/team-policy.json   (Team settings)
+User:         %LOCALAPPDATA%/InControl/policy.json   (User prefs)
+Session:      In-memory only (programmatic)
+```
+
+### Policy Precedence
+
+1. **Organization** (highest) - IT-deployed, locked rules cannot be overridden
+2. **Team** - Shared team settings
+3. **User** - Personal preferences
+4. **Session** - Runtime approvals
+5. **Default** (lowest) - Built-in defaults (allow most)
+
+### Policy Enforcement Points
+
+| Area | Enforcement |
+|------|-------------|
+| **Tools** | Allow/Deny/RequireApproval lists, wildcards, constraints |
+| **Plugins** | Risk level limits, trusted authors, approval workflow |
+| **Memory** | Enabled, max entries, retention days, excluded categories |
+| **Connectivity** | Allowed modes, blocked/allowed domains, telemetry |
+| **Updates** | Auto-update, required channel, deferral days, minimum version |
+
+### Admin UX
+
+```csharp
+var viewer = new PolicyViewer(engine);
+
+// Quick status
+var status = viewer.GetStatusView();
+// { IsHealthy: true, ActiveSourceCount: 2, TotalRuleCount: 15 }
+
+// Explain tool decision
+var toolView = viewer.GetToolView("shell-execute");
+// { Decision: Deny, Source: Organization, EvaluationPath: "Organization.deny(shell-*)=Deny" }
+
+// Export full report
+var report = viewer.ExportAsText();
+```
 
 ---
 
