@@ -253,11 +253,13 @@ public sealed class PluginSandbox : IPluginSandbox
 {
     private readonly ConnectivityManager _connectivity;
     private readonly string _storageBasePath;
+    private readonly IPluginAuditLog? _auditLog;
 
-    public PluginSandbox(ConnectivityManager connectivity, string storageBasePath)
+    public PluginSandbox(ConnectivityManager connectivity, string storageBasePath, IPluginAuditLog? auditLog = null)
     {
         _connectivity = connectivity;
         _storageBasePath = storageBasePath;
+        _auditLog = auditLog;
 
         // Ensure storage directory exists
         Directory.CreateDirectory(storageBasePath);
@@ -265,7 +267,7 @@ public sealed class PluginSandbox : IPluginSandbox
 
     public IPluginContext CreateContext(PluginManifest manifest)
     {
-        return new PluginContext(manifest, _connectivity, _storageBasePath);
+        return new PluginContext(manifest, _connectivity, _storageBasePath, _auditLog);
     }
 }
 
@@ -276,6 +278,7 @@ internal sealed class PluginContext : IPluginContext
 {
     private readonly ConnectivityManager _connectivity;
     private readonly string _storageBasePath;
+    private readonly IPluginAuditLog? _auditLog;
     private bool _disposed;
 
     public PluginManifest Manifest { get; }
@@ -287,17 +290,19 @@ internal sealed class PluginContext : IPluginContext
     public PluginContext(
         PluginManifest manifest,
         ConnectivityManager connectivity,
-        string storageBasePath)
+        string storageBasePath,
+        IPluginAuditLog? auditLog = null)
     {
         Manifest = manifest;
         _connectivity = connectivity;
         _storageBasePath = storageBasePath;
+        _auditLog = auditLog;
 
-        // Create mediated access objects
-        Files = new PluginFileAccessImpl(manifest);
-        Network = new PluginNetworkAccessImpl(manifest, connectivity);
-        Memory = new PluginMemoryAccessImpl(manifest);
-        Storage = new PluginStorageImpl(manifest, storageBasePath);
+        // Create mediated access objects with audit logging
+        Files = new PluginFileAccessImpl(manifest, auditLog);
+        Network = new PluginNetworkAccessImpl(manifest, connectivity, auditLog);
+        Memory = new PluginMemoryAccessImpl(manifest, auditLog);
+        Storage = new PluginStorageImpl(manifest, storageBasePath, auditLog);
     }
 
     public bool HasPermission(PermissionType type, PermissionAccess access, string? scope = null)
@@ -327,15 +332,17 @@ internal sealed class PluginContext : IPluginContext
 }
 
 /// <summary>
-/// File access implementation that enforces permissions.
+/// File access implementation that enforces permissions and logs all access.
 /// </summary>
 internal sealed class PluginFileAccessImpl : IPluginFileAccess
 {
     private readonly PluginManifest _manifest;
+    private readonly IPluginAuditLog? _auditLog;
 
-    public PluginFileAccessImpl(PluginManifest manifest)
+    public PluginFileAccessImpl(PluginManifest manifest, IPluginAuditLog? auditLog = null)
     {
         _manifest = manifest;
+        _auditLog = auditLog;
     }
 
     public bool IsPathPermitted(string path, PermissionAccess access)
@@ -349,7 +356,10 @@ internal sealed class PluginFileAccessImpl : IPluginFileAccess
 
     public async Task<PluginFileResult> ReadAsync(string path, CancellationToken ct = default)
     {
-        if (!IsPathPermitted(path, PermissionAccess.Read))
+        var permitted = IsPathPermitted(path, PermissionAccess.Read);
+        _auditLog?.LogResourceAccess(_manifest.Id, ResourceAccessType.FileRead, path, permitted);
+
+        if (!permitted)
         {
             return PluginFileResult.Failed($"No read permission for path: {path}");
         }
@@ -367,7 +377,10 @@ internal sealed class PluginFileAccessImpl : IPluginFileAccess
 
     public async Task<PluginFileResult> WriteAsync(string path, string content, CancellationToken ct = default)
     {
-        if (!IsPathPermitted(path, PermissionAccess.Write))
+        var permitted = IsPathPermitted(path, PermissionAccess.Write);
+        _auditLog?.LogResourceAccess(_manifest.Id, ResourceAccessType.FileWrite, path, permitted);
+
+        if (!permitted)
         {
             return PluginFileResult.Failed($"No write permission for path: {path}");
         }
@@ -385,7 +398,10 @@ internal sealed class PluginFileAccessImpl : IPluginFileAccess
 
     public async Task<PluginFileListResult> ListAsync(string path, CancellationToken ct = default)
     {
-        if (!IsPathPermitted(path, PermissionAccess.Read))
+        var permitted = IsPathPermitted(path, PermissionAccess.Read);
+        _auditLog?.LogResourceAccess(_manifest.Id, ResourceAccessType.FileList, path, permitted);
+
+        if (!permitted)
         {
             return PluginFileListResult.Failed($"No read permission for path: {path}");
         }
@@ -405,16 +421,19 @@ internal sealed class PluginFileAccessImpl : IPluginFileAccess
 
 /// <summary>
 /// Network access implementation that enforces permissions and uses ConnectivityManager.
+/// Logs all network access attempts for traceability.
 /// </summary>
 internal sealed class PluginNetworkAccessImpl : IPluginNetworkAccess
 {
     private readonly PluginManifest _manifest;
     private readonly ConnectivityManager _connectivity;
+    private readonly IPluginAuditLog? _auditLog;
 
-    public PluginNetworkAccessImpl(PluginManifest manifest, ConnectivityManager connectivity)
+    public PluginNetworkAccessImpl(PluginManifest manifest, ConnectivityManager connectivity, IPluginAuditLog? auditLog = null)
     {
         _manifest = manifest;
         _connectivity = connectivity;
+        _auditLog = auditLog;
     }
 
     public bool IsAvailable => _connectivity.IsOnline;
@@ -434,7 +453,10 @@ internal sealed class PluginNetworkAccessImpl : IPluginNetworkAccess
         string intent,
         CancellationToken ct = default)
     {
-        if (!IsEndpointPermitted(endpoint))
+        var permitted = IsEndpointPermitted(endpoint);
+        _auditLog?.LogResourceAccess(_manifest.Id, ResourceAccessType.NetworkRequest, endpoint, permitted, $"{method}: {intent}");
+
+        if (!permitted)
         {
             return PluginNetworkResult.Failed($"No network permission for endpoint: {endpoint}");
         }
@@ -478,15 +500,18 @@ internal sealed class PluginNetworkAccessImpl : IPluginNetworkAccess
 
 /// <summary>
 /// Memory access stub (will integrate with actual memory system).
+/// Logs all memory access attempts for traceability.
 /// </summary>
 internal sealed class PluginMemoryAccessImpl : IPluginMemoryAccess
 {
     private readonly PluginManifest _manifest;
+    private readonly IPluginAuditLog? _auditLog;
     private readonly Dictionary<string, string> _memoryStore = new();
 
-    public PluginMemoryAccessImpl(PluginManifest manifest)
+    public PluginMemoryAccessImpl(PluginManifest manifest, IPluginAuditLog? auditLog = null)
     {
         _manifest = manifest;
+        _auditLog = auditLog;
     }
 
     private bool HasReadPermission => _manifest.Permissions.Any(p =>
@@ -497,7 +522,10 @@ internal sealed class PluginMemoryAccessImpl : IPluginMemoryAccess
 
     public Task<bool> StoreAsync(string key, string content, CancellationToken ct = default)
     {
-        if (!HasWritePermission)
+        var permitted = HasWritePermission;
+        _auditLog?.LogResourceAccess(_manifest.Id, ResourceAccessType.MemoryWrite, key, permitted);
+
+        if (!permitted)
             return Task.FromResult(false);
 
         _memoryStore[$"{_manifest.Id}:{key}"] = content;
@@ -506,7 +534,10 @@ internal sealed class PluginMemoryAccessImpl : IPluginMemoryAccess
 
     public Task<string?> RetrieveAsync(string key, CancellationToken ct = default)
     {
-        if (!HasReadPermission)
+        var permitted = HasReadPermission;
+        _auditLog?.LogResourceAccess(_manifest.Id, ResourceAccessType.MemoryRead, key, permitted);
+
+        if (!permitted)
             return Task.FromResult<string?>(null);
 
         _memoryStore.TryGetValue($"{_manifest.Id}:{key}", out var value);
@@ -515,7 +546,10 @@ internal sealed class PluginMemoryAccessImpl : IPluginMemoryAccess
 
     public Task<IReadOnlyList<string>> SearchAsync(string query, int limit = 10, CancellationToken ct = default)
     {
-        if (!HasReadPermission)
+        var permitted = HasReadPermission;
+        _auditLog?.LogResourceAccess(_manifest.Id, ResourceAccessType.MemorySearch, query, permitted);
+
+        if (!permitted)
             return Task.FromResult<IReadOnlyList<string>>([]);
 
         var prefix = $"{_manifest.Id}:";
@@ -532,14 +566,19 @@ internal sealed class PluginMemoryAccessImpl : IPluginMemoryAccess
 /// <summary>
 /// Plugin-specific storage implementation.
 /// Each plugin has isolated storage in its own directory.
+/// Logs all storage access for traceability.
 /// </summary>
 internal sealed class PluginStorageImpl : IPluginStorage, IDisposable
 {
+    private readonly string _pluginId;
     private readonly string _storagePath;
+    private readonly IPluginAuditLog? _auditLog;
 
-    public PluginStorageImpl(PluginManifest manifest, string basePath)
+    public PluginStorageImpl(PluginManifest manifest, string basePath, IPluginAuditLog? auditLog = null)
     {
+        _pluginId = manifest.Id;
         _storagePath = Path.Combine(basePath, manifest.Id);
+        _auditLog = auditLog;
         Directory.CreateDirectory(_storagePath);
     }
 
@@ -547,12 +586,16 @@ internal sealed class PluginStorageImpl : IPluginStorage, IDisposable
 
     public async Task SetAsync(string key, string value, CancellationToken ct = default)
     {
+        _auditLog?.LogResourceAccess(_pluginId, ResourceAccessType.StorageWrite, key, true);
+
         var path = GetFilePath(key);
         await File.WriteAllTextAsync(path, value, ct);
     }
 
     public async Task<string?> GetAsync(string key, CancellationToken ct = default)
     {
+        _auditLog?.LogResourceAccess(_pluginId, ResourceAccessType.StorageRead, key, true);
+
         var path = GetFilePath(key);
         if (!File.Exists(path))
             return null;
@@ -562,6 +605,8 @@ internal sealed class PluginStorageImpl : IPluginStorage, IDisposable
 
     public Task<bool> RemoveAsync(string key, CancellationToken ct = default)
     {
+        _auditLog?.LogResourceAccess(_pluginId, ResourceAccessType.StorageDelete, key, true);
+
         var path = GetFilePath(key);
         if (!File.Exists(path))
             return Task.FromResult(false);
@@ -572,6 +617,8 @@ internal sealed class PluginStorageImpl : IPluginStorage, IDisposable
 
     public Task<IReadOnlyList<string>> ListKeysAsync(CancellationToken ct = default)
     {
+        _auditLog?.LogResourceAccess(_pluginId, ResourceAccessType.StorageRead, "*", true, "List keys");
+
         var keys = Directory.GetFiles(_storagePath, "*.json")
             .Select(f => Path.GetFileNameWithoutExtension(f))
             .ToList();
@@ -581,6 +628,8 @@ internal sealed class PluginStorageImpl : IPluginStorage, IDisposable
 
     public Task ClearAsync(CancellationToken ct = default)
     {
+        _auditLog?.LogResourceAccess(_pluginId, ResourceAccessType.StorageDelete, "*", true, "Clear all");
+
         foreach (var file in Directory.GetFiles(_storagePath))
         {
             File.Delete(file);

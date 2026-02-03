@@ -59,6 +59,22 @@ public partial class PluginManagerViewModel : ViewModelBase
     /// </summary>
     public bool HasActivity => RecentActivity.Count > 0;
 
+    /// <summary>
+    /// Current audit statistics.
+    /// </summary>
+    [ObservableProperty]
+    private PluginAuditStatistics? _auditStatistics;
+
+    /// <summary>
+    /// Formatted statistics summary for display.
+    /// </summary>
+    public string StatisticsSummary => AuditStatistics switch
+    {
+        null => "No activity recorded",
+        { TotalEntries: 0 } => "No activity recorded",
+        var s => $"{s.TotalEntries} events | {s.ActionCompletedEvents} actions ({s.ActionSuccessRate:P0} success) | {s.DeniedResourceAccesses + s.DeniedPermissionChecks} denied"
+    };
+
     public PluginManagerViewModel(
         PluginHost host,
         IPluginAuditLog auditLog,
@@ -75,6 +91,7 @@ public partial class PluginManagerViewModel : ViewModelBase
         // Load initial state
         RefreshPlugins();
         LoadRecentActivity();
+        RefreshStatistics();
     }
 
     /// <summary>
@@ -183,6 +200,16 @@ public partial class PluginManagerViewModel : ViewModelBase
     }
 
     /// <summary>
+    /// Refreshes audit statistics.
+    /// </summary>
+    [RelayCommand]
+    private void RefreshStatistics()
+    {
+        AuditStatistics = _auditLog.GetStatistics();
+        OnPropertyChanged(nameof(StatisticsSummary));
+    }
+
+    /// <summary>
     /// Clears the plugin audit log.
     /// </summary>
     [RelayCommand]
@@ -190,8 +217,19 @@ public partial class PluginManagerViewModel : ViewModelBase
     {
         _auditLog.Clear();
         RecentActivity.Clear();
+        RefreshStatistics();
         OnPropertyChanged(nameof(HasActivity));
         Logger.LogInformation("User cleared plugin audit log");
+    }
+
+    /// <summary>
+    /// Exports the audit log for review.
+    /// </summary>
+    public PluginAuditExport ExportAuditLog()
+    {
+        var export = _auditLog.ExportEntries();
+        Logger.LogInformation("Exported {Count} audit entries", export.EntryCount);
+        return export;
     }
 
     private void OnPluginLoaded(object? sender, PluginLoadedEventArgs e)
@@ -355,6 +393,13 @@ public sealed class PluginActivityEntry
     public string Details { get; }
     public bool IsSuccess { get; }
     public string StatusIcon { get; }
+    public string? Resource { get; }
+    public string? ResourceType { get; }
+
+    /// <summary>
+    /// Formatted display text for the entry.
+    /// </summary>
+    public string DisplayText { get; }
 
     public PluginActivityEntry(PluginAuditEntry entry)
     {
@@ -365,6 +410,36 @@ public sealed class PluginActivityEntry
         Details = entry.Details ?? "";
         IsSuccess = entry.Success ?? true;
         StatusIcon = IsSuccess ? "CheckCircle" : "XCircle";
+        Resource = entry.Resource;
+        ResourceType = entry.ResourceType?.ToString();
+
+        // Build display text based on event type
+        DisplayText = entry.EventType switch
+        {
+            PluginAuditEventType.Loaded => $"Plugin loaded: {entry.Details}",
+            PluginAuditEventType.Unloaded => "Plugin unloaded",
+            PluginAuditEventType.Enabled => "Plugin enabled",
+            PluginAuditEventType.Disabled => "Plugin disabled",
+            PluginAuditEventType.Error => $"Error: {entry.Details}",
+            PluginAuditEventType.ActionStarted => $"Started: {entry.ActionId}",
+            PluginAuditEventType.ActionCompleted => $"Completed: {entry.ActionId} ({entry.Duration?.TotalMilliseconds:F0}ms)",
+            PluginAuditEventType.ActionFailed => $"Failed: {entry.ActionId} - {entry.Details}",
+            PluginAuditEventType.ResourceAccess => FormatResourceAccess(entry),
+            PluginAuditEventType.PermissionCheck => FormatPermissionCheck(entry),
+            _ => entry.Details ?? EventType
+        };
+    }
+
+    private static string FormatResourceAccess(PluginAuditEntry entry)
+    {
+        var status = entry.Success == true ? "allowed" : "DENIED";
+        return $"{entry.ResourceType}: {entry.Resource} [{status}]";
+    }
+
+    private static string FormatPermissionCheck(PluginAuditEntry entry)
+    {
+        var status = entry.Success == true ? "allowed" : "DENIED";
+        return $"Permission check: {entry.PermissionChecked} {entry.AccessRequested} [{status}]";
     }
 }
 
