@@ -51,7 +51,7 @@
             <StackPanel Spacing="24" MaxWidth="800">
 
                 <!-- General Section -->
-                <StackPanel Spacing="8">
+                <StackPanel x:Name="GeneralSection" Spacing="8" Tag="theme light dark system startup launch minimize tray background">
                     <TextBlock Text="General"
                                Style="{StaticResource SubtitleTextBlockStyle}" />
 
@@ -116,7 +116,7 @@
                 </StackPanel>
 
                 <!-- Models Section -->
-                <StackPanel Spacing="8">
+                <StackPanel x:Name="ModelsSection" Spacing="8" Tag="model default gpu cuda directml acceleration context length tokens">
                     <TextBlock Text="Models"
                                Style="{StaticResource SubtitleTextBlockStyle}" />
 
@@ -187,7 +187,7 @@
                 </StackPanel>
 
                 <!-- Assistant Section -->
-                <StackPanel Spacing="8">
+                <StackPanel x:Name="AssistantSection" Spacing="8" Tag="assistant memory context sessions tool extensions">
                     <TextBlock Text="Assistant"
                                Style="{StaticResource SubtitleTextBlockStyle}" />
 
@@ -231,7 +231,7 @@
                 </StackPanel>
 
                 <!-- Memory Section -->
-                <StackPanel Spacing="8">
+                <StackPanel x:Name="MemorySection" Spacing="8" Tag="memory storage location clear history data">
                     <TextBlock Text="Memory"
                                Style="{StaticResource SubtitleTextBlockStyle}" />
 
@@ -252,7 +252,7 @@
                                                Style="{StaticResource CaptionTextBlockStyle}"
                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                 </StackPanel>
-                                <Button Grid.Column="1" Content="Change..." />
+                                <Button Grid.Column="1" x:Name="ChangeStorageButton" Content="Change..." />
                             </Grid>
 
                             <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
@@ -269,14 +269,14 @@
                                                Style="{StaticResource CaptionTextBlockStyle}"
                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                 </StackPanel>
-                                <Button Grid.Column="1" Content="Clear..." />
+                                <Button Grid.Column="1" x:Name="ClearMemoryButton" Content="Clear..." />
                             </Grid>
                         </StackPanel>
                     </Border>
                 </StackPanel>
 
                 <!-- Extensions Section -->
-                <StackPanel Spacing="8">
+                <StackPanel x:Name="ExtensionsSection" Spacing="8" Tag="extensions plugins tools integrations install">
                     <TextBlock Text="Extensions"
                                Style="{StaticResource SubtitleTextBlockStyle}" />
 
@@ -308,7 +308,7 @@
                 </StackPanel>
 
                 <!-- Connectivity Section -->
-                <StackPanel Spacing="8">
+                <StackPanel x:Name="ConnectivitySection" Spacing="8" Tag="connectivity network offline policy connections internet">
                     <TextBlock Text="Connectivity"
                                Style="{StaticResource SubtitleTextBlockStyle}" />
 
@@ -352,7 +352,7 @@
                 </StackPanel>
 
                 <!-- Updates Section -->
-                <StackPanel Spacing="8">
+                <StackPanel x:Name="UpdatesSection" Spacing="8" Tag="updates automatic version check download">
                     <TextBlock Text="Updates"
                                Style="{StaticResource SubtitleTextBlockStyle}" />
 
@@ -389,14 +389,14 @@
                                                Style="{StaticResource CaptionTextBlockStyle}"
                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                 </StackPanel>
-                                <Button Grid.Column="1" Content="Check for updates" />
+                                <Button Grid.Column="1" x:Name="CheckUpdatesButton" Content="Check for updates" />
                             </Grid>
                         </StackPanel>
                     </Border>
                 </StackPanel>
 
                 <!-- Diagnostics Section -->
-                <StackPanel Spacing="8">
+                <StackPanel x:Name="DiagnosticsSection" Spacing="8" Tag="diagnostics logs export reset defaults troubleshooting support">
                     <TextBlock Text="Diagnostics"
                                Style="{StaticResource SubtitleTextBlockStyle}" />
 
@@ -416,7 +416,7 @@
                                                Style="{StaticResource CaptionTextBlockStyle}"
                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                 </StackPanel>
-                                <Button Grid.Column="1" Content="Export..." />
+                                <Button Grid.Column="1" x:Name="ExportDiagnosticsButton" Content="Export..." />
                             </Grid>
 
                             <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
@@ -433,7 +433,7 @@
                                                Style="{StaticResource CaptionTextBlockStyle}"
                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                 </StackPanel>
-                                <Button Grid.Column="1" Content="Open folder" />
+                                <Button Grid.Column="1" x:Name="OpenLogsButton" Content="Open folder" />
                             </Grid>
 
                             <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
@@ -450,11 +450,33 @@
                                                Style="{StaticResource CaptionTextBlockStyle}"
                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                 </StackPanel>
-                                <Button Grid.Column="1" Content="Reset..." />
+                                <Button Grid.Column="1" x:Name="ResetSettingsButton" Content="Reset..." />
                             </Grid>
                         </StackPanel>
                     </Border>
                 </StackPanel>
+
+                <!-- No Results Found (for search) -->
+                <Border x:Name="NoResultsPanel"
+                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                        CornerRadius="8"
+                        Padding="48"
+                        Visibility="Collapsed">
+                    <StackPanel HorizontalAlignment="Center" Spacing="12">
+                        <FontIcon Glyph="&#xE721;"
+                                  FontSize="32"
+                                  Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                                  HorizontalAlignment="Center" />
+                        <TextBlock x:Name="NoResultsText"
+                                   Text="No settings found"
+                                   Style="{StaticResource BodyStrongTextBlockStyle}"
+                                   HorizontalAlignment="Center" />
+                        <TextBlock Text="Try a different search term"
+                                   Style="{StaticResource CaptionTextBlockStyle}"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                   HorizontalAlignment="Center" />
+                    </StackPanel>
+                </Border>
 
                 <!-- Bottom Spacer -->
                 <Border Height="24" />
