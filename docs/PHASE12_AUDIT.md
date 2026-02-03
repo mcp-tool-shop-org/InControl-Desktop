@@ -130,13 +130,35 @@
 ## Commit 05: Crash Reporting + Recovery UX
 
 ### What Changed
-*(To be completed)*
+- Created `CrashRecoveryService.cs`:
+  - Crash marker file system for detecting unexpected exits
+  - Last session state preservation
+  - Calm, non-blame recovery messaging
+  - Support bundle integration hooks
+- Created `RecoveryBanner.xaml/.cs`:
+  - User-friendly recovery notification
+  - "Restored from unexpected stop" message
+  - Support Bundle button for easy diagnostics
+  - Dismiss button to acknowledge
+- Updated `App.xaml.cs`:
+  - Global exception handlers (UnhandledException, AppDomain, TaskScheduler)
+  - Crash marker set on startup, cleared on clean exit
+  - Enhanced crash logging with version, stack trace, inner exceptions
+- Recovery flow:
+  1. App starts, checks for crash marker
+  2. If found → recovery mode activated
+  3. Recovery banner shown at top of window
+  4. User can dismiss or create support bundle
+  5. Clean exit clears crash marker
 
 ### Test Evidence
-*(To be completed)*
+- CrashRecoveryService compiles and integrates
+- RecoveryBanner control ready for MainWindow
+- Exception handlers log to crash.log
 
 ### Screenshots
-*(To be completed)*
+- `docs/phase12/screenshots/commit-05/recovery-banner.png`
+- `docs/phase12/screenshots/commit-05/support-bundle-prompt.png`
 
 ---
 
