@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="Volt.App.Controls.IssueCard"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Volt.App.Controls">
+
+    <!-- Issue Card: Displays errors/warnings with recovery actions -->
+    <!-- Per UX contract: No blame language, state facts, offer actions -->
+    <Border x:Name="CardBorder"
+            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+            BorderThickness="1"
+            CornerRadius="8"
+            Padding="16">
+        <Grid RowSpacing="12">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!-- Header: Icon + Title + Dismiss -->
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Severity Icon -->
+                <FontIcon Grid.Column="0"
+                          x:Name="SeverityIcon"
+                          Glyph="&#xE7BA;"
+                          FontSize="20"
+                          VerticalAlignment="Center"
+                          Margin="0,0,12,0" />
+
+                <!-- Title -->
+                <TextBlock Grid.Column="1"
+                           x:Name="TitleText"
+                           Text="Issue title"
+                           Style="{StaticResource BodyStrongTextBlockStyle}"
+                           VerticalAlignment="Center"
+                           TextTrimming="CharacterEllipsis" />
+
+                <!-- Dismiss Button -->
+                <Button Grid.Column="2"
+                        x:Name="DismissButton"
+                        ToolTipService.ToolTip="Dismiss"
+                        Padding="4">
+                    <FontIcon Glyph="&#xE711;" FontSize="12" />
+                </Button>
+            </Grid>
+
+            <!-- Detail Text -->
+            <TextBlock Grid.Row="1"
+                       x:Name="DetailText"
+                       Text="Issue details"
+                       TextWrapping="Wrap"
+                       Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+
+            <!-- Recovery Actions -->
+            <StackPanel Grid.Row="2"
+                        x:Name="ActionsPanel"
+                        Orientation="Horizontal"
+                        Spacing="8"
+                        Visibility="Collapsed">
+                <!-- Actions will be populated dynamically -->
+            </StackPanel>
+        </Grid>
+    </Border>
+</UserControl>
