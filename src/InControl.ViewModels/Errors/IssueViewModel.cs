@@ -103,6 +103,17 @@ public sealed class IssueViewModel : INotifyPropertyChanged
     public bool HasRecoveryActions => RecoveryActions.Count > 0;
 
     /// <summary>
+    /// Suggestions for what to try.
+    /// Per UX contract: Help users understand recovery options.
+    /// </summary>
+    public List<string> Suggestions { get; } = new();
+
+    /// <summary>
+    /// Whether this issue has suggestions.
+    /// </summary>
+    public bool HasSuggestions => Suggestions.Count > 0;
+
+    /// <summary>
     /// When this issue occurred.
     /// </summary>
     public DateTimeOffset OccurredAt { get; }
@@ -134,6 +145,29 @@ public sealed class IssueViewModel : INotifyPropertyChanged
     }
 
     /// <summary>
+    /// Adds a suggestion for what to try.
+    /// </summary>
+    public IssueViewModel WithSuggestion(string suggestion)
+    {
+        Suggestions.Add(suggestion);
+        OnPropertyChanged(nameof(HasSuggestions));
+        return this;
+    }
+
+    /// <summary>
+    /// Adds multiple suggestions.
+    /// </summary>
+    public IssueViewModel WithSuggestions(params string[] suggestions)
+    {
+        foreach (var suggestion in suggestions)
+        {
+            Suggestions.Add(suggestion);
+        }
+        OnPropertyChanged(nameof(HasSuggestions));
+        return this;
+    }
+
+    /// <summary>
     /// Dismisses this issue.
     /// </summary>
     public void Dismiss()
@@ -159,6 +193,10 @@ public sealed class IssueViewModel : INotifyPropertyChanged
             "Connection unavailable",
             $"The inference backend at {endpoint} is not responding.",
             IssueSeverity.Critical)
+            .WithSuggestions(
+                "Check if the backend service is running",
+                "Verify the endpoint address is correct",
+                "Check your network connection")
             .WithAction("Retry connection", () => { }, isPrimary: true)
             .WithAction("Check backend status", () => { });
     }
@@ -172,6 +210,9 @@ public sealed class IssueViewModel : INotifyPropertyChanged
             "Model not found",
             $"\"{modelName}\" is not available on this device.",
             IssueSeverity.Warning)
+            .WithSuggestions(
+                "The model may need to be downloaded first",
+                "Check if the model file was moved or renamed")
             .WithAction($"Pull model", () => { }, isPrimary: true)
             .WithAction("Select a different model", () => { });
     }
@@ -185,6 +226,10 @@ public sealed class IssueViewModel : INotifyPropertyChanged
             "Context limit exceeded",
             $"The input exceeds the model's context window ({maxTokens:N0} tokens). Current: {tokenCount:N0} tokens.",
             IssueSeverity.Warning)
+            .WithSuggestions(
+                "Remove some context attachments",
+                "Shorten the conversation history",
+                "Use a model with a larger context window")
             .WithAction("Reduce context size", () => { }, isPrimary: true)
             .WithAction("Start a new session", () => { });
     }
@@ -197,9 +242,13 @@ public sealed class IssueViewModel : INotifyPropertyChanged
         var required = FormatBytes(requiredBytes);
         var available = FormatBytes(availableBytes);
         return new IssueViewModel(
-            "Insufficient memory",
-            $"The model requires {required} but only {available} is available on the device.",
+            "Insufficient GPU memory",
+            $"The model requires {required} but only {available} is available.",
             IssueSeverity.Critical)
+            .WithSuggestions(
+                "Close other GPU-intensive applications",
+                "Use a quantized (smaller) version of the model",
+                "Select a model with fewer parameters")
             .WithAction("Select a smaller model", () => { }, isPrimary: true)
             .WithAction("Close other applications", () => { });
     }
@@ -213,7 +262,20 @@ public sealed class IssueViewModel : INotifyPropertyChanged
             "Execution interrupted",
             reason,
             IssueSeverity.Warning)
+            .WithSuggestion("This may be a temporary issue. Try running again.")
             .WithAction("Retry", () => { }, isPrimary: true);
+    }
+
+    /// <summary>
+    /// Creates a generic operation failed issue.
+    /// </summary>
+    public static IssueViewModel OperationFailed(string operation, string reason)
+    {
+        return new IssueViewModel(
+            $"{operation} did not complete",
+            reason,
+            IssueSeverity.Warning)
+            .WithSuggestion("Check the logs for more details if the issue persists.");
     }
 
     private static string FormatBytes(long bytes)

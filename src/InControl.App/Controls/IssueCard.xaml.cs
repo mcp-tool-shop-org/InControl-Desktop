@@ -63,6 +63,17 @@ public sealed partial class IssueCard : UserControl
         SeverityIcon.Foreground = GetSeverityBrush(issue.Severity);
         CardBorder.BorderBrush = GetSeverityBrush(issue.Severity);
 
+        // Show suggestions if available
+        if (issue.HasSuggestions)
+        {
+            SuggestionsPanel.Visibility = Visibility.Visible;
+            SuggestionsList.ItemsSource = issue.Suggestions;
+        }
+        else
+        {
+            SuggestionsPanel.Visibility = Visibility.Collapsed;
+        }
+
         // Build recovery actions
         ActionsPanel.Children.Clear();
         if (issue.HasRecoveryActions)

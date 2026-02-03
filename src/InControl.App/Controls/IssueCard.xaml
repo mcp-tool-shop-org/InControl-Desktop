@@ -5,8 +5,14 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:InControl.App.Controls">
 
-    <!-- Issue Card: Displays errors/warnings with recovery actions -->
-    <!-- Per UX contract: No blame language, state facts, offer actions -->
+    <!--
+    Issue Card: Displays errors/warnings with recovery actions
+    Per UX contract:
+    - No blame language - state facts, provide context
+    - Calm visual tone - not alarming red unless truly critical
+    - Always offer next steps or actions
+    - Suggestions help users understand what to try
+    -->
     <Border x:Name="CardBorder"
             Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
             BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
@@ -15,6 +21,7 @@
             Padding="16">
         <Grid RowSpacing="12">
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
@@ -47,6 +54,7 @@
                 <!-- Dismiss Button -->
                 <Button Grid.Column="2"
                         x:Name="DismissButton"
+                        Style="{StaticResource GhostButtonStyle}"
                         ToolTipService.ToolTip="Dismiss"
                         Padding="4">
                     <FontIcon Glyph="&#xE711;" FontSize="12" />
@@ -60,8 +68,34 @@
                        TextWrapping="Wrap"
                        Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
 
-            <!-- Recovery Actions -->
+            <!-- Suggestions (What to try) -->
             <StackPanel Grid.Row="2"
+                        x:Name="SuggestionsPanel"
+                        Spacing="4"
+                        Visibility="Collapsed">
+                <TextBlock Text="What to try:"
+                           Style="{StaticResource CaptionTextBlockStyle}"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                           FontWeight="SemiBold" />
+                <ItemsControl x:Name="SuggestionsList">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <TextBlock Text="•"
+                                           Style="{StaticResource CaptionTextBlockStyle}"
+                                           Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+                                <TextBlock Text="{Binding}"
+                                           Style="{StaticResource CaptionTextBlockStyle}"
+                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                           TextWrapping="Wrap" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+
+            <!-- Recovery Actions -->
+            <StackPanel Grid.Row="3"
                         x:Name="ActionsPanel"
                         Orientation="Horizontal"
                         Spacing="8"
