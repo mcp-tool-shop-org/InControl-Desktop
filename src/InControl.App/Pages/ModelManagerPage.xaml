@@ -34,20 +34,21 @@
             </StackPanel>
 
             <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
-                <Button x:Name="ImportButton"
-                        AutomationProperties.Name="Import model from file"
-                        AccessKey="I">
+                <Button x:Name="RefreshOllamaButton"
+                        AutomationProperties.Name="Refresh Ollama models"
+                        AccessKey="R">
                     <StackPanel Orientation="Horizontal" Spacing="8">
-                        <FontIcon Glyph="&#xE8B5;" FontSize="14" />
-                        <TextBlock Text="Import Model" />
+                        <FontIcon Glyph="&#xE72C;" FontSize="14" />
+                        <TextBlock Text="Refresh" />
                     </StackPanel>
                 </Button>
-                <Button x:Name="DownloadButton"
-                        AutomationProperties.Name="Download model from Hugging Face"
-                        AccessKey="D">
+                <Button x:Name="PullModelButton"
+                        AutomationProperties.Name="Pull model from Ollama library"
+                        AccessKey="P"
+                        Style="{ThemeResource AccentButtonStyle}">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <FontIcon Glyph="&#xE896;" FontSize="14" />
-                        <TextBlock Text="Download" />
+                        <TextBlock Text="Pull Model" />
                     </StackPanel>
                 </Button>
             </StackPanel>
@@ -70,14 +71,27 @@
                 <!-- Section Header -->
                 <Grid Grid.Row="0" Margin="0,0,0,12">
                     <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="Installed Models"
+
+                    <!-- Ollama Icon -->
+                    <Border Grid.Column="0"
+                            Width="24" Height="24"
+                            CornerRadius="4"
+                            Background="{ThemeResource AccentFillColorDefaultBrush}"
+                            Margin="0,0,8,0"
+                            VerticalAlignment="Center">
+                        <TextBlock Text="🦙" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+
+                    <TextBlock Grid.Column="1"
+                               Text="Ollama Models"
                                Style="{StaticResource SectionHeaderStyle}"
                                VerticalAlignment="Center" />
                     <TextBlock x:Name="ModelCountText"
-                               Grid.Column="1"
+                               Grid.Column="2"
                                Text="0 models"
                                Style="{StaticResource CaptionTextBlockStyle}"
                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
@@ -86,7 +100,7 @@
 
                 <!-- Models List or Empty State -->
                 <Grid Grid.Row="1">
-                    <!-- Empty State -->
+                    <!-- Empty State - Ollama not connected or no models -->
                     <Border x:Name="EmptyState"
                             Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                             CornerRadius="8"
@@ -94,30 +108,31 @@
                         <StackPanel HorizontalAlignment="Center"
                                     VerticalAlignment="Center"
                                     Spacing="16">
-                            <FontIcon Glyph="&#xE950;"
-                                      FontSize="48"
-                                      Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
-                            <TextBlock Text="No models installed"
+                            <TextBlock Text="🦙" FontSize="48" HorizontalAlignment="Center" />
+                            <TextBlock x:Name="EmptyStateTitle"
+                                       Text="No Ollama models found"
                                        Style="{StaticResource SubtitleTextBlockStyle}"
                                        HorizontalAlignment="Center" />
-                            <TextBlock Text="Import a model file or download from Hugging Face to get started."
+                            <TextBlock x:Name="EmptyStateDescription"
+                                       Text="Pull a model from the Ollama library to get started."
                                        Style="{StaticResource BodyTextBlockStyle}"
                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                        HorizontalAlignment="Center"
                                        TextWrapping="Wrap"
                                        TextAlignment="Center"
-                                       MaxWidth="300" />
+                                       MaxWidth="350" />
                             <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center" Margin="0,8,0,0">
-                                <Button x:Name="EmptyImportButton">
-                                    <StackPanel Orientation="Horizontal" Spacing="8">
-                                        <FontIcon Glyph="&#xE8B5;" FontSize="14" />
-                                        <TextBlock Text="Import Model" />
-                                    </StackPanel>
-                                </Button>
-                                <Button x:Name="EmptyDownloadButton">
+                                <Button x:Name="EmptyPullButton"
+                                        Style="{ThemeResource AccentButtonStyle}">
                                     <StackPanel Orientation="Horizontal" Spacing="8">
                                         <FontIcon Glyph="&#xE896;" FontSize="14" />
-                                        <TextBlock Text="Download Model" />
+                                        <TextBlock Text="Pull Model" />
+                                    </StackPanel>
+                                </Button>
+                                <Button x:Name="EmptyRefreshButton">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <FontIcon Glyph="&#xE72C;" FontSize="14" />
+                                        <TextBlock Text="Refresh" />
                                     </StackPanel>
                                 </Button>
                             </StackPanel>
@@ -225,9 +240,9 @@
 
                         <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
 
-                        <!-- GPU Info Section -->
+                        <!-- Ollama Connection -->
                         <StackPanel Spacing="{StaticResource InlineSpacing}">
-                            <TextBlock Text="GPU Status"
+                            <TextBlock Text="Ollama Connection"
                                        Style="{StaticResource SectionHeaderStyle}" />
 
                             <Grid>
@@ -239,107 +254,110 @@
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="Auto" />
                                 </Grid.RowDefinitions>
 
-                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Device:"
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Status:"
                                            Style="{StaticResource CaptionTextBlockStyle}"
                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                            Margin="0,0,16,4" />
-                                <TextBlock Grid.Row="0" Grid.Column="1" x:Name="GpuNameText"
-                                           Text="Detecting..."
-                                           Style="{StaticResource CaptionTextBlockStyle}" />
-
-                                <TextBlock Grid.Row="1" Grid.Column="0" Text="VRAM:"
-                                           Style="{StaticResource CaptionTextBlockStyle}"
-                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                           Margin="0,0,16,4" />
-                                <TextBlock Grid.Row="1" Grid.Column="1" x:Name="VramText"
-                                           Text="--"
-                                           Style="{StaticResource CaptionTextBlockStyle}" />
-
-                                <TextBlock Grid.Row="2" Grid.Column="0" Text="CUDA:"
-                                           Style="{StaticResource CaptionTextBlockStyle}"
-                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                           Margin="0,0,16,4" />
-                                <TextBlock Grid.Row="2" Grid.Column="1" x:Name="CudaText"
-                                           Text="--"
-                                           Style="{StaticResource CaptionTextBlockStyle}" />
-
-                                <TextBlock Grid.Row="3" Grid.Column="0" Text="Status:"
-                                           Style="{StaticResource CaptionTextBlockStyle}"
-                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                           Margin="0,0,16,4" />
-                                <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal" Spacing="6">
-                                    <Ellipse x:Name="GpuStatusIndicator"
+                                <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Spacing="6">
+                                    <Ellipse x:Name="OllamaStatusIndicator"
                                              Width="8" Height="8"
                                              Fill="{ThemeResource SystemFillColorSuccessBrush}"
                                              VerticalAlignment="Center" />
-                                    <TextBlock x:Name="GpuStatusText"
-                                               Text="Ready"
+                                    <TextBlock x:Name="OllamaStatusText"
+                                               Text="Connected"
                                                Style="{StaticResource CaptionTextBlockStyle}" />
                                 </StackPanel>
+
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Endpoint:"
+                                           Style="{StaticResource CaptionTextBlockStyle}"
+                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                           Margin="0,0,16,4" />
+                                <TextBlock Grid.Row="1" Grid.Column="1" x:Name="OllamaEndpointText"
+                                           Text="http://localhost:11434"
+                                           Style="{StaticResource CaptionTextBlockStyle}" />
+
+                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Version:"
+                                           Style="{StaticResource CaptionTextBlockStyle}"
+                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                           Margin="0,0,16,4" />
+                                <TextBlock Grid.Row="2" Grid.Column="1" x:Name="OllamaVersionText"
+                                           Text="--"
+                                           Style="{StaticResource CaptionTextBlockStyle}" />
                             </Grid>
                         </StackPanel>
 
                         <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
 
-                        <!-- Compatibility Info -->
+                        <!-- Popular Models -->
                         <StackPanel Spacing="{StaticResource InlineSpacing}">
-                            <TextBlock Text="Compatibility"
+                            <TextBlock Text="Popular Models"
                                        Style="{StaticResource SectionHeaderStyle}" />
 
-                            <InfoBar x:Name="CompatibilityInfo"
-                                     IsOpen="True"
-                                     IsClosable="False"
-                                     Severity="Informational"
-                                     Title="Model Requirements"
-                                     Message="Models are loaded into GPU memory. Larger models require more VRAM." />
-                        </StackPanel>
+                            <TextBlock Text="Quick pull from Ollama library:"
+                                       Style="{StaticResource CaptionTextBlockStyle}"
+                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
 
-                        <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+                            <Button x:Name="PullLlama32Button"
+                                    HorizontalAlignment="Stretch"
+                                    HorizontalContentAlignment="Left"
+                                    Padding="8">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <TextBlock Text="llama3.2" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                                        <TextBlock Text="3B • Latest Llama model" Style="{StaticResource CaptionTextBlockStyle}"
+                                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                    </StackPanel>
+                                    <TextBlock Grid.Column="1" Text="~2 GB" Style="{StaticResource CaptionTextBlockStyle}"
+                                               Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                                               VerticalAlignment="Center" />
+                                </Grid>
+                            </Button>
 
-                        <!-- VRAM Estimation -->
-                        <StackPanel Spacing="{StaticResource InlineSpacing}">
-                            <TextBlock Text="VRAM Estimation"
-                                       Style="{StaticResource SectionHeaderStyle}" />
+                            <Button x:Name="PullMistralButton"
+                                    HorizontalAlignment="Stretch"
+                                    HorizontalContentAlignment="Left"
+                                    Padding="8">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <TextBlock Text="mistral" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                                        <TextBlock Text="7B • Fast and capable" Style="{StaticResource CaptionTextBlockStyle}"
+                                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                    </StackPanel>
+                                    <TextBlock Grid.Column="1" Text="~4 GB" Style="{StaticResource CaptionTextBlockStyle}"
+                                               Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                                               VerticalAlignment="Center" />
+                                </Grid>
+                            </Button>
 
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="Auto" />
-                                </Grid.RowDefinitions>
-
-                                <TextBlock Grid.Row="0" Grid.Column="0" Text="7B (Q4)"
-                                           Style="{StaticResource CaptionTextBlockStyle}" />
-                                <TextBlock Grid.Row="0" Grid.Column="1" Text="~4 GB"
-                                           Style="{StaticResource CaptionTextBlockStyle}"
-                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-
-                                <TextBlock Grid.Row="1" Grid.Column="0" Text="13B (Q4)"
-                                           Style="{StaticResource CaptionTextBlockStyle}" />
-                                <TextBlock Grid.Row="1" Grid.Column="1" Text="~8 GB"
-                                           Style="{StaticResource CaptionTextBlockStyle}"
-                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-
-                                <TextBlock Grid.Row="2" Grid.Column="0" Text="34B (Q4)"
-                                           Style="{StaticResource CaptionTextBlockStyle}" />
-                                <TextBlock Grid.Row="2" Grid.Column="1" Text="~20 GB"
-                                           Style="{StaticResource CaptionTextBlockStyle}"
-                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-
-                                <TextBlock Grid.Row="3" Grid.Column="0" Text="70B (Q4)"
-                                           Style="{StaticResource CaptionTextBlockStyle}" />
-                                <TextBlock Grid.Row="3" Grid.Column="1" Text="~40 GB"
-                                           Style="{StaticResource CaptionTextBlockStyle}"
-                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                            </Grid>
+                            <Button x:Name="PullCodegemmaButton"
+                                    HorizontalAlignment="Stretch"
+                                    HorizontalContentAlignment="Left"
+                                    Padding="8">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <TextBlock Text="codegemma" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                                        <TextBlock Text="7B • Optimized for code" Style="{StaticResource CaptionTextBlockStyle}"
+                                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                    </StackPanel>
+                                    <TextBlock Grid.Column="1" Text="~5 GB" Style="{StaticResource CaptionTextBlockStyle}"
+                                               Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                                               VerticalAlignment="Center" />
+                                </Grid>
+                            </Button>
                         </StackPanel>
 
                         <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
@@ -349,25 +367,23 @@
                             <TextBlock Text="Quick Actions"
                                        Style="{StaticResource SectionHeaderStyle}" />
 
-                            <Button x:Name="OpenModelsFolderButton"
+                            <Button x:Name="OpenOllamaDocsButton"
                                     HorizontalAlignment="Stretch"
                                     HorizontalContentAlignment="Left"
-                                    AutomationProperties.Name="Open models folder in Explorer"
-                                    AccessKey="O">
+                                    AutomationProperties.Name="Open Ollama documentation">
                                 <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <FontIcon Glyph="&#xE838;" FontSize="14" />
-                                    <TextBlock Text="Open models folder" />
+                                    <FontIcon Glyph="&#xE8A7;" FontSize="14" />
+                                    <TextBlock Text="Ollama documentation" />
                                 </StackPanel>
                             </Button>
 
-                            <Button x:Name="RefreshModelsButton"
+                            <Button x:Name="OpenOllamaLibraryButton"
                                     HorizontalAlignment="Stretch"
                                     HorizontalContentAlignment="Left"
-                                    AutomationProperties.Name="Refresh model list"
-                                    AccessKey="R">
+                                    AutomationProperties.Name="Browse Ollama model library">
                                 <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <FontIcon Glyph="&#xE72C;" FontSize="14" />
-                                    <TextBlock Text="Refresh model list" />
+                                    <FontIcon Glyph="&#xE8B7;" FontSize="14" />
+                                    <TextBlock Text="Browse model library" />
                                 </StackPanel>
                             </Button>
                         </StackPanel>

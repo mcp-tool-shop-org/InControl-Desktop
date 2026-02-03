@@ -1,22 +1,26 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media;
 using System.Collections.ObjectModel;
+using OllamaSharp;
 
 namespace InControl.App.Pages;
 
 /// <summary>
-/// Model Manager page - first-class screen for managing AI models.
-/// Allows users to import, download, configure defaults, and understand GPU requirements.
+/// Model Manager page - first-class screen for managing AI models via Ollama.
+/// Allows users to view, pull, and manage Ollama models.
 /// </summary>
 public sealed partial class ModelManagerPage : UserControl
 {
-    private readonly ObservableCollection<ModelInfo> _models = new();
+    private readonly ObservableCollection<OllamaModelInfo> _models = new();
+    private OllamaApiClient? _ollamaClient;
+    private bool _isConnected;
 
     public ModelManagerPage()
     {
         this.InitializeComponent();
         SetupEventHandlers();
-        InitializeGpuInfo();
+        _ = InitializeOllamaAsync();
     }
 
     /// <summary>
@@ -32,46 +36,104 @@ public sealed partial class ModelManagerPage : UserControl
     private void SetupEventHandlers()
     {
         BackButton.Click += (s, e) => BackRequested?.Invoke(this, EventArgs.Empty);
-        ImportButton.Click += OnImportClick;
-        DownloadButton.Click += OnDownloadClick;
-        EmptyImportButton.Click += OnImportClick;
-        EmptyDownloadButton.Click += OnDownloadClick;
-        OpenModelsFolderButton.Click += OnOpenModelsFolderClick;
-        RefreshModelsButton.Click += OnRefreshClick;
+        RefreshOllamaButton.Click += async (s, e) => await RefreshModelsAsync();
+        PullModelButton.Click += OnPullModelClick;
+        EmptyPullButton.Click += OnPullModelClick;
+        EmptyRefreshButton.Click += async (s, e) => await RefreshModelsAsync();
         DefaultModelSelector.SelectionChanged += OnDefaultModelChanged;
         ModelsListView.ItemsSource = _models;
+
+        // Quick pull buttons
+        PullLlama32Button.Click += async (s, e) => await PullModelAsync("llama3.2");
+        PullMistralButton.Click += async (s, e) => await PullModelAsync("mistral");
+        PullCodegemmaButton.Click += async (s, e) => await PullModelAsync("codegemma");
+
+        // External links
+        OpenOllamaDocsButton.Click += (s, e) => OpenUrl("https://ollama.com/docs");
+        OpenOllamaLibraryButton.Click += (s, e) => OpenUrl("https://ollama.com/library");
     }
 
-    private void InitializeGpuInfo()
+    private async Task InitializeOllamaAsync()
     {
-        // Detect GPU capabilities
-        DetectGpu();
-    }
-
-    private void DetectGpu()
-    {
-        // This would use actual GPU detection in production
-        // For now, show placeholder info
-        GpuNameText.Text = "NVIDIA RTX 5080";
-        VramText.Text = "16 GB";
-        CudaText.Text = "12.6 (SM 12.0)";
-        GpuStatusText.Text = "Ready";
-    }
-
-    /// <summary>
-    /// Loads the list of available models.
-    /// </summary>
-    public void LoadModels(IEnumerable<ModelInfo> models)
-    {
-        _models.Clear();
-        foreach (var model in models)
+        try
         {
-            _models.Add(model);
-        }
+            _ollamaClient = new OllamaApiClient("http://localhost:11434");
 
-        UpdateModelCount();
-        UpdateEmptyState();
-        UpdateDefaultSelector();
+            // Check connection by getting version
+            var version = await _ollamaClient.GetVersionAsync();
+            _isConnected = true;
+
+            OllamaStatusIndicator.Fill = new SolidColorBrush(Microsoft.UI.Colors.LimeGreen);
+            OllamaStatusText.Text = "Connected";
+            OllamaVersionText.Text = version?.ToString() ?? "Unknown";
+
+            await RefreshModelsAsync();
+        }
+        catch (Exception)
+        {
+            _isConnected = false;
+            SetDisconnectedState();
+        }
+    }
+
+    private void SetDisconnectedState()
+    {
+        OllamaStatusIndicator.Fill = new SolidColorBrush(Microsoft.UI.Colors.Orange);
+        OllamaStatusText.Text = "Not running";
+        OllamaVersionText.Text = "--";
+
+        EmptyStateTitle.Text = "Ollama not running";
+        EmptyStateDescription.Text = "Start Ollama to manage your local AI models. Visit ollama.com to download and install.";
+
+        EmptyState.Visibility = Visibility.Visible;
+        ModelsListView.Visibility = Visibility.Collapsed;
+    }
+
+    private async Task RefreshModelsAsync()
+    {
+        if (_ollamaClient == null) return;
+
+        try
+        {
+            LoadingOverlay.Show("Loading models...", "Fetching from Ollama");
+
+            var models = await _ollamaClient.ListLocalModelsAsync();
+
+            _models.Clear();
+            foreach (var model in models)
+            {
+                _models.Add(new OllamaModelInfo
+                {
+                    Name = model.Name,
+                    Size = FormatSize(model.Size),
+                    ModifiedAt = model.ModifiedAt.ToString("MMM d, yyyy"),
+                    Family = model.Details?.Family ?? "",
+                    ParameterSize = model.Details?.ParameterSize ?? "",
+                    Quantization = model.Details?.QuantizationLevel ?? ""
+                });
+            }
+
+            UpdateModelCount();
+            UpdateEmptyState();
+            UpdateDefaultSelector();
+
+            LoadingOverlay.Hide();
+            OperationFeedback.ShowSuccess($"Found {_models.Count} models");
+        }
+        catch (Exception ex)
+        {
+            LoadingOverlay.Hide();
+            OperationFeedback.ShowError($"Failed to load models: {ex.Message}");
+            SetDisconnectedState();
+        }
+    }
+
+    private static string FormatSize(long bytes)
+    {
+        if (bytes < 1024) return $"{bytes} B";
+        if (bytes < 1024 * 1024) return $"{bytes / 1024.0:F1} KB";
+        if (bytes < 1024 * 1024 * 1024) return $"{bytes / (1024.0 * 1024.0):F1} MB";
+        return $"{bytes / (1024.0 * 1024.0 * 1024.0):F1} GB";
     }
 
     private void UpdateModelCount()
@@ -85,6 +147,12 @@ public sealed partial class ModelManagerPage : UserControl
         var hasModels = _models.Count > 0;
         EmptyState.Visibility = hasModels ? Visibility.Collapsed : Visibility.Visible;
         ModelsListView.Visibility = hasModels ? Visibility.Visible : Visibility.Collapsed;
+
+        if (!hasModels && _isConnected)
+        {
+            EmptyStateTitle.Text = "No models installed";
+            EmptyStateDescription.Text = "Pull a model from the Ollama library to get started.";
+        }
     }
 
     private void UpdateDefaultSelector()
@@ -101,107 +169,13 @@ public sealed partial class ModelManagerPage : UserControl
         }
     }
 
-    private async void OnImportClick(object sender, RoutedEventArgs e)
+    private async void OnPullModelClick(object sender, RoutedEventArgs e)
     {
-        var picker = new Windows.Storage.Pickers.FileOpenPicker();
-        picker.FileTypeFilter.Add(".gguf");
-        picker.FileTypeFilter.Add(".bin");
-        picker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.Downloads;
-
-        // Initialize picker with window handle
-        var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow);
-        WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
-
-        var file = await picker.PickSingleFileAsync();
-        if (file != null)
-        {
-            // Import the model file
-            // In production, this would copy/link the file and update the model list
-            await ShowImportDialogAsync(file.Path);
-        }
-    }
-
-    private async void OnDownloadClick(object sender, RoutedEventArgs e)
-    {
-        // Show download dialog
         var dialog = new ContentDialog
         {
-            Title = "Download Model",
-            Content = CreateDownloadContent(),
-            PrimaryButtonText = "Download",
-            CloseButtonText = "Cancel",
-            XamlRoot = this.XamlRoot
-        };
-
-        await dialog.ShowAsync();
-    }
-
-    private UIElement CreateDownloadContent()
-    {
-        var panel = new StackPanel { Spacing = 16 };
-
-        panel.Children.Add(new TextBlock
-        {
-            Text = "Enter a Hugging Face model URL or search for popular models.",
-            TextWrapping = TextWrapping.Wrap
-        });
-
-        var searchBox = new AutoSuggestBox
-        {
-            PlaceholderText = "Search models or paste URL...",
-            QueryIcon = new SymbolIcon(Symbol.Find)
-        };
-        panel.Children.Add(searchBox);
-
-        panel.Children.Add(new TextBlock
-        {
-            Text = "Popular Models",
-            Style = (Style)Application.Current.Resources["SubtitleTextBlockStyle"],
-            Margin = new Thickness(0, 8, 0, 0)
-        });
-
-        var models = new[] {
-            ("Llama 3.2 3B", "meta-llama/Llama-3.2-3B-Instruct-GGUF", "~2 GB"),
-            ("Llama 3.1 8B", "meta-llama/Llama-3.1-8B-Instruct-GGUF", "~5 GB"),
-            ("Mistral 7B", "mistralai/Mistral-7B-Instruct-v0.3-GGUF", "~4 GB"),
-            ("Qwen2.5 7B", "Qwen/Qwen2.5-7B-Instruct-GGUF", "~4 GB")
-        };
-
-        foreach (var (name, repo, size) in models)
-        {
-            var item = new Grid { Margin = new Thickness(0, 4, 0, 4) };
-            item.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-            item.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-
-            var info = new StackPanel();
-            info.Children.Add(new TextBlock { Text = name });
-            info.Children.Add(new TextBlock
-            {
-                Text = size,
-                Foreground = (Microsoft.UI.Xaml.Media.Brush)Application.Current.Resources["TextFillColorSecondaryBrush"],
-                FontSize = 12
-            });
-            Grid.SetColumn(info, 0);
-            item.Children.Add(info);
-
-            var btn = new Button { Content = "Download", Padding = new Thickness(12, 4, 12, 4) };
-            Grid.SetColumn(btn, 1);
-            item.Children.Add(btn);
-
-            panel.Children.Add(item);
-        }
-
-        return panel;
-    }
-
-    private async Task ShowImportDialogAsync(string filePath)
-    {
-        var fileName = System.IO.Path.GetFileName(filePath);
-        var dialog = new ContentDialog
-        {
-            Title = "Import Model",
-            Content = $"Import '{fileName}' as a new model?",
-            PrimaryButtonText = "Import",
+            Title = "Pull Model",
+            Content = CreatePullModelContent(),
+            PrimaryButtonText = "Pull",
             CloseButtonText = "Cancel",
             XamlRoot = this.XamlRoot
         };
@@ -209,56 +183,72 @@ public sealed partial class ModelManagerPage : UserControl
         var result = await dialog.ShowAsync();
         if (result == ContentDialogResult.Primary)
         {
-            // Show loading overlay during import
-            LoadingOverlay.Show("Importing model...", fileName);
-
-            // Simulate import delay
-            await Task.Delay(1500);
-
-            // Add model to list (in production, would actually import)
-            _models.Add(new ModelInfo
+            if (dialog.Content is StackPanel panel &&
+                panel.Children.OfType<TextBox>().FirstOrDefault() is TextBox modelNameBox &&
+                !string.IsNullOrWhiteSpace(modelNameBox.Text))
             {
-                Name = System.IO.Path.GetFileNameWithoutExtension(filePath),
-                Path = filePath,
-                Size = "Unknown",
-                Parameters = "Unknown",
-                Status = "Ready"
-            });
-            UpdateModelCount();
-            UpdateEmptyState();
-            UpdateDefaultSelector();
-
-            // Hide loading and show success
-            LoadingOverlay.Hide();
-            OperationFeedback.ShowSuccess($"Model '{System.IO.Path.GetFileNameWithoutExtension(filePath)}' imported");
+                await PullModelAsync(modelNameBox.Text.Trim());
+            }
         }
     }
 
-    private void OnOpenModelsFolderClick(object sender, RoutedEventArgs e)
+    private UIElement CreatePullModelContent()
     {
-        var modelsPath = System.IO.Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "InControl", "models");
+        var panel = new StackPanel { Spacing = 16 };
 
-        if (!System.IO.Directory.Exists(modelsPath))
+        panel.Children.Add(new TextBlock
         {
-            System.IO.Directory.CreateDirectory(modelsPath);
-        }
+            Text = "Enter the model name to pull from the Ollama library.",
+            TextWrapping = TextWrapping.Wrap
+        });
 
-        System.Diagnostics.Process.Start("explorer.exe", modelsPath);
+        var modelNameBox = new TextBox
+        {
+            PlaceholderText = "e.g., llama3.2, mistral, codellama",
+            HorizontalAlignment = HorizontalAlignment.Stretch
+        };
+        panel.Children.Add(modelNameBox);
+
+        panel.Children.Add(new TextBlock
+        {
+            Text = "Browse available models at ollama.com/library",
+            Style = (Style)Application.Current.Resources["CaptionTextBlockStyle"],
+            Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"]
+        });
+
+        return panel;
     }
 
-    private async void OnRefreshClick(object sender, RoutedEventArgs e)
+    private async Task PullModelAsync(string modelName)
     {
-        // Show loading state
-        LoadingOverlay.Show("Scanning for models...", "Checking model directories");
+        if (_ollamaClient == null || string.IsNullOrWhiteSpace(modelName)) return;
 
-        // Simulate refresh operation
-        await Task.Delay(1000);
+        try
+        {
+            LoadingOverlay.Show($"Pulling {modelName}...", "This may take a while for large models");
 
-        // Hide loading and show success
-        LoadingOverlay.Hide();
-        OperationFeedback.ShowSuccess("Model list refreshed");
+            await foreach (var status in _ollamaClient.PullModelAsync(modelName))
+            {
+                if (status != null)
+                {
+                    var progressText = status.Completed > 0 && status.Total > 0
+                        ? $"{status.Completed * 100 / status.Total}%"
+                        : status.Status ?? "Downloading...";
+                    LoadingOverlay.Show($"Pulling {modelName}...", progressText);
+                }
+            }
+
+            LoadingOverlay.Hide();
+            OperationFeedback.ShowSuccess($"Successfully pulled {modelName}");
+
+            // Refresh model list
+            await RefreshModelsAsync();
+        }
+        catch (Exception ex)
+        {
+            LoadingOverlay.Hide();
+            OperationFeedback.ShowError($"Failed to pull {modelName}: {ex.Message}");
+        }
     }
 
     private void OnDefaultModelChanged(object sender, SelectionChangedEventArgs e)
@@ -268,16 +258,33 @@ public sealed partial class ModelManagerPage : UserControl
             ModelSelected?.Invoke(this, modelName);
         }
     }
+
+    private static void OpenUrl(string url)
+    {
+        try
+        {
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = url,
+                UseShellExecute = true
+            });
+        }
+        catch { }
+    }
 }
 
 /// <summary>
-/// Represents model information for the UI.
+/// Represents Ollama model information for the UI.
 /// </summary>
-public class ModelInfo
+public class OllamaModelInfo
 {
     public string Name { get; set; } = "";
-    public string Path { get; set; } = "";
     public string Size { get; set; } = "";
-    public string Parameters { get; set; } = "";
-    public string Status { get; set; } = "";
+    public string ModifiedAt { get; set; } = "";
+    public string Family { get; set; } = "";
+    public string ParameterSize { get; set; } = "";
+    public string Quantization { get; set; } = "";
+
+    public string Status => "Ready";
+    public string Parameters => string.IsNullOrEmpty(ParameterSize) ? Family : $"{ParameterSize} • {Family}";
 }

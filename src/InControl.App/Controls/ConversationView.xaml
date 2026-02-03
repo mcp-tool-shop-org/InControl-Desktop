@@ -28,7 +28,7 @@
                            Style="{StaticResource SubtitleTextBlockStyle}"
                            HorizontalAlignment="Center" />
 
-                <TextBlock Text="A local AI workstation for your RTX GPU."
+                <TextBlock Text="A local AI workstation powered by Ollama."
                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                            HorizontalAlignment="Center" />
 

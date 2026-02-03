@@ -33,12 +33,26 @@ public partial class App : Application
 
     protected override async void OnLaunched(LaunchActivatedEventArgs args)
     {
-        // Initialize DI container after XAML framework is fully initialized
-        _host = CreateHostBuilder().Build();
-        await _host.StartAsync();
+        try
+        {
+            // Initialize DI container after XAML framework is fully initialized
+            _host = CreateHostBuilder().Build();
+            await _host.StartAsync();
 
-        MainWindow = new MainWindow();
-        MainWindow.Activate();
+            MainWindow = new MainWindow();
+            MainWindow.Activate();
+        }
+        catch (Exception ex)
+        {
+            // Log fatal error
+            System.Diagnostics.Debug.WriteLine($"FATAL: {ex}");
+            var logPath = System.IO.Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "InControl", "Logs", "crash.log");
+            System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(logPath)!);
+            System.IO.File.WriteAllText(logPath, $"[{DateTime.Now}] FATAL CRASH:\n{ex}");
+            throw;
+        }
     }
 
     private static IHostBuilder CreateHostBuilder()
