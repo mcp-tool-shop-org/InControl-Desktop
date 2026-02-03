@@ -5,6 +5,47 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Volt.App.Controls">
 
+    <UserControl.Resources>
+        <!-- Context Item Template -->
+        <DataTemplate x:Key="ContextItemTemplate">
+            <Grid Padding="8,6" ColumnSpacing="8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Type Icon -->
+                <FontIcon Grid.Column="0"
+                          Glyph="{Binding TypeIcon}"
+                          FontSize="14"
+                          Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                          VerticalAlignment="Center" />
+
+                <!-- Name -->
+                <TextBlock Grid.Column="1"
+                           Text="{Binding Name}"
+                           TextTrimming="CharacterEllipsis"
+                           VerticalAlignment="Center" />
+
+                <!-- Size -->
+                <TextBlock Grid.Column="2"
+                           Text="{Binding SizeText}"
+                           Style="{StaticResource CaptionTextBlockStyle}"
+                           Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                           VerticalAlignment="Center" />
+
+                <!-- Remove Button -->
+                <Button Grid.Column="3"
+                        Padding="4"
+                        ToolTipService.ToolTip="Remove">
+                    <FontIcon Glyph="&#xE711;" FontSize="10" />
+                </Button>
+            </Grid>
+        </DataTemplate>
+    </UserControl.Resources>
+
     <Border Background="{ThemeResource LayerFillColorDefaultBrush}"
             BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
             BorderThickness="1,0,0,0">
