@@ -214,6 +214,47 @@ public sealed record PluginCapability
     /// Whether this tool modifies local state.
     /// </summary>
     public bool ModifiesState { get; init; }
+
+    /// <summary>
+    /// Parameters accepted by this capability.
+    /// </summary>
+    public IReadOnlyList<PluginCapabilityParameter> Parameters { get; init; } = [];
+}
+
+/// <summary>
+/// Parameter definition for a plugin capability.
+/// </summary>
+public sealed record PluginCapabilityParameter
+{
+    /// <summary>
+    /// Parameter name.
+    /// </summary>
+    public required string Name { get; init; }
+
+    /// <summary>
+    /// Parameter description.
+    /// </summary>
+    public required string Description { get; init; }
+
+    /// <summary>
+    /// Parameter type (string, number, boolean, object, array).
+    /// </summary>
+    public required string Type { get; init; }
+
+    /// <summary>
+    /// Whether the parameter is required.
+    /// </summary>
+    public bool Required { get; init; }
+
+    /// <summary>
+    /// Default value if not provided.
+    /// </summary>
+    public object? Default { get; init; }
+
+    /// <summary>
+    /// Allowed values for enum-style parameters.
+    /// </summary>
+    public IReadOnlyList<string>? Enum { get; init; }
 }
 
 /// <summary>
