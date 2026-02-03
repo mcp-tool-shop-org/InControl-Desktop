@@ -41,16 +41,68 @@
                 VerticalAlignment="Center"
                 Margin="16,0"
                 Background="{ThemeResource SubtleFillColorSecondaryBrush}">
-            <StackPanel Orientation="Horizontal" Spacing="8">
-                <Ellipse Width="8" Height="8"
-                         x:Name="StatusIndicator"
-                         Fill="{ThemeResource SystemFillColorSuccessBrush}"
-                         VerticalAlignment="Center" />
-                <TextBlock x:Name="StatusText"
-                           Text="Idle"
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Idle/Complete State -->
+                <StackPanel Grid.Column="0"
+                            x:Name="IdleState"
+                            Orientation="Horizontal"
+                            Spacing="8">
+                    <Ellipse Width="8" Height="8"
+                             x:Name="StatusIndicator"
+                             Fill="{ThemeResource SystemFillColorSuccessBrush}"
+                             VerticalAlignment="Center" />
+                    <TextBlock x:Name="StatusText"
+                               Text="Idle"
+                               Style="{StaticResource CaptionTextBlockStyle}"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+
+                <!-- Executing State -->
+                <StackPanel Grid.Column="0"
+                            x:Name="ExecutingState"
+                            Orientation="Horizontal"
+                            Spacing="8"
+                            Visibility="Collapsed">
+                    <ProgressRing x:Name="ExecutingProgress"
+                                  IsActive="False"
+                                  Width="14"
+                                  Height="14"
+                                  VerticalAlignment="Center" />
+                    <TextBlock x:Name="ExecutingText"
+                               Text="Running..."
+                               Style="{StaticResource CaptionTextBlockStyle}"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+
+                <!-- Elapsed Time (shown during execution) -->
+                <TextBlock Grid.Column="1"
+                           x:Name="ElapsedTimeText"
                            Style="{StaticResource CaptionTextBlockStyle}"
-                           VerticalAlignment="Center" />
-            </StackPanel>
+                           Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                           VerticalAlignment="Center"
+                           Margin="8,0,0,0"
+                           Visibility="Collapsed" />
+
+                <!-- Cancel Button (shown during execution) -->
+                <Button Grid.Column="2"
+                        x:Name="CancelButton"
+                        Content="Cancel"
+                        Padding="6,2"
+                        Margin="8,0,0,0"
+                        FontSize="11"
+                        VerticalAlignment="Center"
+                        Visibility="Collapsed">
+                    <Button.KeyboardAccelerators>
+                        <KeyboardAccelerator Key="Escape" />
+                    </Button.KeyboardAccelerators>
+                </Button>
+            </Grid>
         </Border>
 
         <!-- Global Search (Ctrl+K placeholder) -->
