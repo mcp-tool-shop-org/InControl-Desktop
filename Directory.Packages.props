@@ -4,8 +4,8 @@
   </PropertyGroup>
 
   <ItemGroup Label="Windows App SDK">
-    <PackageVersion Include="Microsoft.WindowsAppSDK" Version="1.8.250907003" />
-    <PackageVersion Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.4654" />
+    <PackageVersion Include="Microsoft.WindowsAppSDK" Version="1.6.250205002" />
+    <PackageVersion Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.3233" />
   </ItemGroup>
 
   <ItemGroup Label="MVVM">
