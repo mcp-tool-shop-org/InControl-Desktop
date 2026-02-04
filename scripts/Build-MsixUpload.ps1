@@ -92,7 +92,8 @@ $manifestTemplate = @"
   <Identity
     Name="mcp-tool-shop.InControl-Desktop"
     Publisher="CN=5305D976-6952-4F00-9C21-3A5DB090359F"
-    Version="$msixVersion" />
+    Version="$msixVersion"
+    ProcessorArchitecture="$Platform" />
 
   <mp:PhoneIdentity PhoneProductId="a1b2c3d4-e5f6-7890-abcd-ef1234567890" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
@@ -196,7 +197,11 @@ if ($IncludeSymbols) {
     }
 }
 
-Compress-Archive -Path "$tempDir\*" -DestinationPath $uploadPath -Force
+# Create as .zip first, then rename to .msixupload
+$zipPath = Join-Path $OutputPath "InControl-Desktop-$Version.zip"
+Compress-Archive -Path "$tempDir\*" -DestinationPath $zipPath -Force
+if (Test-Path $uploadPath) { Remove-Item $uploadPath -Force }
+Rename-Item -Path $zipPath -NewName (Split-Path $uploadPath -Leaf)
 Remove-Item -Path $tempDir -Recurse -Force
 
 Write-Host "  Created: $uploadPath" -ForegroundColor Green
