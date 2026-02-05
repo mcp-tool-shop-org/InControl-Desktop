@@ -40,6 +40,7 @@ public sealed partial class ModelManagerPage : UserControl
         PullModelButton.Click += OnPullModelClick;
         EmptyPullButton.Click += OnPullModelClick;
         EmptyRefreshButton.Click += async (s, e) => await RefreshModelsAsync();
+        InstallOllamaButton.Click += (s, e) => OpenUrl("https://ollama.com/download");
         DefaultModelSelector.SelectionChanged += OnDefaultModelChanged;
         ModelsListView.ItemsSource = _models;
 
@@ -82,8 +83,13 @@ public sealed partial class ModelManagerPage : UserControl
         OllamaStatusText.Text = "Not running";
         OllamaVersionText.Text = "--";
 
-        EmptyStateTitle.Text = "Ollama not running";
-        EmptyStateDescription.Text = "Start Ollama to manage your local AI models. Visit ollama.com to download and install.";
+        EmptyStateTitle.Text = "Ollama Required";
+        EmptyStateDescription.Text = "InControl uses Ollama to run AI models locally on your computer. Ollama is free and runs in the background.";
+
+        // Show setup instructions and Install button, hide Pull Model button
+        SetupInstructionsPanel.Visibility = Visibility.Visible;
+        InstallOllamaButton.Visibility = Visibility.Visible;
+        EmptyPullButton.Visibility = Visibility.Collapsed;
 
         EmptyState.Visibility = Visibility.Visible;
         ModelsListView.Visibility = Visibility.Collapsed;
@@ -152,6 +158,11 @@ public sealed partial class ModelManagerPage : UserControl
         {
             EmptyStateTitle.Text = "No models installed";
             EmptyStateDescription.Text = "Pull a model from the Ollama library to get started.";
+
+            // Hide setup instructions, show Pull Model button (Ollama is connected)
+            SetupInstructionsPanel.Visibility = Visibility.Collapsed;
+            InstallOllamaButton.Visibility = Visibility.Collapsed;
+            EmptyPullButton.Visibility = Visibility.Visible;
         }
     }
 
@@ -221,7 +232,14 @@ public sealed partial class ModelManagerPage : UserControl
 
     private async Task PullModelAsync(string modelName)
     {
-        if (_ollamaClient == null || string.IsNullOrWhiteSpace(modelName)) return;
+        if (string.IsNullOrWhiteSpace(modelName)) return;
+
+        // Check if Ollama is connected before attempting to pull
+        if (!_isConnected || _ollamaClient == null)
+        {
+            await ShowOllamaNotInstalledDialogAsync();
+            return;
+        }
 
         try
         {
@@ -244,10 +262,76 @@ public sealed partial class ModelManagerPage : UserControl
             // Refresh model list
             await RefreshModelsAsync();
         }
+        catch (HttpRequestException)
+        {
+            // Connection error - Ollama is not running
+            LoadingOverlay.Hide();
+            _isConnected = false;
+            SetDisconnectedState();
+            await ShowOllamaNotInstalledDialogAsync();
+        }
         catch (Exception ex)
         {
             LoadingOverlay.Hide();
-            OperationFeedback.ShowError($"Failed to pull {modelName}: {ex.Message}");
+            // Check if this is a connection-related error
+            if (ex.InnerException is System.Net.Sockets.SocketException ||
+                ex.Message.Contains("connection", StringComparison.OrdinalIgnoreCase) ||
+                ex.Message.Contains("refused", StringComparison.OrdinalIgnoreCase))
+            {
+                _isConnected = false;
+                SetDisconnectedState();
+                await ShowOllamaNotInstalledDialogAsync();
+            }
+            else
+            {
+                OperationFeedback.ShowError($"Failed to pull {modelName}: {ex.Message}");
+            }
+        }
+    }
+
+    private async Task ShowOllamaNotInstalledDialogAsync()
+    {
+        var dialog = new ContentDialog
+        {
+            Title = "Ollama Required",
+            XamlRoot = this.XamlRoot,
+            PrimaryButtonText = "Download Ollama",
+            CloseButtonText = "Close",
+            DefaultButton = ContentDialogButton.Primary
+        };
+
+        var panel = new StackPanel { Spacing = 12 };
+
+        panel.Children.Add(new TextBlock
+        {
+            Text = "InControl requires Ollama to run AI models locally on your computer.",
+            TextWrapping = TextWrapping.Wrap
+        });
+
+        panel.Children.Add(new TextBlock
+        {
+            Text = "Ollama is a free, open-source tool that manages local AI models. Once installed, InControl will automatically connect to it.",
+            TextWrapping = TextWrapping.Wrap,
+            Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"]
+        });
+
+        var stepsPanel = new StackPanel { Spacing = 4, Margin = new Thickness(0, 8, 0, 0) };
+        stepsPanel.Children.Add(new TextBlock
+        {
+            Text = "Setup steps:",
+            Style = (Style)Application.Current.Resources["BodyStrongTextBlockStyle"]
+        });
+        stepsPanel.Children.Add(new TextBlock { Text = "1. Download and install Ollama from ollama.com" });
+        stepsPanel.Children.Add(new TextBlock { Text = "2. Run Ollama (it runs in the background)" });
+        stepsPanel.Children.Add(new TextBlock { Text = "3. Return to InControl and click Refresh" });
+        panel.Children.Add(stepsPanel);
+
+        dialog.Content = panel;
+
+        var result = await dialog.ShowAsync();
+        if (result == ContentDialogResult.Primary)
+        {
+            OpenUrl("https://ollama.com/download");
         }
     }
 

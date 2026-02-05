@@ -120,8 +120,40 @@
                                        HorizontalAlignment="Center"
                                        TextWrapping="Wrap"
                                        TextAlignment="Center"
-                                       MaxWidth="350" />
+                                       MaxWidth="400" />
+
+                            <!-- Setup instructions shown when Ollama is not connected -->
+                            <StackPanel x:Name="SetupInstructionsPanel"
+                                        Visibility="Collapsed"
+                                        HorizontalAlignment="Center"
+                                        Spacing="4"
+                                        Margin="0,8,0,0">
+                                <TextBlock Text="Setup steps:"
+                                           Style="{StaticResource BodyStrongTextBlockStyle}"
+                                           HorizontalAlignment="Center" />
+                                <TextBlock Text="1. Download and install Ollama"
+                                           Style="{StaticResource CaptionTextBlockStyle}"
+                                           HorizontalAlignment="Center" />
+                                <TextBlock Text="2. Run Ollama (it runs in the background)"
+                                           Style="{StaticResource CaptionTextBlockStyle}"
+                                           HorizontalAlignment="Center" />
+                                <TextBlock Text="3. Click Refresh below"
+                                           Style="{StaticResource CaptionTextBlockStyle}"
+                                           HorizontalAlignment="Center" />
+                            </StackPanel>
+
                             <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center" Margin="0,8,0,0">
+                                <!-- Install Ollama button - shown when not connected -->
+                                <Button x:Name="InstallOllamaButton"
+                                        Style="{ThemeResource AccentButtonStyle}"
+                                        Visibility="Collapsed"
+                                        AutomationProperties.Name="Download Ollama">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <FontIcon Glyph="&#xE896;" FontSize="14" />
+                                        <TextBlock Text="Download Ollama" />
+                                    </StackPanel>
+                                </Button>
+                                <!-- Pull Model button - shown when connected but no models -->
                                 <Button x:Name="EmptyPullButton"
                                         Style="{ThemeResource AccentButtonStyle}">
                                     <StackPanel Orientation="Horizontal" Spacing="8">
