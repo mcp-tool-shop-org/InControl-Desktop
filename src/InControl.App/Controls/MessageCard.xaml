@@ -6,7 +6,7 @@
     xmlns:local="using:InControl.App.Controls">
 
     <UserControl.Resources>
-        <!-- Context Menu for Messages -->
+        <!-- Context Menu for User Messages -->
         <MenuFlyout x:Key="MessageContextMenu">
             <MenuFlyoutItem x:Name="CopyMenuItem"
                             Text="Copy"
@@ -24,6 +24,34 @@
                             Text="Add to context"
                             Icon="Attach"
                             AutomationProperties.Name="Add message to context" />
+        </MenuFlyout>
+
+        <!-- Context Menu for AI-Generated Messages (includes report option) -->
+        <MenuFlyout x:Key="AssistantContextMenu">
+            <MenuFlyoutItem x:Name="AssistantCopyMenuItem"
+                            Text="Copy"
+                            Icon="Copy"
+                            AutomationProperties.Name="Copy message content">
+                <MenuFlyoutItem.KeyboardAccelerators>
+                    <KeyboardAccelerator Key="C" Modifiers="Control" />
+                </MenuFlyoutItem.KeyboardAccelerators>
+            </MenuFlyoutItem>
+            <MenuFlyoutItem x:Name="AssistantCopyAsMarkdownMenuItem"
+                            Text="Copy as Markdown"
+                            AutomationProperties.Name="Copy as Markdown format" />
+            <MenuFlyoutSeparator />
+            <MenuFlyoutItem x:Name="AssistantAddToContextMenuItem"
+                            Text="Add to context"
+                            Icon="Attach"
+                            AutomationProperties.Name="Add message to context" />
+            <MenuFlyoutSeparator />
+            <MenuFlyoutItem x:Name="ReportInappropriateMenuItem"
+                            Text="Report inappropriate content"
+                            AutomationProperties.Name="Report inappropriate AI-generated content">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xE730;" />
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
         </MenuFlyout>
     </UserControl.Resources>
 
@@ -77,7 +105,7 @@
                 Padding="16,12"
                 HorizontalAlignment="Left"
                 MaxWidth="700"
-                ContextFlyout="{StaticResource MessageContextMenu}"
+                ContextFlyout="{StaticResource AssistantContextMenu}"
                 Visibility="Collapsed"
                 AutomationProperties.Name="Assistant response">
             <Grid RowSpacing="8">

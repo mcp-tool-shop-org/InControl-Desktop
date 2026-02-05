@@ -3,6 +3,7 @@ using Microsoft.UI.Xaml.Controls;
 using Windows.ApplicationModel.DataTransfer;
 using InControl.Core.Models;
 using InControl.ViewModels;
+using InControl.App.Services;
 
 namespace InControl.App.Controls;
 
@@ -20,9 +21,16 @@ public sealed partial class MessageCard : UserControl
 
     private void SetupEventHandlers()
     {
+        // User message context menu
         CopyMenuItem.Click += OnCopyClick;
         CopyAsMarkdownMenuItem.Click += OnCopyAsMarkdownClick;
         AddToContextMenuItem.Click += OnAddToContextClick;
+
+        // Assistant message context menu (includes report option)
+        AssistantCopyMenuItem.Click += OnCopyClick;
+        AssistantCopyAsMarkdownMenuItem.Click += OnCopyAsMarkdownClick;
+        AssistantAddToContextMenuItem.Click += OnAddToContextClick;
+        ReportInappropriateMenuItem.Click += OnReportInappropriateClick;
     }
 
     private void OnCopyClick(object sender, RoutedEventArgs e)
@@ -58,6 +66,79 @@ public sealed partial class MessageCard : UserControl
             XamlRoot = this.XamlRoot
         };
         await dialog.ShowAsync();
+    }
+
+    private async void OnReportInappropriateClick(object sender, RoutedEventArgs e)
+    {
+        if (Message == null) return;
+
+        var reportDialog = new ContentDialog
+        {
+            Title = "Report Inappropriate Content",
+            XamlRoot = this.XamlRoot,
+            PrimaryButtonText = "Submit Report",
+            CloseButtonText = "Cancel",
+            DefaultButton = ContentDialogButton.Primary
+        };
+
+        // Create report form
+        var panel = new StackPanel { Spacing = 12 };
+
+        panel.Children.Add(new TextBlock
+        {
+            Text = "Help us improve by reporting AI-generated content that is inappropriate, harmful, or incorrect.",
+            TextWrapping = TextWrapping.Wrap,
+            Opacity = 0.8
+        });
+
+        var reasonCombo = new ComboBox
+        {
+            Header = "Reason for report",
+            PlaceholderText = "Select a reason",
+            HorizontalAlignment = HorizontalAlignment.Stretch,
+            ItemsSource = new[]
+            {
+                "Harmful or unsafe content",
+                "Factually incorrect information",
+                "Biased or discriminatory content",
+                "Inappropriate language",
+                "Privacy concern",
+                "Other"
+            }
+        };
+        panel.Children.Add(reasonCombo);
+
+        var detailsBox = new TextBox
+        {
+            Header = "Additional details (optional)",
+            PlaceholderText = "Provide any additional context...",
+            AcceptsReturn = true,
+            TextWrapping = TextWrapping.Wrap,
+            MinHeight = 80,
+            MaxHeight = 150
+        };
+        panel.Children.Add(detailsBox);
+
+        reportDialog.Content = panel;
+
+        var result = await reportDialog.ShowAsync();
+
+        if (result == ContentDialogResult.Primary && reasonCombo.SelectedItem != null)
+        {
+            // Save the report
+            var report = new ContentReport
+            {
+                MessageId = Message.Id,
+                MessageContent = Message.Content,
+                Model = Message.Model ?? "Unknown",
+                Reason = reasonCombo.SelectedItem.ToString()!,
+                Details = detailsBox.Text,
+                ReportedAt = DateTimeOffset.Now
+            };
+
+            ContentReportService.Instance.SaveReport(report);
+            CopyFeedback.ShowSuccess("Report submitted");
+        }
     }
 
     /// <summary>
