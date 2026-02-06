@@ -23,6 +23,11 @@ public sealed partial class ConversationView : UserControl
     /// </summary>
     public event EventHandler? StopSpeakRequested;
 
+    /// <summary>
+    /// Raised when the user confirms deletion of a message.
+    /// </summary>
+    public event EventHandler<MessageViewModel>? MessageDeleteRequested;
+
     public ConversationView()
     {
         this.InitializeComponent();
@@ -184,6 +189,7 @@ public sealed partial class ConversationView : UserControl
         {
             card.SpeakRequested += (s, msg) => SpeakRequested?.Invoke(this, msg);
             card.StopSpeakRequested += (s, _) => StopSpeakRequested?.Invoke(this, EventArgs.Empty);
+            card.DeleteRequested += (s, msg) => MessageDeleteRequested?.Invoke(this, msg);
         }
     }
 }

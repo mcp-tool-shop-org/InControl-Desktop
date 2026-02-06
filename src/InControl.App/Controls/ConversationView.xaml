@@ -107,6 +107,15 @@
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
+
+                    <!-- Context menu hint -->
+                    <TextBlock x:Name="ContextMenuHint"
+                               Text="Right-click messages for more options"
+                               Style="{StaticResource CaptionTextBlockStyle}"
+                               Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,16"
+                               Opacity="0.6" />
                 </Grid>
             </ScrollViewer>
         </Grid>

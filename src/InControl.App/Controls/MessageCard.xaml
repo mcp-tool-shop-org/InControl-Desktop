@@ -24,6 +24,11 @@
                             Text="Add to context"
                             Icon="Attach"
                             AutomationProperties.Name="Add message to context" />
+            <MenuFlyoutSeparator />
+            <MenuFlyoutItem x:Name="DeleteMenuItem"
+                            Text="Delete message"
+                            Icon="Delete"
+                            AutomationProperties.Name="Delete this message" />
         </MenuFlyout>
 
         <!-- Context Menu for AI-Generated Messages (includes report option) -->
@@ -52,6 +57,11 @@
                     <FontIcon Glyph="&#xE730;" />
                 </MenuFlyoutItem.Icon>
             </MenuFlyoutItem>
+            <MenuFlyoutSeparator />
+            <MenuFlyoutItem x:Name="AssistantDeleteMenuItem"
+                            Text="Delete message"
+                            Icon="Delete"
+                            AutomationProperties.Name="Delete this message" />
         </MenuFlyout>
     </UserControl.Resources>
 

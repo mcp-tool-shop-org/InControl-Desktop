@@ -258,6 +258,29 @@ public sealed class ChatService : IChatService
         }
     }
 
+    public async Task<Conversation> RemoveMessageAsync(
+        Guid conversationId,
+        Guid messageId,
+        CancellationToken ct = default)
+    {
+        await EnsureLoadedAsync(ct);
+
+        if (!_conversations.TryGetValue(conversationId, out var conversation))
+        {
+            throw new KeyNotFoundException($"Conversation {conversationId} not found");
+        }
+
+        conversation = conversation.WithoutMessage(messageId);
+        _conversations[conversationId] = conversation;
+
+        await SaveQuietly(conversation, ct);
+
+        _logger.LogInformation("Removed message {MessageId} from conversation {ConversationId}", messageId, conversationId);
+        ConversationUpdated?.Invoke(this, new ConversationEventArgs { Conversation = conversation });
+
+        return conversation;
+    }
+
     public void StopGeneration(Guid conversationId)
     {
         if (_activeGenerations.TryGetValue(conversationId, out var cts))

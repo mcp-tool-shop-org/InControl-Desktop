@@ -68,6 +68,15 @@ public sealed record Conversation
     };
 
     /// <summary>
+    /// Returns a new conversation with the specified message removed.
+    /// </summary>
+    public Conversation WithoutMessage(Guid messageId) => this with
+    {
+        Messages = Messages.Where(m => m.Id != messageId).ToList(),
+        ModifiedAt = DateTimeOffset.UtcNow
+    };
+
+    /// <summary>
     /// Returns a new conversation with the title updated.
     /// </summary>
     public Conversation WithTitle(string title) => this with

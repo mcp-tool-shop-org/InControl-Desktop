@@ -100,6 +100,18 @@ public interface IChatService
         CancellationToken ct = default);
 
     /// <summary>
+    /// Removes a message from a conversation.
+    /// </summary>
+    /// <param name="conversationId">The conversation ID.</param>
+    /// <param name="messageId">The message ID to remove.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The updated conversation.</returns>
+    Task<Conversation> RemoveMessageAsync(
+        Guid conversationId,
+        Guid messageId,
+        CancellationToken ct = default);
+
+    /// <summary>
     /// Stops the current generation.
     /// </summary>
     /// <param name="conversationId">The conversation ID.</param>

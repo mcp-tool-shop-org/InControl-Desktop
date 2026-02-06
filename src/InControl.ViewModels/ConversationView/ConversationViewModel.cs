@@ -263,6 +263,20 @@ public sealed class ConversationViewModel : INotifyPropertyChanged
     }
 
     /// <summary>
+    /// Removes a message from the UI collection by its ID.
+    /// </summary>
+    public void RemoveMessage(Guid messageId)
+    {
+        var toRemove = Messages.FirstOrDefault(m => m.Id == messageId);
+        if (toRemove != null)
+        {
+            Messages.Remove(toRemove);
+            UpdateViewState();
+            OnPropertyChanged(nameof(HasMessages));
+        }
+    }
+
+    /// <summary>
     /// Gets the underlying conversation.
     /// </summary>
     public Core.Models.Conversation? GetConversation() => _conversation;

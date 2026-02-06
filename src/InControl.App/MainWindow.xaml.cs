@@ -164,6 +164,9 @@ public sealed partial class MainWindow : Window
         ConversationView.SpeakRequested += OnSpeakRequested;
         ConversationView.StopSpeakRequested += OnStopSpeakRequested;
 
+        // ConversationView message delete events
+        ConversationView.MessageDeleteRequested += OnMessageDeleteRequested;
+
         // Global keyboard shortcuts
         this.Content.KeyDown += OnGlobalKeyDown;
     }
@@ -592,6 +595,31 @@ public sealed partial class MainWindow : Window
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"Failed to delete session: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Handles a message delete request from the conversation view.
+    /// </summary>
+    private async void OnMessageDeleteRequested(object? sender, InControl.ViewModels.MessageViewModel msg)
+    {
+        var conversation = _conversationVm.GetConversation();
+        if (conversation is null) return;
+
+        try
+        {
+            var chatService = App.GetService<IChatService>();
+            var updated = await chatService.RemoveMessageAsync(conversation.Id, msg.Id);
+
+            // Remove from UI
+            _conversationVm.RemoveMessage(msg.Id);
+
+            // Update sidebar message count
+            UpdateSidebarSession(conversation.Id);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Failed to delete message: {ex.Message}");
         }
     }
 

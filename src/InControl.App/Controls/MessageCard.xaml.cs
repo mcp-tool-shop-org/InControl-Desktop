@@ -23,6 +23,11 @@ public sealed partial class MessageCard : UserControl
     /// </summary>
     public event EventHandler? StopSpeakRequested;
 
+    /// <summary>
+    /// Raised when the user confirms deletion of a message.
+    /// </summary>
+    public event EventHandler<MessageViewModel>? DeleteRequested;
+
     public MessageCard()
     {
         this.InitializeComponent();
@@ -36,11 +41,14 @@ public sealed partial class MessageCard : UserControl
         CopyAsMarkdownMenuItem.Click += OnCopyAsMarkdownClick;
         AddToContextMenuItem.Click += OnAddToContextClick;
 
+        DeleteMenuItem.Click += OnDeleteClick;
+
         // Assistant message context menu (includes report option)
         AssistantCopyMenuItem.Click += OnCopyClick;
         AssistantCopyAsMarkdownMenuItem.Click += OnCopyAsMarkdownClick;
         AssistantAddToContextMenuItem.Click += OnAddToContextClick;
         ReportInappropriateMenuItem.Click += OnReportInappropriateClick;
+        AssistantDeleteMenuItem.Click += OnDeleteClick;
     }
 
     private void OnCopyClick(object sender, RoutedEventArgs e)
@@ -148,6 +156,31 @@ public sealed partial class MessageCard : UserControl
 
             ContentReportService.Instance.SaveReport(report);
             CopyFeedback.ShowSuccess("Report submitted");
+        }
+    }
+
+    private async void OnDeleteClick(object sender, RoutedEventArgs e)
+    {
+        if (Message is null) return;
+
+        var preview = Message.Content.Length > 80
+            ? Message.Content[..80] + "..."
+            : Message.Content;
+
+        var dialog = new ContentDialog
+        {
+            Title = "Delete Message",
+            Content = $"Are you sure you want to delete this message?\n\n\"{preview}\"",
+            PrimaryButtonText = "Delete",
+            CloseButtonText = "Cancel",
+            DefaultButton = ContentDialogButton.Close,
+            XamlRoot = this.XamlRoot
+        };
+
+        var result = await dialog.ShowAsync();
+        if (result == ContentDialogResult.Primary)
+        {
+            DeleteRequested?.Invoke(this, Message);
         }
     }
 
