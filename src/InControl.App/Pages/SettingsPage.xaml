@@ -180,6 +180,104 @@
                     </Border>
                 </StackPanel>
 
+                <!-- Voice Section -->
+                <StackPanel x:Name="VoiceSection" Spacing="{StaticResource InlineSpacing}" Tag="voice speech audio tts kokoro speak volume speed">
+                    <TextBlock Text="Voice"
+                               Style="{StaticResource SectionHeaderStyle}" />
+
+                    <Border Style="{StaticResource CardBorderStyle}">
+                        <StackPanel Spacing="{StaticResource ItemSpacing}">
+                            <!-- Auto-speak -->
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="Auto-speak responses" />
+                                    <TextBlock Text="Automatically read assistant replies aloud"
+                                               Style="{StaticResource CaptionTextBlockStyle}"
+                                               Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                </StackPanel>
+                                <ToggleSwitch Grid.Column="1" x:Name="AutoSpeakToggle" IsOn="True" />
+                            </Grid>
+
+                            <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+
+                            <!-- Voice Selection -->
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="Voice" />
+                                    <TextBlock Text="Select the TTS voice to use"
+                                               Style="{StaticResource CaptionTextBlockStyle}"
+                                               Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                </StackPanel>
+                                <ComboBox Grid.Column="1" x:Name="VoiceComboBox" MinWidth="180"
+                                          AutomationProperties.Name="Voice selection" />
+                            </Grid>
+
+                            <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+
+                            <!-- Volume -->
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="Volume" />
+                                    <TextBlock Text="Audio playback volume"
+                                               Style="{StaticResource CaptionTextBlockStyle}"
+                                               Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                </StackPanel>
+                                <Slider Grid.Column="1" x:Name="VoiceVolumeSlider"
+                                        Minimum="0" Maximum="1" StepFrequency="0.05"
+                                        Value="0.8" Width="180" />
+                            </Grid>
+
+                            <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+
+                            <!-- Speed -->
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="Speed" />
+                                    <TextBlock Text="Speech rate multiplier"
+                                               Style="{StaticResource CaptionTextBlockStyle}"
+                                               Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                </StackPanel>
+                                <Slider Grid.Column="1" x:Name="VoiceSpeedSlider"
+                                        Minimum="0.5" Maximum="2.0" StepFrequency="0.1"
+                                        Value="1.0" Width="180" />
+                            </Grid>
+
+                            <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+
+                            <!-- Test Voice -->
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="Test voice" />
+                                    <TextBlock x:Name="VoiceStatusText" Text="Not tested"
+                                               Style="{StaticResource CaptionTextBlockStyle}"
+                                               Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                </StackPanel>
+                                <Button Grid.Column="1" x:Name="TestVoiceButton" Content="Test" />
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
                 <!-- Assistant Section -->
                 <StackPanel x:Name="AssistantSection" Spacing="{StaticResource InlineSpacing}" Tag="assistant memory context sessions tool extensions">
                     <TextBlock Text="Assistant"

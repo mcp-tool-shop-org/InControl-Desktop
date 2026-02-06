@@ -12,6 +12,7 @@
     <Platforms>x64</Platforms>
     <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
     <UseWinUI>true</UseWinUI>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Description>InControl - Local AI Chat Assistant for Windows</Description>
 
     <!-- Version: RC versions use format X.Y.Z-rc.N -->
@@ -31,6 +32,7 @@
     <AppxGeneratePriEnabled>false</AppxGeneratePriEnabled>
     <MrtCoreGenerateBundlePri>false</MrtCoreGenerateBundlePri>
     <DisableMrtResourceGeneration>true</DisableMrtResourceGeneration>
+    <DisableMsixProjectCapabilityAddedByProject>true</DisableMsixProjectCapabilityAddedByProject>
   </PropertyGroup>
 
   <!-- Release: MSIX packaged deployment with self-contained runtime for Store compatibility -->

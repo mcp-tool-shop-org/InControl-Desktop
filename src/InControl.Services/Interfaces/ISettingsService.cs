@@ -33,6 +33,11 @@ public interface ISettingsService
     OllamaOptions OllamaOptions { get; }
 
     /// <summary>
+    /// Gets the current voice options.
+    /// </summary>
+    VoiceOptions VoiceOptions { get; }
+
+    /// <summary>
     /// Updates app options.
     /// </summary>
     /// <param name="configure">Action to configure options.</param>
@@ -66,6 +71,15 @@ public interface ISettingsService
     /// <param name="ct">Cancellation token.</param>
     Task UpdateOllamaOptionsAsync(
         Action<OllamaOptions> configure,
+        CancellationToken ct = default);
+
+    /// <summary>
+    /// Updates voice options.
+    /// </summary>
+    /// <param name="configure">Action to configure options.</param>
+    /// <param name="ct">Cancellation token.</param>
+    Task UpdateVoiceOptionsAsync(
+        Action<VoiceOptions> configure,
         CancellationToken ct = default);
 
     /// <summary>

@@ -113,7 +113,7 @@
             <Grid Grid.Row="1" MinHeight="60">
                 <TextBox x:Name="IntentInput"
                          PlaceholderText="Enter your prompt..."
-                         AcceptsReturn="True"
+                         AcceptsReturn="False"
                          TextWrapping="Wrap"
                          ScrollViewer.VerticalScrollBarVisibility="Auto"
                          MaxHeight="200"
@@ -123,11 +123,7 @@
                          CornerRadius="4"
                          TabIndex="1"
                          AutomationProperties.Name="Prompt input"
-                         AutomationProperties.HelpText="Enter your prompt here. Press Ctrl+Enter to run.">
-                    <TextBox.KeyboardAccelerators>
-                        <KeyboardAccelerator Key="Enter" Modifiers="Control" />
-                    </TextBox.KeyboardAccelerators>
-                </TextBox>
+                         AutomationProperties.HelpText="Enter your prompt here. Press Enter to send, Shift+Enter for new line." />
             </Grid>
 
             <!-- Disabled State Explanation Banner -->
@@ -189,7 +185,7 @@
 
                     <!-- Keyboard Hint -->
                     <TextBlock x:Name="KeyboardHint"
-                               Text="Ctrl+Enter to run"
+                               Text="Enter to send · Shift+Enter for new line"
                                Style="{StaticResource CaptionTextBlockStyle}"
                                Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
                 </StackPanel>
@@ -219,15 +215,12 @@
                             IsEnabled="False"
                             TabIndex="2"
                             AutomationProperties.Name="Run"
-                            AutomationProperties.HelpText="Run inference with the selected model"
+                            AutomationProperties.HelpText="Run inference with the selected model (Enter)"
                             AccessKey="R">
                         <StackPanel Orientation="Horizontal" Spacing="6">
                             <FontIcon Glyph="&#xE768;" FontSize="14" />
                             <TextBlock Text="Run" />
                         </StackPanel>
-                        <Button.KeyboardAccelerators>
-                            <KeyboardAccelerator Key="Enter" Modifiers="Control" />
-                        </Button.KeyboardAccelerators>
                     </Button>
                 </StackPanel>
             </Grid>

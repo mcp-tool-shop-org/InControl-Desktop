@@ -154,6 +154,7 @@ public sealed partial class InputComposer : UserControl
     private void SetupEventHandlers()
     {
         IntentInput.TextChanged += OnIntentTextChanged;
+        IntentInput.KeyDown += OnIntentInputKeyDown;
         RunButton.Click += OnRunButtonClick;
         CancelButton.Click += OnCancelButtonClick;
         AttachFileButton.Click += OnAttachFileButtonClick;
@@ -167,6 +168,40 @@ public sealed partial class InputComposer : UserControl
 
         // Initial tooltip state
         UpdateTooltips();
+    }
+
+    /// <summary>
+    /// Handles Enter to send and Shift+Enter for new line.
+    /// </summary>
+    private void OnIntentInputKeyDown(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
+    {
+        if (e.Key != Windows.System.VirtualKey.Enter)
+            return;
+
+        var shiftDown = Microsoft.UI.Input.InputKeyboardSource.GetKeyStateForCurrentThread(
+            Windows.System.VirtualKey.Shift)
+            .HasFlag(Windows.UI.Core.CoreVirtualKeyStates.Down);
+
+        if (shiftDown)
+        {
+            // Shift+Enter → insert newline manually
+            e.Handled = true;
+            var textBox = (TextBox)sender;
+            var selStart = textBox.SelectionStart;
+            var text = textBox.Text;
+            textBox.Text = text.Insert(selStart, "\r\n");
+            textBox.SelectionStart = selStart + 2;
+            return;
+        }
+
+        // Bare Enter → send
+        e.Handled = true;
+
+        if (CanRun())
+        {
+            var args = new RunRequestedEventArgs(IntentInput.Text.TrimEnd('\r', '\n'), SelectedModel);
+            RunRequested?.Invoke(this, args);
+        }
     }
 
     private void OnIntentTextChanged(object sender, TextChangedEventArgs e)
@@ -269,11 +304,7 @@ public sealed partial class InputComposer : UserControl
 
     private void UpdateDisabledState()
     {
-        var hasText = !string.IsNullOrWhiteSpace(IntentInput.Text);
-        var hasModel = ModelSelector.SelectedItem != null;
-        var allowsInput = _executionState.AllowsInput();
-
-        // Determine the disabled reason (priority order)
+        // Only show banner for actionable issues (no models available, offline blocked)
         string? reason = null;
         string? actionText = null;
         bool showAction = false;
@@ -281,47 +312,26 @@ public sealed partial class InputComposer : UserControl
         if (_isOfflineBlocked)
         {
             reason = "Run is blocked by connectivity policy";
-            actionText = "View Policy";
-            showAction = false; // Policy can't be changed from here
         }
-        else if (!hasModel && ModelSelector.Items.Count == 0)
+        else if (ModelSelector.SelectedItem == null && ModelSelector.Items.Count == 0)
         {
             reason = "No models available. Add a model to get started.";
             actionText = "Open Model Manager";
             showAction = true;
         }
-        else if (!hasModel)
-        {
-            reason = "Select a model from the dropdown to enable Run";
-            showAction = false;
-        }
-        else if (!hasText && hasModel)
-        {
-            reason = "Type a prompt to enable Run";
-            showAction = false;
-        }
-        else if (!allowsInput)
-        {
-            reason = "Wait for the current operation to complete";
-            showAction = false;
-        }
 
-        // Show or hide the disabled banner
-        if (reason != null && !RunButton.IsEnabled)
+        if (reason != null)
         {
             DisabledBanner.Visibility = Visibility.Visible;
             DisabledReasonText.Text = reason;
             DisabledActionButton.Content = actionText;
             DisabledActionButton.Visibility = showAction ? Visibility.Visible : Visibility.Collapsed;
-            KeyboardHint.Visibility = Visibility.Collapsed;
         }
         else
         {
             DisabledBanner.Visibility = Visibility.Collapsed;
-            KeyboardHint.Visibility = Visibility.Visible;
         }
 
-        // Update tooltips to reflect current state
         UpdateTooltips();
     }
 
@@ -330,7 +340,7 @@ public sealed partial class InputComposer : UserControl
         // Update Run button tooltip based on enabled state
         if (RunButton.IsEnabled)
         {
-            ToolTipService.SetToolTip(RunButton, "Run inference (Ctrl+Enter)");
+            ToolTipService.SetToolTip(RunButton, "Run inference (Enter)");
         }
         else
         {

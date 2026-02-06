@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using InControl.Inference.Interfaces;
+using InControl.Inference.Ollama;
 
 namespace InControl.Inference.Extensions;
 
@@ -15,10 +16,7 @@ public static class ServiceCollectionExtensions
     /// <returns>The service collection for chaining.</returns>
     public static IServiceCollection AddInferenceServices(this IServiceCollection services)
     {
-        // These will be implemented in Phase 2
-        // services.AddSingleton<IInferenceClientFactory, InferenceClientFactory>();
-        // services.AddSingleton<IModelManager, OllamaModelManager>();
-
+        services.AddSingleton<IModelManager, OllamaModelManager>();
         return services;
     }
 
@@ -29,9 +27,7 @@ public static class ServiceCollectionExtensions
     /// <returns>The service collection for chaining.</returns>
     public static IServiceCollection AddOllamaBackend(this IServiceCollection services)
     {
-        // Will be implemented in Phase 2
-        // services.AddSingleton<OllamaInferenceClient>();
-
+        services.AddSingleton<IInferenceClient, OllamaInferenceClient>();
         return services;
     }
 }

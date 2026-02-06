@@ -236,6 +236,21 @@ public sealed class ConversationViewModel : INotifyPropertyChanged
     }
 
     /// <summary>
+    /// Finalizes the current streaming message in place (sets IsStreaming=false).
+    /// Use this when you've already appended all tokens and just need to stop the spinner.
+    /// </summary>
+    public void FinalizeModelOutput()
+    {
+        if (_streamingMessage != null)
+        {
+            _streamingMessage.FinalizeMessage();
+            _streamingMessage = null;
+        }
+
+        OnPropertyChanged(nameof(HasMessages));
+    }
+
+    /// <summary>
     /// Cancels the current streaming output.
     /// </summary>
     public void CancelModelOutput()

@@ -1,6 +1,9 @@
+using Microsoft.Extensions.Options;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using InControl.App.Services;
+using InControl.Core.Configuration;
+using InControl.Services.Voice;
 
 namespace InControl.App.Pages;
 
@@ -20,6 +23,7 @@ public sealed partial class SettingsPage : UserControl
         SetupEventHandlers();
         InitializeThemeComboBox();
         InitializeStoragePath();
+        InitializeVoiceSection();
     }
 
     private void CollectSections()
@@ -29,6 +33,7 @@ public sealed partial class SettingsPage : UserControl
         {
             GeneralSection,
             ModelsSection,
+            VoiceSection,
             AssistantSection,
             MemorySection,
             ExtensionsSection,
@@ -99,6 +104,78 @@ public sealed partial class SettingsPage : UserControl
         ExportDiagnosticsButton.Click += OnExportDiagnosticsClick;
         OpenLogsButton.Click += OnOpenLogsClick;
         ResetSettingsButton.Click += OnResetSettingsClick;
+    }
+
+    private async void InitializeVoiceSection()
+    {
+        try
+        {
+            var voiceService = App.GetService<IVoiceService>();
+
+            // Ensure the engine is loaded so we can list voices
+            if (voiceService.ConnectionState != VoiceConnectionState.Connected)
+                await voiceService.ConnectAsync();
+
+            if (voiceService.AvailableVoices.Count > 0)
+            {
+                foreach (var voice in voiceService.AvailableVoices)
+                    VoiceComboBox.Items.Add(voice);
+
+                // Select current default voice
+                var voiceOpts = App.GetService<IOptions<VoiceOptions>>();
+                var currentVoice = voiceOpts.Value.DefaultVoice;
+                var voiceList = voiceService.AvailableVoices.ToList();
+                var index = voiceList.IndexOf(currentVoice);
+                VoiceComboBox.SelectedIndex = index >= 0 ? index : 0;
+
+                VoiceStatusText.Text = $"Ready ({voiceService.AvailableVoices.Count} voices)";
+            }
+            else
+            {
+                VoiceStatusText.Text = "No voices found";
+            }
+        }
+        catch
+        {
+            VoiceStatusText.Text = "Failed to load voices";
+        }
+
+        // Wire up events
+        TestVoiceButton.Click += OnTestVoiceClick;
+        VoiceComboBox.SelectionChanged += OnVoiceSelectionChanged;
+    }
+
+    private void OnVoiceSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (VoiceComboBox.SelectedItem is string selectedVoice)
+        {
+            // Update the voice option in-memory — takes effect on next SpeakAsync call
+            var voiceOpts = App.GetService<IOptions<VoiceOptions>>();
+            voiceOpts.Value.DefaultVoice = selectedVoice;
+        }
+    }
+
+    private async void OnTestVoiceClick(object sender, RoutedEventArgs e)
+    {
+        var voiceService = App.GetService<IVoiceService>();
+        var selectedVoice = VoiceComboBox.SelectedItem as string;
+
+        TestVoiceButton.IsEnabled = false;
+        VoiceStatusText.Text = "Speaking...";
+
+        try
+        {
+            await voiceService.SpeakAsync("Hello! This is a voice test.", selectedVoice);
+            VoiceStatusText.Text = $"Voice: {selectedVoice ?? "default"}";
+        }
+        catch (Exception ex)
+        {
+            VoiceStatusText.Text = $"Error: {ex.Message}";
+        }
+        finally
+        {
+            TestVoiceButton.IsEnabled = true;
+        }
     }
 
     private void OnThemeSelectionChanged(object sender, SelectionChangedEventArgs e)

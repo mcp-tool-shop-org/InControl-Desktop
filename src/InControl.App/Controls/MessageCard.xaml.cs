@@ -13,6 +13,16 @@ namespace InControl.App.Controls;
 /// </summary>
 public sealed partial class MessageCard : UserControl
 {
+    /// <summary>
+    /// Raised when the user clicks the speak button on an assistant message.
+    /// </summary>
+    public event EventHandler<MessageViewModel>? SpeakRequested;
+
+    /// <summary>
+    /// Raised when the user clicks stop while speaking.
+    /// </summary>
+    public event EventHandler? StopSpeakRequested;
+
     public MessageCard()
     {
         this.InitializeComponent();
@@ -225,17 +235,16 @@ public sealed partial class MessageCard : UserControl
         else
         {
             StreamingIndicator.Visibility = Visibility.Collapsed;
+            ModelFooter.Visibility = Visibility.Visible;
 
             // Show token count if available
             if (message.Message.TokenCount.HasValue)
             {
                 TokenCountText.Text = $"{message.Message.TokenCount.Value} tokens";
-                ModelFooter.Visibility = Visibility.Visible;
             }
-            else
-            {
-                ModelFooter.Visibility = Visibility.Collapsed;
-            }
+
+            // Show speak button if voice is available
+            UpdateSpeakButton(message);
         }
 
         // Subscribe to property changes for streaming updates
@@ -258,16 +267,69 @@ public sealed partial class MessageCard : UserControl
 
     private void OnMessagePropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
-        if (sender is MessageViewModel message && e.PropertyName == nameof(MessageViewModel.Content))
+        if (sender is not MessageViewModel message) return;
+
+        DispatcherQueue.TryEnqueue(() =>
         {
-            // Update content during streaming
-            DispatcherQueue.TryEnqueue(() =>
+            switch (e.PropertyName)
             {
-                if (message.IsAssistant)
-                {
-                    ModelContent.Text = message.Content;
-                }
-            });
+                case nameof(MessageViewModel.Content):
+                    if (message.IsAssistant)
+                    {
+                        ModelContent.Text = message.Content;
+                    }
+                    break;
+
+                case nameof(MessageViewModel.IsStreaming):
+                    if (!message.IsStreaming)
+                    {
+                        StreamingIndicator.Visibility = Visibility.Collapsed;
+                        ModelFooter.Visibility = Visibility.Visible;
+                        UpdateSpeakButton(message);
+                    }
+                    break;
+
+                case nameof(MessageViewModel.IsSpeaking):
+                case nameof(MessageViewModel.CanSpeak):
+                    UpdateSpeakButton(message);
+                    break;
+            }
+        });
+    }
+
+    private void UpdateSpeakButton(MessageViewModel message)
+    {
+        if (message.CanSpeak)
+        {
+            SpeakButton.Visibility = Visibility.Visible;
+            if (message.IsSpeaking)
+            {
+                SpeakIcon.Glyph = "\uE71A"; // Stop icon
+                ToolTipService.SetToolTip(SpeakButton, "Stop speaking");
+            }
+            else
+            {
+                SpeakIcon.Glyph = "\uE767"; // Volume icon
+                ToolTipService.SetToolTip(SpeakButton, "Read aloud");
+            }
+        }
+        else
+        {
+            SpeakButton.Visibility = Visibility.Collapsed;
+        }
+    }
+
+    private void OnSpeakClicked(object sender, RoutedEventArgs e)
+    {
+        if (Message is null) return;
+
+        if (Message.IsSpeaking)
+        {
+            StopSpeakRequested?.Invoke(this, EventArgs.Empty);
+        }
+        else
+        {
+            SpeakRequested?.Invoke(this, Message);
         }
     }
 }

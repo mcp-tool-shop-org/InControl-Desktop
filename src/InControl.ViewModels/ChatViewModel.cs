@@ -2,8 +2,11 @@ using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using InControl.Core.Configuration;
 using InControl.Core.Models;
 using InControl.Services.Interfaces;
+using InControl.Services.Voice;
 
 namespace InControl.ViewModels;
 
@@ -13,6 +16,8 @@ namespace InControl.ViewModels;
 public partial class ChatViewModel : ViewModelBase
 {
     private readonly IChatService _chatService;
+    private readonly IVoiceService _voiceService;
+    private readonly IOptions<VoiceOptions> _voiceOptions;
     private CancellationTokenSource? _generationCts;
 
     /// <summary>
@@ -63,11 +68,20 @@ public partial class ChatViewModel : ViewModelBase
 
     public ChatViewModel(
         IChatService chatService,
+        IVoiceService voiceService,
+        IOptions<VoiceOptions> voiceOptions,
         ILogger<ChatViewModel> logger)
         : base(logger)
     {
         _chatService = chatService;
+        _voiceService = voiceService;
+        _voiceOptions = voiceOptions;
     }
+
+    /// <summary>
+    /// The voice service, exposed for UI binding.
+    /// </summary>
+    public IVoiceService VoiceService => _voiceService;
 
     /// <summary>
     /// Indicates whether a message can be sent.
@@ -129,6 +143,10 @@ public partial class ChatViewModel : ViewModelBase
         {
             assistantMessage.IsStreaming = false;
             IsGenerating = false;
+
+            // Auto-speak if enabled and voice engine connected
+            AutoSpeakIfEnabled(assistantMessage.Content);
+
             _generationCts?.Dispose();
             _generationCts = null;
         }
@@ -145,6 +163,26 @@ public partial class ChatViewModel : ViewModelBase
             _chatService.StopGeneration(CurrentConversation.Id);
         }
         _generationCts?.Cancel();
+    }
+
+    /// <summary>
+    /// Speaks the given text using the voice service.
+    /// </summary>
+    /// <param name="text">Text to speak.</param>
+    [RelayCommand]
+    private async Task SpeakTextAsync(string text)
+    {
+        if (string.IsNullOrWhiteSpace(text)) return;
+        await _voiceService.SpeakAsync(text);
+    }
+
+    /// <summary>
+    /// Stops current speech.
+    /// </summary>
+    [RelayCommand]
+    private async Task StopSpeakingAsync()
+    {
+        await _voiceService.StopSpeakingAsync();
     }
 
     /// <summary>
@@ -232,8 +270,23 @@ public partial class ChatViewModel : ViewModelBase
         {
             assistantMessage.IsStreaming = false;
             IsGenerating = false;
+
+            // Auto-speak if enabled and voice engine connected
+            AutoSpeakIfEnabled(assistantMessage.Content);
+
             _generationCts?.Dispose();
             _generationCts = null;
+        }
+    }
+
+    private void AutoSpeakIfEnabled(string? content)
+    {
+        if (_voiceOptions.Value.AutoSpeak
+            && _voiceService.ConnectionState == VoiceConnectionState.Connected
+            && !string.IsNullOrWhiteSpace(content))
+        {
+            // Fire-and-forget — speaking should not block the UI
+            _ = _voiceService.SpeakAsync(content);
         }
     }
 

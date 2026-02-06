@@ -38,11 +38,29 @@ public sealed class CrashRecoveryService
 
     private CrashRecoveryService()
     {
-        _dataPath = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "InControl");
+        try
+        {
+            _dataPath = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "InControl");
 
-        Directory.CreateDirectory(_dataPath);
+            Directory.CreateDirectory(_dataPath);
+        }
+        catch (Exception ex)
+        {
+            // Fallback to temp directory if LocalApplicationData is not accessible
+            Debug.WriteLine($"Failed to create data directory: {ex.Message}");
+            _dataPath = Path.Combine(Path.GetTempPath(), "InControl");
+            try
+            {
+                Directory.CreateDirectory(_dataPath);
+            }
+            catch
+            {
+                // Last resort - use current directory (will fail gracefully)
+                _dataPath = Path.GetTempPath();
+            }
+        }
     }
 
     /// <summary>

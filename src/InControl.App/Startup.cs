@@ -5,6 +5,8 @@ using Serilog;
 using InControl.Core.Configuration;
 using InControl.Inference.Extensions;
 using InControl.Services.Extensions;
+using InControl.App.Audio;
+using InControl.Services.Voice;
 using InControl.ViewModels;
 
 namespace InControl.App;
@@ -29,6 +31,8 @@ public static class Startup
         services.AddInferenceServices();
         services.AddOllamaBackend();
         services.AddApplicationServices();
+        services.AddVoiceServices();
+        services.AddSingleton<IAudioPlayer, AudioGraphPlayer>();
 
         // ViewModels
         ConfigureViewModels(services);
@@ -40,6 +44,7 @@ public static class Startup
         services.Configure<ChatOptions>(configuration.GetSection(ChatOptions.SectionName));
         services.Configure<InferenceOptions>(configuration.GetSection(InferenceOptions.SectionName));
         services.Configure<OllamaOptions>(configuration.GetSection(OllamaOptions.SectionName));
+        services.Configure<VoiceOptions>(configuration.GetSection(VoiceOptions.SectionName));
         services.Configure<LoggingOptions>(configuration.GetSection(LoggingOptions.SectionName));
     }
 

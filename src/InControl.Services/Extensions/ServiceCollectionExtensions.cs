@@ -1,5 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
+using InControl.Services.Chat;
 using InControl.Services.Interfaces;
+using InControl.Services.Voice;
 
 namespace InControl.Services.Extensions;
 
@@ -15,12 +17,18 @@ public static class ServiceCollectionExtensions
     /// <returns>The service collection for chaining.</returns>
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
-        // These will be implemented in Phase 2
-        // services.AddSingleton<IChatService, ChatService>();
-        // services.AddSingleton<ISettingsService, SettingsService>();
-        // services.AddSingleton<IConversationStorage, JsonConversationStorage>();
-        // services.AddSingleton<INavigationService, NavigationService>();
+        services.AddSingleton<IChatService, ChatService>();
+        return services;
+    }
 
+    /// <summary>
+    /// Adds voice synthesis services to the DI container.
+    /// </summary>
+    /// <param name="services">The service collection.</param>
+    /// <returns>The service collection for chaining.</returns>
+    public static IServiceCollection AddVoiceServices(this IServiceCollection services)
+    {
+        services.AddSingleton<IVoiceService, KokoroVoiceService>();
         return services;
     }
 }

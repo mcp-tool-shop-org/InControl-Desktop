@@ -1,5 +1,6 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using InControl.ViewModels;
 using InControl.ViewModels.ConversationView;
 
 namespace InControl.App.Controls;
@@ -11,6 +12,16 @@ namespace InControl.App.Controls;
 public sealed partial class ConversationView : UserControl
 {
     private ConversationViewModel? _viewModel;
+
+    /// <summary>
+    /// Raised when the user clicks the speak button on a message.
+    /// </summary>
+    public event EventHandler<MessageViewModel>? SpeakRequested;
+
+    /// <summary>
+    /// Raised when the user clicks stop speaking on a message.
+    /// </summary>
+    public event EventHandler? StopSpeakRequested;
 
     public ConversationView()
     {
@@ -40,6 +51,20 @@ public sealed partial class ConversationView : UserControl
             }
         }
     }
+
+    /// <summary>
+    /// Sets the available models for the input composer's model selector.
+    /// Filters out embedding-only models that cannot be used for chat.
+    /// </summary>
+    public void SetAvailableModels(IEnumerable<string> models)
+    {
+        InputComposer.SetAvailableModels(models);
+    }
+
+    /// <summary>
+    /// Gets the input composer control for event wiring.
+    /// </summary>
+    public InputComposer Composer => InputComposer;
 
     /// <summary>
     /// Shows the welcome state.
@@ -150,6 +175,15 @@ public sealed partial class ConversationView : UserControl
         if (_viewModel != null && _viewModel.IsExecuting)
         {
             ElapsedTimeText.Text = _viewModel.ElapsedTimeText;
+        }
+    }
+
+    private void OnMessageCardLoaded(object sender, RoutedEventArgs e)
+    {
+        if (sender is MessageCard card)
+        {
+            card.SpeakRequested += (s, msg) => SpeakRequested?.Invoke(this, msg);
+            card.StopSpeakRequested += (s, _) => StopSpeakRequested?.Invoke(this, EventArgs.Empty);
         }
     }
 }

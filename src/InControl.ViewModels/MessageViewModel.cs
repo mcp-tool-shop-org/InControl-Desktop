@@ -49,6 +49,18 @@ public partial class MessageViewModel : ObservableObject
     private bool _isStreaming;
 
     /// <summary>
+    /// Whether this message is currently being spoken aloud.
+    /// </summary>
+    [ObservableProperty]
+    private bool _isSpeaking;
+
+    /// <summary>
+    /// Whether this message can be spoken (assistant message, not streaming, voice connected).
+    /// </summary>
+    [ObservableProperty]
+    private bool _canSpeak;
+
+    /// <summary>
     /// Whether this is a user message.
     /// </summary>
     public bool IsUser => Role == MessageRole.User;
@@ -109,6 +121,12 @@ public partial class MessageViewModel : ObservableObject
         if (tokenCount.HasValue)
         {
             Message = Message with { TokenCount = tokenCount };
+        }
+
+        // Enable speak button for assistant messages with content
+        if (IsAssistant && !string.IsNullOrWhiteSpace(Content))
+        {
+            CanSpeak = true;
         }
     }
 }

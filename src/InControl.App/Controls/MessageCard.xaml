@@ -150,7 +150,7 @@
                            TextWrapping="Wrap"
                            IsTextSelectionEnabled="True" />
 
-                <!-- Footer (Token count, etc.) -->
+                <!-- Footer (Token count, speak button) -->
                 <StackPanel Grid.Row="2"
                             x:Name="ModelFooter"
                             Orientation="Horizontal"
@@ -159,6 +159,18 @@
                     <TextBlock x:Name="TokenCountText"
                                Style="{StaticResource CaptionTextBlockStyle}"
                                Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+                    <Button x:Name="SpeakButton"
+                            Padding="4,2"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            ToolTipService.ToolTip="Read aloud"
+                            AutomationProperties.Name="Read this response aloud"
+                            Visibility="Collapsed"
+                            Click="OnSpeakClicked">
+                        <FontIcon x:Name="SpeakIcon"
+                                  Glyph="&#xE767;"
+                                  FontSize="12" />
+                    </Button>
                 </StackPanel>
 
                 <!-- Streaming Indicator -->

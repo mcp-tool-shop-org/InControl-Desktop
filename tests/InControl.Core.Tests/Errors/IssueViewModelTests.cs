@@ -135,7 +135,7 @@ public class IssueFactoryMethodTests
     {
         var issue = IssueViewModel.OutOfMemory(8L * 1024 * 1024 * 1024, 4L * 1024 * 1024 * 1024);
 
-        issue.Title.Should().Be("Insufficient memory");
+        issue.Title.Should().Be("Insufficient GPU memory");
         issue.Detail.Should().Contain("GB");
         issue.Severity.Should().Be(IssueSeverity.Critical);
     }

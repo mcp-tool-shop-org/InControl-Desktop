@@ -103,7 +103,7 @@
                                   HorizontalAlignment="Center">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <local:MessageCard Message="{Binding}" />
+                                <local:MessageCard Message="{Binding}" Loaded="OnMessageCardLoaded" />
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>

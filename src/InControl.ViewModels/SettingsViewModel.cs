@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using InControl.Core.Models;
 using InControl.Inference.Interfaces;
 using InControl.Services.Interfaces;
+using InControl.Services.Voice;
 
 namespace InControl.ViewModels;
 
@@ -15,6 +16,7 @@ public partial class SettingsViewModel : ViewModelBase
 {
     private readonly ISettingsService _settingsService;
     private readonly IModelManager _modelManager;
+    private readonly IVoiceService _voiceService;
 
     /// <summary>
     /// Available themes.
@@ -98,14 +100,65 @@ public partial class SettingsViewModel : ViewModelBase
     [ObservableProperty]
     private bool _isConnected;
 
+    // ── Voice Settings ──
+
+    /// <summary>
+    /// Whether to auto-speak assistant responses.
+    /// </summary>
+    [ObservableProperty]
+    private bool _autoSpeak;
+
+    /// <summary>
+    /// Default voice selection.
+    /// </summary>
+    [ObservableProperty]
+    private string? _defaultVoice;
+
+    /// <summary>
+    /// Voice volume (0.0 to 1.0).
+    /// </summary>
+    [ObservableProperty]
+    private double _voiceVolume = 0.8;
+
+    /// <summary>
+    /// Speech speed multiplier.
+    /// </summary>
+    [ObservableProperty]
+    private double _voiceSpeed = 1.0;
+
+    /// <summary>
+    /// Whether to use GPU acceleration for voice synthesis.
+    /// </summary>
+    [ObservableProperty]
+    private bool _useGpu = true;
+
+    /// <summary>
+    /// Voice connection status text.
+    /// </summary>
+    [ObservableProperty]
+    private string _voiceConnectionStatus = "Not connected";
+
+    /// <summary>
+    /// Whether voice engine is connected.
+    /// </summary>
+    [ObservableProperty]
+    private bool _isVoiceConnected;
+
+    /// <summary>
+    /// Available voices from the engine.
+    /// </summary>
+    public ObservableCollection<string> AvailableVoices { get; } = [];
+
     public SettingsViewModel(
         ISettingsService settingsService,
         IModelManager modelManager,
+        IVoiceService voiceService,
         ILogger<SettingsViewModel> logger)
         : base(logger)
     {
         _settingsService = settingsService;
         _modelManager = modelManager;
+        _voiceService = voiceService;
 
         LoadCurrentSettings();
     }
@@ -116,6 +169,7 @@ public partial class SettingsViewModel : ViewModelBase
         var chat = _settingsService.ChatOptions;
         var inference = _settingsService.InferenceOptions;
         var ollama = _settingsService.OllamaOptions;
+        var voice = _settingsService.VoiceOptions;
 
         SelectedTheme = app.Theme;
         ShowTrayIcon = app.ShowTrayIcon;
@@ -129,6 +183,12 @@ public partial class SettingsViewModel : ViewModelBase
         StreamResponses = chat.StreamResponses;
         ShowTokenCounts = chat.ShowTokenCounts;
         ShowGenerationSpeed = chat.ShowGenerationSpeed;
+
+        AutoSpeak = voice.AutoSpeak;
+        DefaultVoice = voice.DefaultVoice;
+        VoiceVolume = voice.Volume;
+        VoiceSpeed = voice.Speed;
+        UseGpu = voice.UseGpu;
     }
 
     /// <summary>
@@ -157,6 +217,44 @@ public partial class SettingsViewModel : ViewModelBase
         {
             IsConnected = false;
             ConnectionStatus = $"Failed: {ErrorMessage}";
+        }
+    }
+
+    /// <summary>
+    /// Tests the voice engine connection.
+    /// </summary>
+    [RelayCommand]
+    private async Task TestVoiceConnectionAsync()
+    {
+        VoiceConnectionStatus = "Loading engine...";
+        ClearError();
+
+        try
+        {
+            await _voiceService.ConnectAsync();
+
+            if (_voiceService.ConnectionState == VoiceConnectionState.Connected)
+            {
+                AvailableVoices.Clear();
+                foreach (var voice in _voiceService.AvailableVoices)
+                {
+                    AvailableVoices.Add(voice);
+                }
+
+                IsVoiceConnected = true;
+                VoiceConnectionStatus = $"Ready ({AvailableVoices.Count} voices)";
+            }
+            else
+            {
+                IsVoiceConnected = false;
+                VoiceConnectionStatus = "Failed to load engine";
+            }
+        }
+        catch (Exception ex)
+        {
+            IsVoiceConnected = false;
+            VoiceConnectionStatus = $"Failed: {ex.Message}";
+            Logger.LogWarning(ex, "Voice engine test failed");
         }
     }
 
@@ -192,6 +290,15 @@ public partial class SettingsViewModel : ViewModelBase
                 o.StreamResponses = StreamResponses;
                 o.ShowTokenCounts = ShowTokenCounts;
                 o.ShowGenerationSpeed = ShowGenerationSpeed;
+            });
+
+            await _settingsService.UpdateVoiceOptionsAsync(o =>
+            {
+                o.AutoSpeak = AutoSpeak;
+                o.DefaultVoice = DefaultVoice ?? "af_bella";
+                o.Volume = (float)VoiceVolume;
+                o.Speed = (float)VoiceSpeed;
+                o.UseGpu = UseGpu;
             });
         });
     }

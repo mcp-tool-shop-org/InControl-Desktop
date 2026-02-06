@@ -2,7 +2,7 @@
 
 $ErrorActionPreference = "Stop"
 
-$msixPath = "artifacts\msix\InControl-Desktop-0.9.0-rc.1.msix"
+$msixPath = "artifacts\msix\InControl-Desktop-0.9.0-rc.2.msix"
 $thumbprint = "FBF2F3F607DD39655B55D0E6B3DC74FEC6F4F0D6"
 
 # Find signtool
