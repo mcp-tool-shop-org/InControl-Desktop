@@ -9,7 +9,7 @@ namespace InControl.ViewModels.Sessions;
 /// </summary>
 public sealed class SessionItemViewModel : INotifyPropertyChanged
 {
-    private readonly Conversation _conversation;
+    private Conversation _conversation;
     private bool _isPinned;
     private bool _isSelected;
 
@@ -51,6 +51,19 @@ public sealed class SessionItemViewModel : INotifyPropertyChanged
     public string RelativeTime => UXStrings.Time.Relative(LastModified);
 
     /// <summary>
+    /// Subtitle shown under the title: relative time + message count.
+    /// </summary>
+    public string Subtitle
+    {
+        get
+        {
+            var time = RelativeTime;
+            var count = MessageCount;
+            return count > 0 ? $"{time} \u00B7 {count} messages" : time;
+        }
+    }
+
+    /// <summary>
     /// Whether this session is pinned to the top.
     /// </summary>
     public bool IsPinned
@@ -86,6 +99,19 @@ public sealed class SessionItemViewModel : INotifyPropertyChanged
     /// Gets the underlying conversation.
     /// </summary>
     public Conversation GetConversation() => _conversation;
+
+    /// <summary>
+    /// Updates the underlying conversation (e.g. after rename or new messages).
+    /// </summary>
+    public void UpdateConversation(Conversation conversation)
+    {
+        _conversation = conversation;
+        OnPropertyChanged(nameof(Title));
+        OnPropertyChanged(nameof(MessageCount));
+        OnPropertyChanged(nameof(LastModified));
+        OnPropertyChanged(nameof(RelativeTime));
+        OnPropertyChanged(nameof(Subtitle));
+    }
 
     public event PropertyChangedEventHandler? PropertyChanged;
 

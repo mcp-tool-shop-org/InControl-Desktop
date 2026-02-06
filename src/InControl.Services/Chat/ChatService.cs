@@ -8,14 +8,17 @@ namespace InControl.Services.Chat;
 
 /// <summary>
 /// Chat service that orchestrates conversations using the inference client.
-/// Manages conversation lifecycle and delegates inference to IInferenceClient.
+/// Manages conversation lifecycle, delegates inference to IInferenceClient,
+/// and persists conversations to disk via IConversationStorage.
 /// </summary>
 public sealed class ChatService : IChatService
 {
     private readonly IInferenceClient _inferenceClient;
+    private readonly IConversationStorage _storage;
     private readonly ILogger<ChatService> _logger;
     private readonly Dictionary<Guid, Conversation> _conversations = new();
     private readonly Dictionary<Guid, CancellationTokenSource> _activeGenerations = new();
+    private bool _loaded;
 
     public event EventHandler<ConversationEventArgs>? ConversationCreated;
     public event EventHandler<ConversationEventArgs>? ConversationUpdated;
@@ -23,47 +26,83 @@ public sealed class ChatService : IChatService
 
     public ChatService(
         IInferenceClient inferenceClient,
+        IConversationStorage storage,
         ILogger<ChatService> logger)
     {
         _inferenceClient = inferenceClient;
+        _storage = storage;
         _logger = logger;
     }
 
-    public Task<Conversation> CreateConversationAsync(
+    /// <summary>
+    /// Loads all persisted conversations into memory.
+    /// Called once on first access.
+    /// </summary>
+    public async Task EnsureLoadedAsync(CancellationToken ct = default)
+    {
+        if (_loaded) return;
+        _loaded = true;
+
+        try
+        {
+            var conversations = await _storage.LoadAllAsync(ct);
+            foreach (var c in conversations)
+            {
+                _conversations[c.Id] = c;
+            }
+            _logger.LogInformation("Loaded {Count} conversations from storage", conversations.Count);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to load conversations from storage");
+        }
+    }
+
+    public async Task<Conversation> CreateConversationAsync(
         string? title = null,
         string? model = null,
         string? systemPrompt = null,
         CancellationToken ct = default)
     {
+        await EnsureLoadedAsync(ct);
+
         var conversation = Conversation.Create(title, model, systemPrompt);
         _conversations[conversation.Id] = conversation;
+
+        // Persist immediately
+        await SaveQuietly(conversation, ct);
 
         _logger.LogInformation("Created conversation {Id} with model {Model}", conversation.Id, model);
         ConversationCreated?.Invoke(this, new ConversationEventArgs { Conversation = conversation });
 
-        return Task.FromResult(conversation);
+        return conversation;
     }
 
-    public Task<Conversation?> GetConversationAsync(Guid conversationId, CancellationToken ct = default)
+    public async Task<Conversation?> GetConversationAsync(Guid conversationId, CancellationToken ct = default)
     {
+        await EnsureLoadedAsync(ct);
         _conversations.TryGetValue(conversationId, out var conversation);
-        return Task.FromResult(conversation);
+        return conversation;
     }
 
-    public Task<IReadOnlyList<Conversation>> GetConversationsAsync(CancellationToken ct = default)
+    public async Task<IReadOnlyList<Conversation>> GetConversationsAsync(CancellationToken ct = default)
     {
+        await EnsureLoadedAsync(ct);
+
         var list = _conversations.Values
             .OrderByDescending(c => c.ModifiedAt)
             .ToList();
-        return Task.FromResult<IReadOnlyList<Conversation>>(list);
+        return list;
     }
 
-    public Task<Conversation> UpdateConversationAsync(
+    public async Task<Conversation> UpdateConversationAsync(
         Guid conversationId,
         string? title = null,
         string? model = null,
         CancellationToken ct = default)
     {
+        await EnsureLoadedAsync(ct);
+
         if (!_conversations.TryGetValue(conversationId, out var conversation))
         {
             throw new KeyNotFoundException($"Conversation {conversationId} not found");
@@ -80,18 +119,26 @@ public sealed class ChatService : IChatService
         }
 
         _conversations[conversationId] = conversation;
+
+        // Persist
+        await SaveQuietly(conversation, ct);
+
         ConversationUpdated?.Invoke(this, new ConversationEventArgs { Conversation = conversation });
 
-        return Task.FromResult(conversation);
+        return conversation;
     }
 
-    public Task DeleteConversationAsync(Guid conversationId, CancellationToken ct = default)
+    public async Task DeleteConversationAsync(Guid conversationId, CancellationToken ct = default)
     {
+        await EnsureLoadedAsync(ct);
+
         if (_conversations.Remove(conversationId, out var conversation))
         {
+            // Delete from disk
+            await _storage.DeleteAsync(conversationId, ct);
+
             ConversationDeleted?.Invoke(this, new ConversationEventArgs { Conversation = conversation });
         }
-        return Task.CompletedTask;
     }
 
     public async IAsyncEnumerable<string> SendMessageAsync(
@@ -135,6 +182,9 @@ public sealed class ChatService : IChatService
             var assistantMessage = Message.Assistant(responseContent.ToString(), model);
             conversation = conversation.WithMessage(assistantMessage);
             _conversations[conversationId] = conversation;
+
+            // Persist after completed exchange
+            await SaveQuietly(conversation);
 
             ConversationUpdated?.Invoke(this, new ConversationEventArgs { Conversation = conversation });
         }
@@ -197,6 +247,9 @@ public sealed class ChatService : IChatService
             var assistantMessage = Message.Assistant(responseContent.ToString(), model);
             conversation = conversation.WithMessage(assistantMessage);
             _conversations[conversationId] = conversation;
+
+            // Persist after regeneration
+            await SaveQuietly(conversation);
         }
         finally
         {
@@ -211,6 +264,21 @@ public sealed class ChatService : IChatService
         {
             _logger.LogDebug("Stopping generation for conversation {Id}", conversationId);
             cts.Cancel();
+        }
+    }
+
+    /// <summary>
+    /// Saves a conversation without throwing on failure.
+    /// </summary>
+    private async Task SaveQuietly(Conversation conversation, CancellationToken ct = default)
+    {
+        try
+        {
+            await _storage.SaveAsync(conversation, ct);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to persist conversation {Id}", conversation.Id);
         }
     }
 }

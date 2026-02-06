@@ -17,13 +17,20 @@
             <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
 
-        <!-- App Name -->
-        <TextBlock Grid.Column="0"
-                   Text="InControl"
-                   Style="{StaticResource TitleTextBlockStyle}"
-                   VerticalAlignment="Center"
-                   Margin="16,0,24,0"
-                   AutomationProperties.HeadingLevel="Level1" />
+        <!-- App Name (clickable — navigates home) -->
+        <Button Grid.Column="0"
+                x:Name="HomeButton"
+                Background="Transparent"
+                BorderThickness="0"
+                Padding="16,0,24,0"
+                VerticalAlignment="Stretch"
+                ToolTipService.ToolTip="Go home"
+                AutomationProperties.Name="InControl Home">
+            <TextBlock Text="InControl"
+                       Style="{StaticResource TitleTextBlockStyle}"
+                       VerticalAlignment="Center"
+                       AutomationProperties.HeadingLevel="Level1" />
+        </Button>
 
         <!-- Model Selector (now opens Model Manager) -->
         <Button Grid.Column="1"

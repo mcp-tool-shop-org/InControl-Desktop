@@ -221,7 +221,7 @@ public sealed class SessionListViewModel : INotifyPropertyChanged
         SearchQuery = string.Empty;
     }
 
-    private void ApplyFilter()
+    public void ApplyFilter()
     {
         FilteredSessions.Clear();
 

@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using InControl.Services.Chat;
 using InControl.Services.Interfaces;
+using InControl.Services.Storage;
 using InControl.Services.Voice;
 
 namespace InControl.Services.Extensions;
@@ -17,6 +18,8 @@ public static class ServiceCollectionExtensions
     /// <returns>The service collection for chaining.</returns>
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
+        services.AddSingleton<IFileStore, FileStore>();
+        services.AddSingleton<IConversationStorage, JsonConversationStorage>();
         services.AddSingleton<IChatService, ChatService>();
         return services;
     }

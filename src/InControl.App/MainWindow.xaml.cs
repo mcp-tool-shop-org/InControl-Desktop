@@ -7,11 +7,13 @@ using InControl.App.Pages;
 using InControl.App.Services;
 using InControl.Core.Configuration;
 using InControl.Core.Models;
+using InControl.Core.Storage;
 using InControl.Core.UX;
 using InControl.Inference.Interfaces;
 using InControl.Services.Interfaces;
 using InControl.Services.Voice;
 using InControl.ViewModels.ConversationView;
+using InControl.ViewModels.Sessions;
 
 namespace InControl.App;
 
@@ -26,6 +28,7 @@ public sealed partial class MainWindow : Window
     private bool _isOffline;
     private readonly NavigationService _navigation = NavigationService.Instance;
     private readonly ConversationViewModel _conversationVm = new();
+    private readonly SessionListViewModel _sessionListVm = new();
     private CancellationTokenSource? _runCts;
 
     /// <summary>
@@ -53,8 +56,14 @@ public sealed partial class MainWindow : Window
         SetupNavigation();
         SetupEventHandlers();
         InitializeStatusStrip();
+        InitializeSidebar();
+
+        // Ensure data directories exist
+        DataPaths.EnsureDirectoriesExist();
+
         _ = LoadModelsAsync();
         _ = InitializeVoiceAsync();
+        _ = LoadSessionsAsync();
     }
 
     private void InitializeTheme()
@@ -81,9 +90,43 @@ public sealed partial class MainWindow : Window
         _navigation.NavigatedHome += (s, e) => NavigateHomeInternal();
     }
 
+    private void InitializeSidebar()
+    {
+        SessionSidebar.SetViewModel(_sessionListVm);
+    }
+
+    /// <summary>
+    /// Loads persisted sessions into the sidebar.
+    /// </summary>
+    private async Task LoadSessionsAsync()
+    {
+        try
+        {
+            var chatService = App.GetService<IChatService>();
+
+            // GetConversationsAsync triggers EnsureLoadedAsync inside ChatService
+            var conversations = await chatService.GetConversationsAsync();
+
+            DispatcherQueue.TryEnqueue(() =>
+            {
+                foreach (var conversation in conversations)
+                {
+                    _sessionListVm.AddSession(conversation);
+                }
+                _sessionListVm.ApplyFilter();
+                SessionSidebar.RefreshVisualState();
+            });
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Failed to load sessions: {ex.Message}");
+        }
+    }
+
     private void SetupEventHandlers()
     {
         // AppBar events - use NavigationService
+        AppBar.HomeRequested += (s, e) => _navigation.GoHome();
         AppBar.SettingsRequested += (s, e) => _navigation.Navigate<SettingsPage>();
         AppBar.AssistantRequested += (s, e) => _navigation.Navigate<AssistantPage>();
         AppBar.ExtensionsRequested += (s, e) => _navigation.Navigate<ExtensionsPage>();
@@ -107,6 +150,10 @@ public sealed partial class MainWindow : Window
 
         // SessionSidebar events
         SessionSidebar.NewSessionRequested += OnNewSessionRequested;
+        SessionSidebar.SessionSelected += OnSessionSelected;
+        SessionSidebar.SessionRenamed += OnSessionRenamed;
+        SessionSidebar.SessionDeleteRequested += OnSessionDeleteRequested;
+        SessionSidebar.SessionExportRequested += OnSessionExportRequested;
 
         // ConversationView InputComposer events
         ConversationView.Composer.ModelManagerRequested += (s, e) => _navigation.Navigate<ModelManagerPage>();
@@ -242,6 +289,11 @@ public sealed partial class MainWindow : Window
                 model: model,
                 systemPrompt: systemPrompt);
             _conversationVm.LoadConversation(conversation);
+
+            // Add to sidebar
+            _sessionListVm.AddSession(conversation);
+            SessionSidebar.RefreshVisualState();
+            SessionSidebar.SelectSession(conversation.Id);
         }
 
         // Add user message to UI
@@ -291,6 +343,9 @@ public sealed partial class MainWindow : Window
 
             _conversationVm.ExecutionState = ExecutionState.Complete;
             ConversationView.Composer.ExecutionState = ExecutionState.Idle;
+
+            // Update sidebar item with latest conversation data
+            UpdateSidebarSession(conversation.Id);
         }
         catch (OperationCanceledException)
         {
@@ -324,6 +379,42 @@ public sealed partial class MainWindow : Window
             {
                 _conversationVm.ExecutionState = ExecutionState.Idle;
             }
+        }
+    }
+
+    /// <summary>
+    /// Updates a session item in the sidebar with the latest conversation data from ChatService.
+    /// </summary>
+    private async void UpdateSidebarSession(Guid conversationId)
+    {
+        try
+        {
+            var chatService = App.GetService<IChatService>();
+            var updated = await chatService.GetConversationAsync(conversationId);
+            if (updated is null) return;
+
+            // Find the matching session item and update it
+            foreach (var session in _sessionListVm.FilteredSessions)
+            {
+                if (session.Id == conversationId)
+                {
+                    session.UpdateConversation(updated);
+                    return;
+                }
+            }
+
+            foreach (var session in _sessionListVm.PinnedSessions)
+            {
+                if (session.Id == conversationId)
+                {
+                    session.UpdateConversation(updated);
+                    return;
+                }
+            }
+        }
+        catch
+        {
+            // Non-critical — sidebar won't update but that's OK
         }
     }
 
@@ -397,6 +488,144 @@ public sealed partial class MainWindow : Window
         {
             var chatService = App.GetService<IChatService>();
             chatService.StopGeneration(conversation.Id);
+        }
+    }
+
+    /// <summary>
+    /// Handles a session being selected in the sidebar.
+    /// Loads the conversation into the conversation view.
+    /// </summary>
+    private async void OnSessionSelected(object? sender, Guid conversationId)
+    {
+        try
+        {
+            var chatService = App.GetService<IChatService>();
+            var conversation = await chatService.GetConversationAsync(conversationId);
+
+            if (conversation is null) return;
+
+            // Navigate home if we're on a page
+            _navigation.GoHome();
+
+            // Load conversation into the view
+            if (ConversationView.ViewModel is null)
+            {
+                ConversationView.ViewModel = _conversationVm;
+            }
+
+            _conversationVm.LoadConversation(conversation);
+
+            if (conversation.Messages.Count > 0)
+            {
+                ConversationView.ShowMessages();
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Failed to load session: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Handles a session rename request from the sidebar.
+    /// </summary>
+    private async void OnSessionRenamed(object? sender, (Guid Id, string NewTitle) args)
+    {
+        try
+        {
+            var chatService = App.GetService<IChatService>();
+            var updated = await chatService.UpdateConversationAsync(args.Id, title: args.NewTitle);
+
+            // Update sidebar item
+            UpdateSidebarSession(args.Id);
+
+            // Update current conversation view title if this is the active conversation
+            var current = _conversationVm.GetConversation();
+            if (current?.Id == args.Id)
+            {
+                _conversationVm.LoadConversation(updated);
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Failed to rename session: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Handles a session delete request from the sidebar.
+    /// </summary>
+    private async void OnSessionDeleteRequested(object? sender, Guid conversationId)
+    {
+        try
+        {
+            var chatService = App.GetService<IChatService>();
+            await chatService.DeleteConversationAsync(conversationId);
+
+            // Remove from sidebar ViewModel
+            SessionItemViewModel? toRemove = null;
+            foreach (var s in _sessionListVm.Sessions)
+            {
+                if (s.Id == conversationId) { toRemove = s; break; }
+            }
+            if (toRemove is null)
+            {
+                foreach (var s in _sessionListVm.PinnedSessions)
+                {
+                    if (s.Id == conversationId) { toRemove = s; break; }
+                }
+            }
+            if (toRemove is not null)
+            {
+                _sessionListVm.RemoveSession(toRemove);
+                SessionSidebar.RefreshVisualState();
+            }
+
+            // If this was the active conversation, clear it
+            var current = _conversationVm.GetConversation();
+            if (current?.Id == conversationId)
+            {
+                _conversationVm.ClearConversation();
+                ConversationView.Composer.Clear();
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Failed to delete session: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Handles a session export request from the sidebar.
+    /// </summary>
+    private async void OnSessionExportRequested(object? sender, Guid conversationId)
+    {
+        try
+        {
+            var storage = App.GetService<IConversationStorage>();
+            var json = await storage.ExportAsync(conversationId);
+
+            // Copy to clipboard
+            var dataPackage = new Windows.ApplicationModel.DataTransfer.DataPackage();
+            dataPackage.SetText(json);
+            Windows.ApplicationModel.DataTransfer.Clipboard.SetContent(dataPackage);
+
+            // Show confirmation
+            if (this.Content is FrameworkElement root)
+            {
+                var dialog = new ContentDialog
+                {
+                    Title = "Exported",
+                    Content = "Session JSON copied to clipboard.",
+                    CloseButtonText = "OK",
+                    XamlRoot = root.XamlRoot
+                };
+                await dialog.ShowAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Failed to export session: {ex.Message}");
         }
     }
 

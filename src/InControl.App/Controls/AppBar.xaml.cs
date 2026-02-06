@@ -69,6 +69,11 @@ public sealed partial class AppBar : UserControl
     /// </summary>
     public event EventHandler? HelpRequested;
 
+    /// <summary>
+    /// Event raised when the app name/logo is clicked to navigate home.
+    /// </summary>
+    public event EventHandler? HomeRequested;
+
     #endregion
 
     #region Properties
@@ -136,6 +141,7 @@ public sealed partial class AppBar : UserControl
 
     private void SetupEventHandlers()
     {
+        HomeButton.Click += OnHomeClick;
         CancelButton.Click += OnCancelClick;
         SearchButton.Click += OnSearchClick;
         ModelManagerButton.Click += OnModelManagerClick;
@@ -202,6 +208,11 @@ public sealed partial class AppBar : UserControl
     #endregion
 
     #region Event Handlers
+
+    private void OnHomeClick(object sender, RoutedEventArgs e)
+    {
+        HomeRequested?.Invoke(this, EventArgs.Empty);
+    }
 
     private void OnCancelClick(object sender, RoutedEventArgs e)
     {
