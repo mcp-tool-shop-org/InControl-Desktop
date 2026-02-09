@@ -31,7 +31,9 @@ public static class ServiceCollectionExtensions
     /// <returns>The service collection for chaining.</returns>
     public static IServiceCollection AddVoiceServices(this IServiceCollection services)
     {
-        services.AddSingleton<IVoiceService, KokoroVoiceService>();
+        services.AddSingleton<KokoroVoiceService>();
+        services.AddSingleton<WindowsVoiceService>();
+        services.AddSingleton<IVoiceService, FallbackVoiceService>();
         return services;
     }
 }

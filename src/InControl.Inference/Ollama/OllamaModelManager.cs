@@ -39,27 +39,19 @@ public sealed class OllamaModelManager : IModelManager
 
     public async Task<IReadOnlyList<ModelInfo>> ListModelsAsync(CancellationToken ct = default)
     {
-        try
-        {
-            var client = GetClient();
-            var models = await client.ListLocalModelsAsync(ct);
+        var client = GetClient();
+        var models = await client.ListLocalModelsAsync(ct);
 
-            return models.Select(m => new ModelInfo
-            {
-                Id = m.Name,
-                Name = m.Name,
-                SizeBytes = m.Size,
-                ParameterCount = m.Details?.ParameterSize,
-                Quantization = m.Details?.QuantizationLevel,
-                Family = m.Details?.Family,
-                ModifiedAt = m.ModifiedAt
-            }).ToList();
-        }
-        catch (Exception ex)
+        return models.Select(m => new ModelInfo
         {
-            _logger.LogError(ex, "Failed to list models from Ollama");
-            return [];
-        }
+            Id = m.Name,
+            Name = m.Name,
+            SizeBytes = m.Size,
+            ParameterCount = m.Details?.ParameterSize,
+            Quantization = m.Details?.QuantizationLevel,
+            Family = m.Details?.Family,
+            ModifiedAt = m.ModifiedAt
+        }).ToList();
     }
 
     public async Task<ModelInfo> PullModelAsync(string modelId, CancellationToken ct = default)

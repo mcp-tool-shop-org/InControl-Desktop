@@ -113,6 +113,23 @@ public sealed partial class InputComposer : UserControl
     }
 
     /// <summary>
+    /// Selects a model by name in the model selector dropdown.
+    /// </summary>
+    public void SelectModel(string? modelName)
+    {
+        if (string.IsNullOrWhiteSpace(modelName)) return;
+
+        foreach (var item in ModelSelector.Items)
+        {
+            if (item is string s && s.Equals(modelName, StringComparison.OrdinalIgnoreCase))
+            {
+                ModelSelector.SelectedItem = item;
+                return;
+            }
+        }
+    }
+
+    /// <summary>
     /// Updates the context count display.
     /// </summary>
     public void SetContextCount(int count)

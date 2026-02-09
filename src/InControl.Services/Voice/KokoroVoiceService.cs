@@ -207,6 +207,8 @@ public sealed class KokoroVoiceService : IVoiceService, IDisposable
         catch (Exception ex)
         {
             _logger.LogWarning(ex, "Speech failed");
+            ConnectionState = VoiceConnectionState.Error;
+            throw;
         }
         finally
         {

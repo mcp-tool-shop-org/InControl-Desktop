@@ -61,6 +61,13 @@ public sealed partial class MainWindow : Window
         // Ensure data directories exist
         DataPaths.EnsureDirectoriesExist();
 
+        // Reload models when settings change (e.g., Ollama URL or default model)
+        var settingsService = App.Services.GetService(typeof(ISettingsService)) as ISettingsService;
+        if (settingsService != null)
+        {
+            settingsService.SettingsChanged += async (_, _) => await LoadModelsAsync();
+        }
+
         _ = LoadModelsAsync();
         _ = InitializeVoiceAsync();
         _ = LoadSessionsAsync();
@@ -203,9 +210,19 @@ public sealed partial class MainWindow : Window
             {
                 ConversationView.SetAvailableModels(chatModels);
 
-                if (chatModels.Count > 0)
+                // Select preferred model from settings, or fall back to first
+                var settings = App.Services.GetService(typeof(ISettingsService)) as ISettingsService;
+                var preferred = settings?.InferenceOptions.DefaultModel;
+                if (!string.IsNullOrWhiteSpace(preferred))
                 {
-                    StatusStrip.SetModelStatus(chatModels[0], true);
+                    ConversationView.Composer.SelectModel(preferred);
+                }
+
+                var selected = ConversationView.Composer.SelectedModel
+                    ?? (chatModels.Count > 0 ? chatModels[0] : null);
+                if (selected != null)
+                {
+                    StatusStrip.SetModelStatus(selected, true);
                     StatusStrip.SetConnectivityStatus(true);
                 }
             });
