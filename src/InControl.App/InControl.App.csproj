@@ -38,6 +38,7 @@
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <WindowsPackageType>MSIX</WindowsPackageType>
     <EnableMsixTooling>true</EnableMsixTooling>
+    <SelfContained>true</SelfContained>
     <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <AppxPackageSigningEnabled>false</AppxPackageSigningEnabled>
