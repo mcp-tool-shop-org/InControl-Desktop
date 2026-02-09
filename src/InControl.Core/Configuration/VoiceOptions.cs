@@ -13,7 +13,7 @@ public sealed class VoiceOptions
     /// <summary>
     /// Whether to automatically speak assistant responses.
     /// </summary>
-    public bool AutoSpeak { get; set; } = false;
+    public bool AutoSpeak { get; set; } = true;
 
     /// <summary>
     /// Default voice identifier (e.g. "af_bella").
