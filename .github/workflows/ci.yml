@@ -40,8 +40,11 @@ jobs:
       - name: Restore
         run: dotnet restore
 
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v2
+
       - name: Build
-        run: dotnet build --configuration ${{ env.CONFIGURATION }} --no-restore
+        run: msbuild InControl.sln /p:Configuration=${{ env.CONFIGURATION }} /p:Platform=x64 /t:Build /v:minimal
 
       - name: Test
         run: dotnet test --configuration ${{ env.CONFIGURATION }} --no-build --verbosity normal --logger "trx;LogFileName=test-results.trx"
@@ -90,8 +93,11 @@ jobs:
       - name: Restore
         run: dotnet restore
 
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v2
+
       - name: Build with Analyzers
-        run: dotnet build --configuration Release -warnaserror
+        run: msbuild InControl.sln /p:Configuration=Release /p:Platform=x64 /t:Build /v:minimal /warnaserror
         continue-on-error: true  # Report but don't fail
 
   package-check:
