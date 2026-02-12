@@ -138,7 +138,7 @@ public static class SessionExporter
             };
 
             // Write file
-            await File.WriteAllTextAsync(outputPath, content, Encoding.UTF8, ct);
+            await File.WriteAllTextAsync(outputPath, content, Encoding.UTF8, ct).ConfigureAwait(false);
 
             return outputPath;
         }
@@ -180,7 +180,7 @@ public static class SessionExporter
             var manifestEntry = archive.CreateEntry("manifest.json");
             await using (var writer = new StreamWriter(manifestEntry.Open()))
             {
-                await writer.WriteAsync(JsonSerializer.Serialize(manifest, JsonOptions));
+                await writer.WriteAsync(JsonSerializer.Serialize(manifest, JsonOptions)).ConfigureAwait(false);
             }
 
             // Add each conversation
@@ -193,7 +193,7 @@ public static class SessionExporter
 
                 var entry = archive.CreateEntry(entryName);
                 await using var writer = new StreamWriter(entry.Open());
-                await writer.WriteAsync(ToJson(conversation));
+                await writer.WriteAsync(ToJson(conversation)).ConfigureAwait(false);
             }
 
             return outputPath;
@@ -259,7 +259,7 @@ public static class SessionImporter
                 return InControlError.Create(ErrorCode.FileNotFound, $"File not found: {filePath}");
             }
 
-            var json = await File.ReadAllTextAsync(filePath, ct);
+            var json = await File.ReadAllTextAsync(filePath, ct).ConfigureAwait(false);
 
             // Try to deserialize as ConversationExport first
             try
@@ -335,7 +335,7 @@ public static class SessionImporter
 
                 await using var stream = entry.Open();
                 using var reader = new StreamReader(stream);
-                var json = await reader.ReadToEndAsync(ct);
+                var json = await reader.ReadToEndAsync(ct).ConfigureAwait(false);
 
                 try
                 {

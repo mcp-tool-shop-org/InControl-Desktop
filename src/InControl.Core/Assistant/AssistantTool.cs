@@ -292,7 +292,7 @@ public sealed class ToolRegistry
 
         try
         {
-            result = await tool.ExecuteAsync(context, ct);
+            result = await tool.ExecuteAsync(context, ct).ConfigureAwait(false);
         }
         catch (OperationCanceledException)
         {
@@ -321,6 +321,11 @@ public sealed class ToolRegistry
         lock (_lock)
         {
             _auditLog.Add(record);
+
+            if (_auditLog.Count > 10_000)
+            {
+                _auditLog.RemoveRange(0, 1_000);
+            }
         }
 
         ToolInvoked?.Invoke(this, new ToolInvokedEventArgs(record));

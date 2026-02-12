@@ -148,13 +148,13 @@ public static class DataPaths
             foreach (var file in Directory.GetFiles(tempPath))
             {
                 try { File.Delete(file); }
-                catch { /* Ignore cleanup errors */ }
+                catch (IOException) { /* Ignore cleanup errors */ }
             }
 
             foreach (var dir in Directory.GetDirectories(tempPath))
             {
                 try { Directory.Delete(dir, recursive: true); }
-                catch { /* Ignore cleanup errors */ }
+                catch (IOException) { /* Ignore cleanup errors */ }
             }
         }
     }
@@ -204,7 +204,7 @@ public static class DataPaths
             return Directory.GetFiles(path, "*", SearchOption.AllDirectories)
                 .Sum(file => new FileInfo(file).Length);
         }
-        catch
+        catch (IOException)
         {
             return 0;
         }

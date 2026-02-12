@@ -168,7 +168,7 @@ public sealed record SecurityConfig
     /// <summary>
     /// List of allowed data paths.
     /// </summary>
-    public IReadOnlyList<string> AllowedDataPaths { get; init; } = Array.Empty<string>();
+    public IReadOnlyList<string> AllowedDataPaths { get; init; } = [];
 
     /// <summary>
     /// Whether inference is properly isolated.
@@ -188,7 +188,7 @@ public sealed record SecurityConfig
     /// <summary>
     /// Additional security notes or warnings.
     /// </summary>
-    public IReadOnlyList<string> SecurityNotes { get; init; } = Array.Empty<string>();
+    public IReadOnlyList<string> SecurityNotes { get; init; } = [];
 
     /// <summary>
     /// Creates a default secure configuration.

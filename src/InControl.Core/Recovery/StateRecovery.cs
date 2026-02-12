@@ -39,7 +39,7 @@ public sealed class StateRecovery
         {
             ct.ThrowIfCancellationRequested();
 
-            var issue = await ValidateSessionFileAsync(file, ct);
+            var issue = await ValidateSessionFileAsync(file, ct).ConfigureAwait(false);
             if (issue != null)
             {
                 issues.Add(issue);
@@ -84,7 +84,7 @@ public sealed class StateRecovery
             }
 
             // Try to deserialize
-            var result = await StateSerializer.DeserializeAsync<AppState>(stream, ct);
+            var result = await StateSerializer.DeserializeAsync<AppState>(stream, ct).ConfigureAwait(false);
             if (!result.IsSuccess)
             {
                 return new StateIssue(
@@ -230,7 +230,7 @@ public sealed class StateRecovery
         try
         {
             // Create backup of current state first
-            var currentBackupResult = await CreateBackupAsync(ct);
+            var currentBackupResult = await CreateBackupAsync(ct).ConfigureAwait(false);
             if (!currentBackupResult.IsSuccess)
             {
                 return InControlError.Create(
@@ -271,7 +271,7 @@ public sealed class StateRecovery
             // Export before reset if requested
             if (exportFirst)
             {
-                var backupResult = await CreateBackupAsync(ct);
+                var backupResult = await CreateBackupAsync(ct).ConfigureAwait(false);
                 if (backupResult.IsSuccess)
                 {
                     exportPath = backupResult.Value;
@@ -331,7 +331,7 @@ public sealed class StateRecovery
         {
             RecoveryAction.Quarantine => QuarantineFile(issue.FilePath).Map(_ => Unit.Value),
             RecoveryAction.Delete => DeleteFile(issue.FilePath),
-            RecoveryAction.RestoreBackup => await RestoreLatestBackupAsync(ct),
+            RecoveryAction.RestoreBackup => await RestoreLatestBackupAsync(ct).ConfigureAwait(false),
             RecoveryAction.Retry => Result<Unit>.Success(Unit.Value), // Just signal retry
             RecoveryAction.Ignore => Result<Unit>.Success(Unit.Value),
             _ => InControlError.Create(ErrorCode.InvalidOperation, $"Unknown recovery action: {action}")
@@ -362,7 +362,7 @@ public sealed class StateRecovery
             return InControlError.Create(ErrorCode.FileNotFound, "No backups available to restore");
         }
 
-        return await RestoreBackupAsync(backups[0].FilePath, ct);
+        return await RestoreBackupAsync(backups[0].FilePath, ct).ConfigureAwait(false);
     }
 }
 

@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
 
 namespace InControl.Core.Policy;
@@ -22,6 +23,7 @@ public sealed class PolicyEngine
     private PolicyDocument? _userPolicy;
     private PolicyDocument? _sessionPolicy;
     private readonly List<PolicyAuditEntry> _auditLog = [];
+    private static readonly ConcurrentDictionary<string, Regex> _patternCache = new();
     private DateTimeOffset _loadedAt;
 
     /// <summary>
@@ -59,7 +61,7 @@ public sealed class PolicyEngine
         var loaded = new List<(PolicySource Source, string Path)>();
 
         // Load organization policy
-        var orgResult = await PolicySerializer.LoadFromFileAsync(PolicyPaths.GetOrgPolicyPath(), ct);
+        var orgResult = await PolicySerializer.LoadFromFileAsync(PolicyPaths.GetOrgPolicyPath(), ct).ConfigureAwait(false);
         if (orgResult.IsSuccess)
         {
             lock (_lock) { _orgPolicy = orgResult.Document; }
@@ -71,7 +73,7 @@ public sealed class PolicyEngine
         }
 
         // Load team policy
-        var teamResult = await PolicySerializer.LoadFromFileAsync(PolicyPaths.GetTeamPolicyPath(), ct);
+        var teamResult = await PolicySerializer.LoadFromFileAsync(PolicyPaths.GetTeamPolicyPath(), ct).ConfigureAwait(false);
         if (teamResult.IsSuccess)
         {
             lock (_lock) { _teamPolicy = teamResult.Document; }
@@ -83,7 +85,7 @@ public sealed class PolicyEngine
         }
 
         // Load user policy
-        var userResult = await PolicySerializer.LoadFromFileAsync(PolicyPaths.GetUserPolicyPath(), ct);
+        var userResult = await PolicySerializer.LoadFromFileAsync(PolicyPaths.GetUserPolicyPath(), ct).ConfigureAwait(false);
         if (userResult.IsSuccess)
         {
             lock (_lock) { _userPolicy = userResult.Document; }
@@ -675,9 +677,12 @@ public sealed class PolicyEngine
 
         if (pattern.Contains('*'))
         {
-            // Convert glob pattern to regex
-            var regex = "^" + Regex.Escape(pattern).Replace("\\*", ".*") + "$";
-            return Regex.IsMatch(value, regex, RegexOptions.IgnoreCase);
+            // Convert glob pattern to regex, using a cache to avoid recompilation
+            var regex = _patternCache.GetOrAdd(pattern, p =>
+                new Regex(
+                    "^" + Regex.Escape(p).Replace("\\*", ".*") + "$",
+                    RegexOptions.IgnoreCase | RegexOptions.Compiled));
+            return regex.IsMatch(value);
         }
 
         return value.Equals(pattern, StringComparison.OrdinalIgnoreCase);

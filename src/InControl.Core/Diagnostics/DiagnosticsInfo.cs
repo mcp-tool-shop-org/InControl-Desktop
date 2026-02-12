@@ -115,11 +115,7 @@ public sealed record DiagnosticsReport(
     /// </summary>
     public string ToJson()
     {
-        return System.Text.Json.JsonSerializer.Serialize(this, new System.Text.Json.JsonSerializerOptions
-        {
-            WriteIndented = true,
-            PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase
-        });
+        return State.StateSerializer.Serialize(this);
     }
 }
 

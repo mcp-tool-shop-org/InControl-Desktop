@@ -97,7 +97,7 @@ public sealed class PluginHost : IDisposable
             var context = _sandbox.CreateContext(manifest);
 
             // Initialize the plugin within the sandbox
-            await instance.InitializeAsync(context, ct);
+            await instance.InitializeAsync(context, ct).ConfigureAwait(false);
 
             var loadedPlugin = new LoadedPlugin(
                 Manifest: manifest,
@@ -146,7 +146,7 @@ public sealed class PluginHost : IDisposable
             // Dispose plugin instance
             if (plugin.Instance is IAsyncDisposable asyncDisposable)
             {
-                await asyncDisposable.DisposeAsync();
+                await asyncDisposable.DisposeAsync().ConfigureAwait(false);
             }
             else if (plugin.Instance is IDisposable disposable)
             {
@@ -250,7 +250,7 @@ public sealed class PluginHost : IDisposable
                 actionId,
                 parameters,
                 plugin.Context,
-                ct);
+                ct).ConfigureAwait(false);
 
             var duration = DateTimeOffset.UtcNow - startTime;
 

@@ -201,7 +201,7 @@ public sealed class PolicyGovernedConnectivityManager
         }
 
         // Forward to inner manager
-        var response = await _innerManager.RequestAsync(request, ct);
+        var response = await _innerManager.RequestAsync(request, ct).ConfigureAwait(false);
 
         if (response == null)
         {

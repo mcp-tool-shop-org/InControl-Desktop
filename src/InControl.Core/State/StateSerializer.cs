@@ -99,7 +99,7 @@ public static class StateSerializer
         CancellationToken ct = default)
     {
         var options = compact ? CompactOptions : SerializerOptions;
-        await JsonSerializer.SerializeAsync(stream, state, options, ct);
+        await JsonSerializer.SerializeAsync(stream, state, options, ct).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -111,7 +111,7 @@ public static class StateSerializer
     {
         try
         {
-            var result = await JsonSerializer.DeserializeAsync<T>(stream, SerializerOptions, ct);
+            var result = await JsonSerializer.DeserializeAsync<T>(stream, SerializerOptions, ct).ConfigureAwait(false);
             if (result is null)
             {
                 return InControlError.Create(ErrorCode.DeserializationFailed, "Deserialization returned null.");

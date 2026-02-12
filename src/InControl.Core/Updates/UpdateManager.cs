@@ -130,7 +130,7 @@ public sealed class UpdateManager
 
         try
         {
-            var update = await _checker.CheckAsync(CurrentVersion, ct);
+            var update = await _checker.CheckAsync(CurrentVersion, ct).ConfigureAwait(false);
 
             lock (_lock)
             {
@@ -172,7 +172,7 @@ public sealed class UpdateManager
 
         try
         {
-            var downloadPath = await _installer.DownloadAsync(update, ct);
+            var downloadPath = await _installer.DownloadAsync(update, ct).ConfigureAwait(false);
 
             State = UpdateState.ReadyToInstall;
 
@@ -199,7 +199,7 @@ public sealed class UpdateManager
 
         try
         {
-            var success = await _installer.InstallAsync(downloadPath, requiresRestart, ct);
+            var success = await _installer.InstallAsync(downloadPath, requiresRestart, ct).ConfigureAwait(false);
 
             if (success)
             {
@@ -268,7 +268,7 @@ public sealed class UpdateManager
 
         try
         {
-            return await _checker.GetChangelogAsync(update.ChangelogUrl, ct);
+            return await _checker.GetChangelogAsync(update.ChangelogUrl, ct).ConfigureAwait(false);
         }
         catch
         {
@@ -293,7 +293,7 @@ public sealed class UpdateManager
 
         try
         {
-            var success = await _installer.RollbackAsync(targetVersion, ct);
+            var success = await _installer.RollbackAsync(targetVersion, ct).ConfigureAwait(false);
 
             if (success)
             {

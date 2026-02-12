@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.0] - 2025-07-14
+
+### InControl.Core
+
+#### Fixed
+- **ConfigureAwait(false)** added to all async methods across 9 files — prevents potential UI deadlocks when Core is consumed by WinUI/WPF callers
+- **DiagnosticsReport.ToJson()** now reuses `StateSerializer` options instead of allocating new `JsonSerializerOptions` per call
+- **ToolRegistry audit log** capped at 10,000 entries (trims oldest 1,000) — prevents unbounded memory growth in long-running sessions
+- **PolicyEngine regex caching** — glob-to-regex patterns are compiled once and cached in a `ConcurrentDictionary`, eliminating redundant `Regex.Escape` + `Regex.IsMatch` on every policy evaluation
+- **DataPaths.ClearTemp / GetDirectorySize** bare `catch {}` narrowed to `catch (IOException)` — no longer silently swallows `OutOfMemoryException`, `ThreadAbortException`, etc.
+- **SecurityConfig** modernized from `Array.Empty<string>()` to `[]` collection expressions
+
+---
+
 ## [0.9.0-rc.1] - 2026-02-03
 
 > **Release Candidate** - Pre-release for testing. Not recommended for production use.

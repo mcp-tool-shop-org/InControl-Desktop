@@ -148,7 +148,7 @@ public sealed class ConnectivityManager
             RequestMade?.Invoke(this, new NetworkRequestEventArgs(auditEntry));
 
             // Make the actual request
-            var response = await _gateway.SendAsync(request, ct);
+            var response = await _gateway.SendAsync(request, ct).ConfigureAwait(false);
 
             // Update audit entry
             auditEntry = auditEntry with
