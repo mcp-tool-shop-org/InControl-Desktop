@@ -1,4 +1,5 @@
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Automation;
 using Microsoft.UI.Xaml.Controls;
 using InControl.Core.UX;
 
@@ -13,6 +14,8 @@ public sealed partial class InputComposer : UserControl
 {
     private ExecutionState _executionState = ExecutionState.Idle;
     private bool _isOfflineBlocked;
+    private bool _isTransitioning;
+    private object? _cachedSelectedModel;
 
     public InputComposer()
     {
@@ -30,11 +33,8 @@ public sealed partial class InputComposer : UserControl
         get => _executionState;
         set
         {
-            if (_executionState != value)
-            {
-                _executionState = value;
-                UpdateUIForState();
-            }
+            _executionState = value;
+            UpdateUIForState();
         }
     }
 
@@ -172,8 +172,7 @@ public sealed partial class InputComposer : UserControl
     {
         IntentInput.TextChanged += OnIntentTextChanged;
         IntentInput.KeyDown += OnIntentInputKeyDown;
-        RunButton.Click += OnRunButtonClick;
-        CancelButton.Click += OnCancelButtonClick;
+        ActionButton.Click += OnActionButtonClick;
         AttachFileButton.Click += OnAttachFileButtonClick;
         ModelSelector.SelectionChanged += OnModelSelectionChanged;
         DisabledActionButton.Click += OnDisabledActionClick;
@@ -223,24 +222,26 @@ public sealed partial class InputComposer : UserControl
 
     private void OnIntentTextChanged(object sender, TextChangedEventArgs e)
     {
+        if (_isTransitioning || _executionState.IsExecuting()) return;
+
         var text = IntentInput.Text;
         CharacterCount.Text = $"{text.Length} characters";
-        UpdateRunButtonState();
+
+        UpdateActionButtonForRun();
         UpdateDisabledState();
     }
 
-    private void OnRunButtonClick(object sender, RoutedEventArgs e)
+    private void OnActionButtonClick(object sender, RoutedEventArgs e)
     {
-        if (CanRun())
+        if (_executionState.IsExecuting())
+        {
+            CancelRequested?.Invoke(this, EventArgs.Empty);
+        }
+        else if (CanRun())
         {
             var args = new RunRequestedEventArgs(IntentInput.Text, SelectedModel);
             RunRequested?.Invoke(this, args);
         }
-    }
-
-    private void OnCancelButtonClick(object sender, RoutedEventArgs e)
-    {
-        CancelRequested?.Invoke(this, EventArgs.Empty);
     }
 
     private void OnAttachFileButtonClick(object sender, RoutedEventArgs e)
@@ -250,7 +251,9 @@ public sealed partial class InputComposer : UserControl
 
     private void OnModelSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        UpdateRunButtonState();
+        if (_isTransitioning || _executionState.IsExecuting()) return;
+
+        UpdateActionButtonForRun();
         UpdateDisabledState();
     }
 
@@ -292,36 +295,79 @@ public sealed partial class InputComposer : UserControl
         var isExecuting = _executionState.IsExecuting();
         var allowsInput = _executionState.AllowsInput();
 
-        // Input area
-        IntentInput.IsEnabled = allowsInput;
+        _isTransitioning = true;
+        try
+        {
+            if (isExecuting)
+            {
+                SetCancelMode();
+            }
+            else
+            {
+                SetRunMode();
+            }
 
-        // Buttons
-        CancelButton.Visibility = isExecuting ? Visibility.Visible : Visibility.Collapsed;
-        RunButton.Visibility = isExecuting ? Visibility.Collapsed : Visibility.Visible;
+            _cachedSelectedModel = ModelSelector.SelectedItem;
 
-        // Model selector
-        ModelSelector.IsEnabled = allowsInput;
+            IntentInput.IsEnabled = allowsInput;
+            ModelSelector.IsEnabled = allowsInput;
 
-        // Context buttons
-        AttachFileButton.IsEnabled = allowsInput;
-        ContextMenuButton.IsEnabled = allowsInput;
+            if (!allowsInput && ModelSelector.SelectedItem == null && _cachedSelectedModel != null)
+            {
+                ModelSelector.SelectedItem = _cachedSelectedModel;
+            }
 
-        UpdateRunButtonState();
+            AttachFileButton.IsEnabled = allowsInput;
+            ContextMenuButton.IsEnabled = allowsInput;
+        }
+        finally
+        {
+            _isTransitioning = false;
+        }
+
+        if (!isExecuting)
+        {
+            UpdateActionButtonForRun();
+        }
+
         UpdateDisabledState();
     }
 
-    private void UpdateRunButtonState()
+    private void SetCancelMode()
+    {
+        ActionButtonIcon.Glyph = "\uE711"; // Cancel X
+        ActionButtonIcon.FontSize = 12;
+        ActionButtonText.Text = "Cancel";
+        ActionButton.IsEnabled = true;
+        ToolTipService.SetToolTip(ActionButton, "Cancel execution (Escape)");
+        AutomationProperties.SetName(ActionButton, "Cancel");
+
+        // Force WinUI to process the visual change
+        ActionButton.InvalidateArrange();
+        ActionButton.InvalidateMeasure();
+        ActionButton.UpdateLayout();
+    }
+
+    private void SetRunMode()
+    {
+        ActionButtonIcon.Glyph = "\uE768"; // Play
+        ActionButtonIcon.FontSize = 14;
+        ActionButtonText.Text = "Run";
+        AutomationProperties.SetName(ActionButton, "Run");
+    }
+
+    private void UpdateActionButtonForRun()
     {
         var hasText = !string.IsNullOrWhiteSpace(IntentInput.Text);
         var hasModel = ModelSelector.SelectedItem != null;
         var allowsInput = _executionState.AllowsInput();
 
-        RunButton.IsEnabled = hasText && hasModel && allowsInput && !_isOfflineBlocked;
+        ActionButton.IsEnabled = hasText && hasModel && allowsInput && !_isOfflineBlocked;
+        UpdateTooltips();
     }
 
     private void UpdateDisabledState()
     {
-        // Only show banner for actionable issues (no models available, offline blocked)
         string? reason = null;
         string? actionText = null;
         bool showAction = false;
@@ -354,10 +400,11 @@ public sealed partial class InputComposer : UserControl
 
     private void UpdateTooltips()
     {
-        // Update Run button tooltip based on enabled state
-        if (RunButton.IsEnabled)
+        if (_executionState.IsExecuting() || _isTransitioning) return;
+
+        if (ActionButton.IsEnabled)
         {
-            ToolTipService.SetToolTip(RunButton, "Run inference (Enter)");
+            ToolTipService.SetToolTip(ActionButton, "Run inference (Enter)");
         }
         else
         {
@@ -366,23 +413,22 @@ public sealed partial class InputComposer : UserControl
 
             if (_isOfflineBlocked)
             {
-                ToolTipService.SetToolTip(RunButton, "Blocked by connectivity policy");
+                ToolTipService.SetToolTip(ActionButton, "Blocked by connectivity policy");
             }
             else if (!hasModel)
             {
-                ToolTipService.SetToolTip(RunButton, "Select a model to enable");
+                ToolTipService.SetToolTip(ActionButton, "Select a model to enable");
             }
             else if (!hasText)
             {
-                ToolTipService.SetToolTip(RunButton, "Type a prompt to enable");
+                ToolTipService.SetToolTip(ActionButton, "Type a prompt to enable");
             }
             else
             {
-                ToolTipService.SetToolTip(RunButton, "Waiting for current operation");
+                ToolTipService.SetToolTip(ActionButton, "Waiting for current operation");
             }
         }
 
-        // Update Clear Context tooltip based on enabled state
         if (ClearContextMenuItem.IsEnabled)
         {
             ToolTipService.SetToolTip(ClearContextMenuItem, "Remove all context items");

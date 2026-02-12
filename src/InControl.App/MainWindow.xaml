@@ -22,14 +22,29 @@
             <!-- Home View (Chat) -->
             <Grid x:Name="HomeView">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="280" MinWidth="200" MaxWidth="400" />
+                    <ColumnDefinition x:Name="SidebarColumn" Width="0" MinWidth="0" MaxWidth="0" />
                     <ColumnDefinition Width="*" MinWidth="400" />
                 </Grid.ColumnDefinitions>
 
-                <controls:SessionSidebar x:Name="SessionSidebar" Grid.Column="0" />
+                <controls:SessionSidebar x:Name="SessionSidebar" Grid.Column="0" Visibility="Collapsed" />
 
                 <Grid Grid.Column="1" Background="{ThemeResource SolidBackgroundFillColorBaseBrush}">
                     <controls:ConversationView x:Name="ConversationView" />
+
+                    <!-- Sidebar toggle button (after ConversationView so it renders on top) -->
+                    <Button x:Name="SidebarToggleButton"
+                            Click="OnSidebarToggleClick"
+                            VerticalAlignment="Top"
+                            HorizontalAlignment="Left"
+                            Width="36" Height="36"
+                            Padding="0"
+                            Margin="6,6,0,0"
+                            Canvas.ZIndex="10"
+                            ToolTipService.ToolTip="Expand sidebar (Ctrl+B)"
+                            Background="Transparent"
+                            BorderThickness="0">
+                        <FontIcon x:Name="SidebarToggleIcon" Glyph="&#xE76C;" FontSize="16" />
+                    </Button>
                 </Grid>
             </Grid>
 

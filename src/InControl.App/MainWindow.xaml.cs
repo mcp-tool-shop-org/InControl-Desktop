@@ -26,6 +26,7 @@ public sealed partial class MainWindow : Window
 {
     private UserControl? _currentPage;
     private bool _isOffline;
+    private bool _isSidebarCollapsed = true;
     private readonly NavigationService _navigation = NavigationService.Instance;
     private readonly ConversationViewModel _conversationVm = new();
     private readonly SessionListViewModel _sessionListVm = new();
@@ -176,6 +177,24 @@ public sealed partial class MainWindow : Window
 
         // Global keyboard shortcuts
         this.Content.KeyDown += OnGlobalKeyDown;
+
+        // Escape accelerator — fires before control-level KeyDown so TextBox can't swallow it
+        var escAccelerator = new KeyboardAccelerator { Key = Windows.System.VirtualKey.Escape };
+        escAccelerator.Invoked += OnEscapeAccelerator;
+        if (this.Content is UIElement rootElement)
+        {
+            rootElement.KeyboardAcceleratorPlacementMode = KeyboardAcceleratorPlacementMode.Hidden;
+            rootElement.KeyboardAccelerators.Add(escAccelerator);
+        }
+    }
+
+    private void OnEscapeAccelerator(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+    {
+        if (_runCts != null && !_runCts.IsCancellationRequested)
+        {
+            OnCancelRequested(this, EventArgs.Empty);
+            args.Handled = true;
+        }
     }
 
     private void InitializeStatusStrip()
@@ -319,12 +338,15 @@ public sealed partial class MainWindow : Window
         // Add user message to UI
         _conversationVm.AddUserIntent(e.Intent);
 
-        // Update UI state
+        // Update UI state — show Cancel button immediately
         _conversationVm.ExecutionState = ExecutionState.Running;
         _conversationVm.CurrentModel = model;
         ConversationView.Composer.ExecutionState = ExecutionState.Running;
         ConversationView.Composer.IntentText = string.Empty;
         StatusStrip.SetModelStatus(model, true);
+
+        // Yield so the Cancel button renders before any async work begins
+        await Task.Yield();
 
         // Start elapsed time tracking
         var stopwatch = System.Diagnostics.Stopwatch.StartNew();
@@ -346,15 +368,26 @@ public sealed partial class MainWindow : Window
             _conversationVm.ExecutionState = ExecutionState.Streaming;
             ConversationView.Composer.ExecutionState = ExecutionState.Streaming;
 
+            // Yield so the message pump processes the Cancel button visibility change
+            await Task.Yield();
+
             var contentBuilder = new System.Text.StringBuilder();
+            int yieldCounter = 0;
 
             await foreach (var token in chatService.SendMessageAsync(
                 conversation.Id, e.Intent, _runCts.Token))
             {
                 contentBuilder.Append(token);
                 _conversationVm.AppendToModelOutput(token);
-                ConversationView.ScrollToBottom();
+
+                // Yield periodically to keep UI responsive (Cancel button, scroll, etc.)
+                if (++yieldCounter % 3 == 0)
+                {
+                    ConversationView.ScrollToBottom();
+                    await Task.Yield();
+                }
             }
+            ConversationView.ScrollToBottom();
 
             completedContent = contentBuilder.ToString();
 
@@ -685,10 +718,25 @@ public sealed partial class MainWindow : Window
             return;
         }
 
-        // Escape - Close overlays or go back
+        // Ctrl+B - Toggle Sidebar
+        if (e.Key == Windows.System.VirtualKey.B &&
+            Microsoft.UI.Input.InputKeyboardSource.GetKeyStateForCurrentThread(Windows.System.VirtualKey.Control).HasFlag(Windows.UI.Core.CoreVirtualKeyStates.Down))
+        {
+            ToggleSidebar();
+            e.Handled = true;
+            return;
+        }
+
+        // Escape - Cancel execution, close overlays, or go back
         if (e.Key == Windows.System.VirtualKey.Escape)
         {
-            if (CommandPaletteOverlay.Visibility == Visibility.Visible)
+            if (_runCts != null && !_runCts.IsCancellationRequested)
+            {
+                // Cancel active generation first
+                OnCancelRequested(this, EventArgs.Empty);
+                e.Handled = true;
+            }
+            else if (CommandPaletteOverlay.Visibility == Visibility.Visible)
             {
                 HideCommandPalette();
                 e.Handled = true;
@@ -743,6 +791,9 @@ public sealed partial class MainWindow : Window
                 break;
             case "open-help":
                 _navigation.Navigate<HelpPage>();
+                break;
+            case "toggle-sidebar":
+                ToggleSidebar();
                 break;
             case "search-sessions":
                 _navigation.GoHome();
@@ -832,6 +883,35 @@ public sealed partial class MainWindow : Window
         {
             help.BackRequested += (s, e) => _navigation.GoBack();
             help.ModelManagerRequested += (s, e) => _navigation.Navigate<ModelManagerPage>();
+        }
+    }
+
+    private void OnSidebarToggleClick(object sender, RoutedEventArgs e)
+    {
+        ToggleSidebar();
+    }
+
+    private void ToggleSidebar()
+    {
+        _isSidebarCollapsed = !_isSidebarCollapsed;
+
+        if (_isSidebarCollapsed)
+        {
+            SidebarColumn.MinWidth = 0;
+            SidebarColumn.MaxWidth = 0;
+            SidebarColumn.Width = new GridLength(0);
+            SessionSidebar.Visibility = Visibility.Collapsed;
+            SidebarToggleIcon.Glyph = "\uE76C"; // ChevronRight
+            ToolTipService.SetToolTip(SidebarToggleButton, "Expand sidebar (Ctrl+B)");
+        }
+        else
+        {
+            SidebarColumn.MinWidth = 200;
+            SidebarColumn.MaxWidth = 400;
+            SidebarColumn.Width = new GridLength(280);
+            SessionSidebar.Visibility = Visibility.Visible;
+            SidebarToggleIcon.Glyph = "\uE76B"; // ChevronLeft
+            ToolTipService.SetToolTip(SidebarToggleButton, "Collapse sidebar (Ctrl+B)");
         }
     }
 

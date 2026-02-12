@@ -190,39 +190,19 @@
                                Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
                 </StackPanel>
 
-                <!-- Action Buttons -->
-                <StackPanel Grid.Column="1"
-                            Orientation="Horizontal"
-                            Spacing="8">
-                    <!-- Cancel Button (shown during execution) -->
-                    <Button x:Name="CancelButton"
-                            Visibility="Collapsed"
-                            ToolTipService.ToolTip="Cancel execution (Escape)"
-                            AutomationProperties.Name="Cancel"
-                            AutomationProperties.HelpText="Cancel the current inference operation">
-                        <StackPanel Orientation="Horizontal" Spacing="6">
-                            <FontIcon Glyph="&#xE711;" FontSize="12" />
-                            <TextBlock Text="Cancel" />
-                        </StackPanel>
-                        <Button.KeyboardAccelerators>
-                            <KeyboardAccelerator Key="Escape" />
-                        </Button.KeyboardAccelerators>
-                    </Button>
-
-                    <!-- Run Button -->
-                    <Button x:Name="RunButton"
-                            ToolTipService.ToolTip="Select a model to enable"
-                            IsEnabled="False"
-                            TabIndex="2"
-                            AutomationProperties.Name="Run"
-                            AutomationProperties.HelpText="Run inference with the selected model (Enter)"
-                            AccessKey="R">
-                        <StackPanel Orientation="Horizontal" Spacing="6">
-                            <FontIcon Glyph="&#xE768;" FontSize="14" />
-                            <TextBlock Text="Run" />
-                        </StackPanel>
-                    </Button>
-                </StackPanel>
+                <!-- Single Action Button (switches between Run and Cancel) -->
+                <Button x:Name="ActionButton"
+                        Grid.Column="1"
+                        ToolTipService.ToolTip="Select a model to enable"
+                        IsEnabled="False"
+                        TabIndex="2"
+                        AutomationProperties.Name="Run"
+                        AccessKey="R">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <FontIcon x:Name="ActionButtonIcon" Glyph="&#xE768;" FontSize="14" />
+                        <TextBlock x:Name="ActionButtonText" Text="Run" />
+                    </StackPanel>
+                </Button>
             </Grid>
         </Grid>
     </Border>
