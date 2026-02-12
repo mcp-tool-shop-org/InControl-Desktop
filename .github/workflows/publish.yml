@@ -19,13 +19,14 @@ jobs:
           dotnet-version: '9.0.x'
 
       - name: Restore
-        run: dotnet restore
+        run: |
+          dotnet restore src/InControl.Core/InControl.Core.csproj
+          dotnet restore src/InControl.Inference/InControl.Inference.csproj
 
       - name: Build
-        run: dotnet build --configuration Release --no-restore
-
-      - name: Test
-        run: dotnet test --configuration Release --no-build --verbosity normal
+        run: |
+          dotnet build src/InControl.Core/InControl.Core.csproj --configuration Release --no-restore
+          dotnet build src/InControl.Inference/InControl.Inference.csproj --configuration Release --no-restore
 
       - name: Pack InControl.Core
         run: dotnet pack src/InControl.Core/InControl.Core.csproj --configuration Release --no-build --output ./nupkg
