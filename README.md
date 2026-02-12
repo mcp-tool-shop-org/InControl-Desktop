@@ -12,6 +12,24 @@ A privacy-first, GPU-accelerated chat application that runs large language model
 - **Multiple backends** - Ollama, llama.cpp, or bring your own
 - **Markdown rendering** - Rich text, code blocks, and syntax highlighting
 
+## NuGet Packages
+
+The core libraries are available as standalone NuGet packages for building your own local AI integrations:
+
+| Package | Description |
+|---------|-------------|
+| `InControl.Core` | Domain models, conversation types, and shared abstractions for local AI chat applications. |
+| `InControl.Inference` | LLM backend abstraction layer with streaming chat, model management, and health checks. Includes Ollama implementation. |
+
+```csharp
+// Example: use InControl.Inference in your own app
+var client = inferenceClientFactory.Create("ollama");
+await foreach (var token in client.StreamChatAsync(messages))
+{
+    Console.Write(token);
+}
+```
+
 ## Target Hardware
 
 | Component | Minimum | Recommended |
