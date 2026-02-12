@@ -147,6 +147,10 @@ public readonly struct Result<T>
     /// <summary>
     /// Whether the operation succeeded.
     /// </summary>
+    /// <remarks>
+    /// For reference-type <typeparamref name="T"/>, the compiler narrows <see cref="Value"/> to non-null after a <c>true</c> check.
+    /// For value-type <typeparamref name="T"/>, use <see cref="Unwrap"/> to obtain the non-nullable value.
+    /// </remarks>
     [MemberNotNullWhen(true, nameof(Value))]
     [MemberNotNullWhen(false, nameof(Error))]
     public bool IsSuccess => _error is null;
@@ -215,6 +219,21 @@ public readonly struct Result<T>
             throw new InvalidOperationException(Error.Message);
         }
         return Value;
+    }
+
+    /// <summary>
+    /// Gets the success value, throwing <see cref="InvalidOperationException"/> if the result is a failure.
+    /// Equivalent to <see cref="GetValueOrThrow"/> but shorter — preferred for value-type <typeparamref name="T"/>
+    /// where <see cref="System.Diagnostics.CodeAnalysis.MemberNotNullWhenAttribute"/> cannot narrow <see cref="Value"/> from <c>T?</c> to <c>T</c>.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">The result is a failure.</exception>
+    public T Unwrap()
+    {
+        if (IsFailure)
+        {
+            throw new InvalidOperationException(Error.Message);
+        }
+        return _value!;
     }
 
     /// <summary>

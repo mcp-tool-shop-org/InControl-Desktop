@@ -6,7 +6,7 @@ namespace InControl.Core.Plugins;
 /// Hosts plugin execution within a sandboxed environment.
 /// All plugin actions flow through mediated APIs - no direct system access.
 /// </summary>
-public sealed class PluginHost : IDisposable
+public sealed class PluginHost : IDisposable, IAsyncDisposable
 {
     private readonly Dictionary<string, LoadedPlugin> _plugins = new();
     private readonly IPluginSandbox _sandbox;
@@ -326,13 +326,53 @@ public sealed class PluginHost : IDisposable
                     }
                     plugin.Context.Dispose();
                 }
-                catch
+                catch (Exception)
                 {
-                    // Ignore disposal errors
+                    // Best-effort disposal — plugin may be faulted
                 }
             }
             _plugins.Clear();
         }
+    }
+
+    /// <summary>
+    /// Asynchronously disposes all loaded plugins.
+    /// Preferred over <see cref="Dispose"/> when plugins implement <see cref="IAsyncDisposable"/>.
+    /// </summary>
+    public async ValueTask DisposeAsync()
+    {
+        if (_disposed) return;
+        _disposed = true;
+
+        List<LoadedPlugin> plugins;
+        lock (_lock)
+        {
+            plugins = [.. _plugins.Values];
+            _plugins.Clear();
+        }
+
+        foreach (var plugin in plugins)
+        {
+            try
+            {
+                if (plugin.Instance is IAsyncDisposable asyncDisposable)
+                {
+                    await asyncDisposable.DisposeAsync().ConfigureAwait(false);
+                }
+                else if (plugin.Instance is IDisposable disposable)
+                {
+                    disposable.Dispose();
+                }
+
+                plugin.Context.Dispose();
+            }
+            catch (Exception)
+            {
+                // Best-effort disposal — plugin may be faulted
+            }
+        }
+
+        GC.SuppressFinalize(this);
     }
 }
 

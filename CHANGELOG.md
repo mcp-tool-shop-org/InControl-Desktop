@@ -9,7 +9,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.1.0] - 2025-07-14
+## [1.2.0] - 2026-02-12
+
+### InControl.Core
+
+#### Added
+- **`IAsyncDisposable` on `PluginHost`** — new `DisposeAsync()` properly awaits async plugin disposal; sync `Dispose()` retained for backward compatibility
+- **`TryProposeAction` on `ToolApprovalManager`** — `Result<ToolProposal>`-returning alternative to the throwing `ProposeAction`, unifies the error-handling pattern
+- **`IDataPathsProvider` interface + `DataPathsProvider`** — DI-friendly path resolution; register as `services.AddSingleton<IDataPathsProvider, DataPathsProvider>()`
+- **`DataPaths.Configure(DataPathsConfig)`** — override default paths for testing and custom deployments; `ResetConfiguration()` for test cleanup
+- **`Result<T>.Unwrap()`** — non-nullable value accessor for value-type `T` where `MemberNotNullWhen` cannot narrow `T?` to `T`
+
+#### Fixed
+- **`PluginHost.Dispose()` bare catch** narrowed to `catch (Exception)` for explicit best-effort semantics
+- **`DataPaths` internal routing** now uses `CurrentConfig` indirection, enabling `Configure()` overrides to take effect on all path properties and methods
+
+---
+
+## [1.1.0] - 2026-02-12
 
 ### InControl.Core
 

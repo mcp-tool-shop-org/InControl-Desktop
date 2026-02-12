@@ -1,3 +1,5 @@
+using InControl.Core.Errors;
+
 namespace InControl.Core.Assistant;
 
 /// <summary>
@@ -42,6 +44,8 @@ public sealed class ToolApprovalManager
 
     /// <summary>
     /// Proposes a tool action for user approval.
+    /// Throws <see cref="InvalidOperationException"/> if the tool is not registered.
+    /// For a non-throwing alternative, use <see cref="TryProposeAction"/>.
     /// </summary>
     public ToolProposal ProposeAction(
         string toolId,
@@ -100,6 +104,26 @@ public sealed class ToolApprovalManager
         ProposalCreated?.Invoke(this, new ToolProposalEventArgs(proposal));
 
         return proposal;
+    }
+
+    /// <summary>
+    /// Proposes a tool action for user approval.
+    /// Returns a <see cref="Result{T}"/> instead of throwing when the tool is not found.
+    /// </summary>
+    public Result<ToolProposal> TryProposeAction(
+        string toolId,
+        IReadOnlyDictionary<string, object?> parameters,
+        string rationale,
+        string expectedOutcome,
+        string? potentialRisks = null)
+    {
+        var tool = _registry.GetTool(toolId);
+        if (tool == null)
+        {
+            return InControlError.Create(ErrorCode.ToolNotFound, $"Tool not found: {toolId}");
+        }
+
+        return ProposeAction(toolId, parameters, rationale, expectedOutcome, potentialRisks);
     }
 
     /// <summary>

@@ -1,65 +1,161 @@
 namespace InControl.Core.Storage;
 
 /// <summary>
+/// Abstraction over data path resolution for dependency injection.
+/// Inject this interface instead of referencing the static <see cref="DataPaths"/> class directly.
+/// </summary>
+public interface IDataPathsProvider
+{
+    /// <inheritdoc cref="DataPaths.AppDataRoot"/>
+    string AppDataRoot { get; }
+
+    /// <inheritdoc cref="DataPaths.Sessions"/>
+    string Sessions { get; }
+
+    /// <inheritdoc cref="DataPaths.Logs"/>
+    string Logs { get; }
+
+    /// <inheritdoc cref="DataPaths.Cache"/>
+    string Cache { get; }
+
+    /// <inheritdoc cref="DataPaths.Exports"/>
+    string Exports { get; }
+
+    /// <inheritdoc cref="DataPaths.Config"/>
+    string Config { get; }
+
+    /// <inheritdoc cref="DataPaths.Temp"/>
+    string Temp { get; }
+
+    /// <inheritdoc cref="DataPaths.Support"/>
+    string Support { get; }
+
+    /// <inheritdoc cref="DataPaths.Configuration"/>
+    DataPathsConfig Configuration { get; }
+
+    /// <inheritdoc cref="DataPaths.IsPathAllowed"/>
+    bool IsPathAllowed(string path);
+}
+
+/// <summary>
+/// Default implementation of <see cref="IDataPathsProvider"/> that delegates to the static <see cref="DataPaths"/> class.
+/// Register as singleton in DI: <c>services.AddSingleton&lt;IDataPathsProvider, DataPathsProvider&gt;();</c>
+/// </summary>
+public sealed class DataPathsProvider : IDataPathsProvider
+{
+    /// <inheritdoc />
+    public string AppDataRoot => DataPaths.AppDataRoot;
+
+    /// <inheritdoc />
+    public string Sessions => DataPaths.Sessions;
+
+    /// <inheritdoc />
+    public string Logs => DataPaths.Logs;
+
+    /// <inheritdoc />
+    public string Cache => DataPaths.Cache;
+
+    /// <inheritdoc />
+    public string Exports => DataPaths.Exports;
+
+    /// <inheritdoc />
+    public string Config => DataPaths.Config;
+
+    /// <inheritdoc />
+    public string Temp => DataPaths.Temp;
+
+    /// <inheritdoc />
+    public string Support => DataPaths.Support;
+
+    /// <inheritdoc />
+    public DataPathsConfig Configuration => DataPaths.Configuration;
+
+    /// <inheritdoc />
+    public bool IsPathAllowed(string path) => DataPaths.IsPathAllowed(path);
+}
+
+/// <summary>
 /// Defines all data storage paths for the application.
 /// All paths are explicit and bounded to specific roots.
+/// For DI scenarios, inject <see cref="IDataPathsProvider"/> instead of using this class directly.
 /// </summary>
 public static class DataPaths
 {
     private static readonly Lazy<DataPathsConfig> _config = new(InitializePaths);
+    private static DataPathsConfig? _override;
+
+    /// <summary>
+    /// Overrides the default path configuration.
+    /// Call before any path property is accessed. Useful for testing and custom deployments.
+    /// </summary>
+    /// <param name="config">The custom configuration to use.</param>
+    /// <exception cref="InvalidOperationException">Thrown if paths have already been read.</exception>
+    public static void Configure(DataPathsConfig config)
+    {
+        ArgumentNullException.ThrowIfNull(config);
+        _override = config;
+    }
+
+    /// <summary>
+    /// Resets configuration to the default (environment-derived) paths.
+    /// Primarily intended for test cleanup.
+    /// </summary>
+    public static void ResetConfiguration() => _override = null;
+
+    private static DataPathsConfig CurrentConfig => _override ?? _config.Value;
 
     /// <summary>
     /// Gets the root directory for all application data.
     /// Default: %LOCALAPPDATA%\InControl
     /// </summary>
-    public static string AppDataRoot => _config.Value.AppDataRoot;
+    public static string AppDataRoot => CurrentConfig.AppDataRoot;
 
     /// <summary>
     /// Gets the directory where sessions are stored.
     /// Path: {AppDataRoot}\sessions
     /// </summary>
-    public static string Sessions => _config.Value.Sessions;
+    public static string Sessions => CurrentConfig.Sessions;
 
     /// <summary>
     /// Gets the directory where log files are stored.
     /// Path: {AppDataRoot}\logs
     /// </summary>
-    public static string Logs => _config.Value.Logs;
+    public static string Logs => CurrentConfig.Logs;
 
     /// <summary>
     /// Gets the directory where cache files are stored.
     /// Path: {AppDataRoot}\cache
     /// </summary>
-    public static string Cache => _config.Value.Cache;
+    public static string Cache => CurrentConfig.Cache;
 
     /// <summary>
     /// Gets the directory where exported files are stored.
     /// Path: {Documents}\InControl\exports
     /// </summary>
-    public static string Exports => _config.Value.Exports;
+    public static string Exports => CurrentConfig.Exports;
 
     /// <summary>
     /// Gets the directory where configuration files are stored.
     /// Path: {AppDataRoot}\config
     /// </summary>
-    public static string Config => _config.Value.Config;
+    public static string Config => CurrentConfig.Config;
 
     /// <summary>
     /// Gets the directory where temporary files are stored.
     /// Path: {AppDataRoot}\temp
     /// </summary>
-    public static string Temp => _config.Value.Temp;
+    public static string Temp => CurrentConfig.Temp;
 
     /// <summary>
     /// Gets the directory where support bundles are stored.
     /// Path: {AppDataRoot}\support
     /// </summary>
-    public static string Support => _config.Value.Support;
+    public static string Support => CurrentConfig.Support;
 
     /// <summary>
     /// Gets all paths configuration.
     /// </summary>
-    public static DataPathsConfig Configuration => _config.Value;
+    public static DataPathsConfig Configuration => CurrentConfig;
 
     /// <summary>
     /// Validates that a path is within allowed write boundaries.
@@ -76,8 +172,8 @@ public static class DataPaths
         // Allowed roots
         var allowedRoots = new[]
         {
-            _config.Value.AppDataRoot,
-            _config.Value.Exports
+            CurrentConfig.AppDataRoot,
+            CurrentConfig.Exports
         };
 
         return allowedRoots.Any(root =>
@@ -96,28 +192,28 @@ public static class DataPaths
 
         var fullPath = Path.GetFullPath(path);
 
-        if (fullPath.StartsWith(_config.Value.Sessions, StringComparison.OrdinalIgnoreCase))
+        if (fullPath.StartsWith(CurrentConfig.Sessions, StringComparison.OrdinalIgnoreCase))
             return "Session data (conversations, messages)";
 
-        if (fullPath.StartsWith(_config.Value.Logs, StringComparison.OrdinalIgnoreCase))
+        if (fullPath.StartsWith(CurrentConfig.Logs, StringComparison.OrdinalIgnoreCase))
             return "Application logs";
 
-        if (fullPath.StartsWith(_config.Value.Cache, StringComparison.OrdinalIgnoreCase))
+        if (fullPath.StartsWith(CurrentConfig.Cache, StringComparison.OrdinalIgnoreCase))
             return "Cached data (model info, temporary results)";
 
-        if (fullPath.StartsWith(_config.Value.Exports, StringComparison.OrdinalIgnoreCase))
+        if (fullPath.StartsWith(CurrentConfig.Exports, StringComparison.OrdinalIgnoreCase))
             return "Exported sessions and data";
 
-        if (fullPath.StartsWith(_config.Value.Config, StringComparison.OrdinalIgnoreCase))
+        if (fullPath.StartsWith(CurrentConfig.Config, StringComparison.OrdinalIgnoreCase))
             return "User configuration and settings";
 
-        if (fullPath.StartsWith(_config.Value.Temp, StringComparison.OrdinalIgnoreCase))
+        if (fullPath.StartsWith(CurrentConfig.Temp, StringComparison.OrdinalIgnoreCase))
             return "Temporary files (cleared on startup)";
 
-        if (fullPath.StartsWith(_config.Value.Support, StringComparison.OrdinalIgnoreCase))
+        if (fullPath.StartsWith(CurrentConfig.Support, StringComparison.OrdinalIgnoreCase))
             return "Support bundles and diagnostics";
 
-        if (fullPath.StartsWith(_config.Value.AppDataRoot, StringComparison.OrdinalIgnoreCase))
+        if (fullPath.StartsWith(CurrentConfig.AppDataRoot, StringComparison.OrdinalIgnoreCase))
             return "Application data";
 
         return "Unknown (outside allowed boundaries)";
@@ -128,13 +224,13 @@ public static class DataPaths
     /// </summary>
     public static void EnsureDirectoriesExist()
     {
-        Directory.CreateDirectory(_config.Value.Sessions);
-        Directory.CreateDirectory(_config.Value.Logs);
-        Directory.CreateDirectory(_config.Value.Cache);
-        Directory.CreateDirectory(_config.Value.Exports);
-        Directory.CreateDirectory(_config.Value.Config);
-        Directory.CreateDirectory(_config.Value.Temp);
-        Directory.CreateDirectory(_config.Value.Support);
+        Directory.CreateDirectory(CurrentConfig.Sessions);
+        Directory.CreateDirectory(CurrentConfig.Logs);
+        Directory.CreateDirectory(CurrentConfig.Cache);
+        Directory.CreateDirectory(CurrentConfig.Exports);
+        Directory.CreateDirectory(CurrentConfig.Config);
+        Directory.CreateDirectory(CurrentConfig.Temp);
+        Directory.CreateDirectory(CurrentConfig.Support);
     }
 
     /// <summary>
@@ -142,7 +238,7 @@ public static class DataPaths
     /// </summary>
     public static void ClearTemp()
     {
-        var tempPath = _config.Value.Temp;
+        var tempPath = CurrentConfig.Temp;
         if (Directory.Exists(tempPath))
         {
             foreach (var file in Directory.GetFiles(tempPath))
@@ -165,13 +261,13 @@ public static class DataPaths
     public static StorageStats GetStorageStats()
     {
         return new StorageStats(
-            SessionsSize: GetDirectorySize(_config.Value.Sessions),
-            LogsSize: GetDirectorySize(_config.Value.Logs),
-            CacheSize: GetDirectorySize(_config.Value.Cache),
-            ExportsSize: GetDirectorySize(_config.Value.Exports),
-            ConfigSize: GetDirectorySize(_config.Value.Config),
-            TempSize: GetDirectorySize(_config.Value.Temp),
-            SupportSize: GetDirectorySize(_config.Value.Support)
+            SessionsSize: GetDirectorySize(CurrentConfig.Sessions),
+            LogsSize: GetDirectorySize(CurrentConfig.Logs),
+            CacheSize: GetDirectorySize(CurrentConfig.Cache),
+            ExportsSize: GetDirectorySize(CurrentConfig.Exports),
+            ConfigSize: GetDirectorySize(CurrentConfig.Config),
+            TempSize: GetDirectorySize(CurrentConfig.Temp),
+            SupportSize: GetDirectorySize(CurrentConfig.Support)
         );
     }
 
