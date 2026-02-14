@@ -190,6 +190,12 @@ Current version: **0.4.0-alpha**
 
 See [CHANGELOG.md](./CHANGELOG.md) for release history.
 
+## Support
+
+- **Questions / help:** [Discussions](https://github.com/mcp-tool-shop-org/InControl-Desktop/discussions)
+- **Bug reports:** [Issues](https://github.com/mcp-tool-shop-org/InControl-Desktop/issues)
+- **Security:** [SECURITY.md](SECURITY.md)
+
 ## License
 
 MIT
