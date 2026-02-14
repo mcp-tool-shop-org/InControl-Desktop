@@ -1,9 +1,11 @@
 # InControl-Desktop
 
-[![CI](https://github.com/mcp-tool-shop-org/InControl-Desktop/actions/workflows/ci.yml/badge.svg)](https://github.com/mcp-tool-shop-org/InControl-Desktop/actions/workflows/ci.yml)
-![.NET 8](https://img.shields.io/badge/.NET-8-purple)
-![WinUI 3](https://img.shields.io/badge/WinUI-3-blue)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+<p align="center">
+  <a href="https://github.com/mcp-tool-shop-org/InControl-Desktop/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/mcp-tool-shop-org/InControl-Desktop/ci.yml?branch=main&style=flat-square&label=CI" alt="CI"></a>
+  <img src="https://img.shields.io/badge/.NET-8-purple?style=flat-square&logo=dotnet" alt=".NET 8">
+  <img src="https://img.shields.io/badge/WinUI-3-blue?style=flat-square" alt="WinUI 3">
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/mcp-tool-shop-org/InControl-Desktop?style=flat-square" alt="License"></a>
+</p>
 
 **Local AI Chat Assistant for Windows**
 
