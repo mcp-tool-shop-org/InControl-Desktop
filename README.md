@@ -1,5 +1,10 @@
 # InControl-Desktop
 
+[![CI](https://github.com/mcp-tool-shop-org/InControl-Desktop/actions/workflows/ci.yml/badge.svg)](https://github.com/mcp-tool-shop-org/InControl-Desktop/actions/workflows/ci.yml)
+![.NET 8](https://img.shields.io/badge/.NET-8-purple)
+![WinUI 3](https://img.shields.io/badge/WinUI-3-blue)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 **Local AI Chat Assistant for Windows**
 
 A privacy-first, GPU-accelerated chat application that runs large language models entirely on your machine. No cloud required.
