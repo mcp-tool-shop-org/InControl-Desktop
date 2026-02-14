@@ -1,15 +1,34 @@
 # InControl-Desktop CI Pipeline
 #
-# Runs on every push and pull request to ensure quality.
-# Fast feedback for developers.
+# Runs on pushes and PRs that touch build inputs.
+# Docs-only changes skip the full Windows pipeline.
 
 name: CI
 
 on:
   push:
     branches: [main, develop]
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - '**/*.csproj'
+      - '*.sln'
+      - 'Directory.Build.props'
+      - 'Directory.Packages.props'
+      - 'global.json'
+      - '.github/workflows/**'
   pull_request:
     branches: [main, develop]
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - '**/*.csproj'
+      - '*.sln'
+      - 'Directory.Build.props'
+      - 'Directory.Packages.props'
+      - 'global.json'
+      - '.github/workflows/**'
+  workflow_dispatch:
 
 env:
   DOTNET_VERSION: '9.0.x'
