@@ -7,7 +7,9 @@
 
 <p align="center">
   <a href="https://github.com/mcp-tool-shop-org/InControl-Desktop/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/mcp-tool-shop-org/InControl-Desktop/ci.yml?branch=main&style=flat-square&label=CI" alt="CI"></a>
-  <img src="https://img.shields.io/badge/.NET-8-purple?style=flat-square&logo=dotnet" alt=".NET 8">
+  <a href="https://www.nuget.org/packages/InControl.Core"><img src="https://img.shields.io/nuget/v/InControl.Core?style=flat-square&label=InControl.Core" alt="InControl.Core NuGet"></a>
+  <a href="https://www.nuget.org/packages/InControl.Inference"><img src="https://img.shields.io/nuget/v/InControl.Inference?style=flat-square&label=InControl.Inference" alt="InControl.Inference NuGet"></a>
+  <img src="https://img.shields.io/badge/.NET-9-purple?style=flat-square&logo=dotnet" alt=".NET 9">
   <img src="https://img.shields.io/badge/WinUI-3-blue?style=flat-square" alt="WinUI 3">
   <a href="LICENSE"><img src="https://img.shields.io/github/license/mcp-tool-shop-org/InControl-Desktop?style=flat-square" alt="License"></a>
 </p>
@@ -28,10 +30,15 @@ A privacy-first, GPU-accelerated chat application that runs large language model
 
 The core libraries are available as standalone NuGet packages for building your own local AI integrations:
 
-| Package | Description |
-|---------|-------------|
-| `InControl.Core` | Domain models, conversation types, and shared abstractions for local AI chat applications. |
-| `InControl.Inference` | LLM backend abstraction layer with streaming chat, model management, and health checks. Includes Ollama implementation. |
+| Package | Version | Description |
+|---------|---------|-------------|
+| [InControl.Core](https://www.nuget.org/packages/InControl.Core) | [![NuGet](https://img.shields.io/nuget/v/InControl.Core?style=flat-square)](https://www.nuget.org/packages/InControl.Core) | Domain models, conversation types, and shared abstractions for local AI chat applications. |
+| [InControl.Inference](https://www.nuget.org/packages/InControl.Inference) | [![NuGet](https://img.shields.io/nuget/v/InControl.Inference?style=flat-square)](https://www.nuget.org/packages/InControl.Inference) | LLM backend abstraction layer with streaming chat, model management, and health checks. Includes Ollama implementation. |
+
+```bash
+dotnet add package InControl.Core
+dotnet add package InControl.Inference
+```
 
 ```csharp
 // Example: use InControl.Inference in your own app
@@ -205,7 +212,7 @@ See [CHANGELOG.md](./CHANGELOG.md) for release history.
 
 ## License
 
-MIT
+[MIT](LICENSE) -- see [LICENSE](LICENSE) for full text.
 
 ---
 
