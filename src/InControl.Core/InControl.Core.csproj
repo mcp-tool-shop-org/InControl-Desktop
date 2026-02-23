@@ -9,7 +9,7 @@
 
     <!-- NuGet package metadata -->
     <PackageId>InControl.Core</PackageId>
-    <Version>1.2.0</Version>
+    <Version>1.2.1</Version>
     <Description>Core domain models, exceptions, and shared types for InControl local AI chat. Includes ChatMessage, ModelInfo, conversation models, and common abstractions.</Description>
     <Authors>mcp-tool-shop</Authors>
     <Company>MCP Tool Shop</Company>
