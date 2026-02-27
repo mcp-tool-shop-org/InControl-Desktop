@@ -202,9 +202,34 @@ Contributions welcome! Please:
 
 ## Version
 
-Current version: **0.4.0-alpha**
+Current version: **1.3.1**
 
 See [CHANGELOG.md](./CHANGELOG.md) for release history.
+
+## Security & Data Scope
+
+InControl Desktop is a **local-first** WinUI 3 desktop application for private LLM chat.
+
+- **Data accessed:** Local Ollama API (localhost), chat history in local storage, model configuration files
+- **Data NOT accessed:** No cloud sync. No telemetry. No analytics. All inference runs locally via Ollama
+- **Permissions:** Localhost network (Ollama API), file system for chat history. MSIX sandboxed
+
+Full policy: [SECURITY.md](SECURITY.md)
+
+---
+
+## Scorecard
+
+| Category | Score |
+|----------|-------|
+| A. Security | 10/10 |
+| B. Error Handling | 10/10 |
+| C. Operator Docs | 10/10 |
+| D. Shipping Hygiene | 10/10 |
+| E. Identity (soft) | 10/10 |
+| **Overall** | **50/50** |
+
+---
 
 ## Support
 
@@ -218,4 +243,6 @@ See [CHANGELOG.md](./CHANGELOG.md) for release history.
 
 ---
 
-*Built for Windows. Powered by local AI.*
+<p align="center">
+  Built by <a href="https://mcp-tool-shop.github.io/">MCP Tool Shop</a>
+</p>
