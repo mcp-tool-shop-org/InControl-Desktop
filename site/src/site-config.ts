@@ -14,7 +14,7 @@ export const config: SiteConfig = {
     headlineAccent: 'Your machine.',
     description: 'A privacy-first, GPU-accelerated chat application that runs large language models entirely on your Windows PC. No cloud required.',
     primaryCta: { href: '#install', label: 'Get started' },
-    secondaryCta: { href: '#features', label: 'Learn more' },
+    secondaryCta: { href: 'handbook/', label: 'Read the Handbook' },
     previews: [
       { label: 'Install', code: 'Download MSIX from Releases → double-click → launch' },
       { label: 'Build', code: 'git clone … && dotnet restore && dotnet build' },
