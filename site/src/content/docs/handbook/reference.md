@@ -1,65 +1,38 @@
 ---
 title: Reference
-description: Architecture, NuGet packages, tech stack, and data storage for InControl Desktop.
+description: NuGet packages, hardware requirements, and security scope.
 sidebar:
-  order: 3
+  order: 4
 ---
-
-## Architecture
-
-InControl follows a clean, layered architecture:
-
-```
-+-------------------------------------------+
-|         InControl.App (WinUI 3)           |  UI Layer
-+-------------------------------------------+
-|         InControl.ViewModels              |  Presentation
-+-------------------------------------------+
-|         InControl.Services                |  Business Logic
-+-------------------------------------------+
-|         InControl.Inference               |  LLM Backends
-+-------------------------------------------+
-|         InControl.Core                    |  Shared Types
-+-------------------------------------------+
-```
-
-See [ARCHITECTURE.md](https://github.com/mcp-tool-shop-org/InControl-Desktop/blob/main/docs/ARCHITECTURE.md) for detailed design documentation.
 
 ## NuGet packages
 
 | Package | Description |
 |---------|-------------|
-| **InControl.Core** | Domain models, conversation types, and shared abstractions for local AI chat applications |
-| **InControl.Inference** | LLM backend abstraction layer with streaming chat, model management, and health checks. Includes Ollama implementation |
+| InControl.Core | Domain models, conversation types, and shared abstractions for local AI chat applications |
+| InControl.Inference | LLM backend abstraction layer with streaming chat, model management, and health checks. Includes Ollama implementation |
 
-## Tech stack
+```bash
+dotnet add package InControl.Core
+dotnet add package InControl.Inference
+```
 
-| Layer | Technology |
-|-------|------------|
-| UI Framework | WinUI 3 (Windows App SDK 1.6) |
-| Architecture | MVVM with CommunityToolkit.Mvvm |
-| LLM Integration | OllamaSharp, Microsoft.Extensions.AI |
-| DI Container | Microsoft.Extensions.DependencyInjection |
-| Configuration | Microsoft.Extensions.Configuration |
-| Logging | Microsoft.Extensions.Logging + Serilog |
+## Usage example
 
-## Data storage
-
-All data is stored locally:
-
-| Data | Location |
-|------|----------|
-| Sessions | `%LOCALAPPDATA%\InControl\sessions\` |
-| Logs | `%LOCALAPPDATA%\InControl\logs\` |
-| Cache | `%LOCALAPPDATA%\InControl\cache\` |
-| Exports | `%USERPROFILE%\Documents\InControl\exports\` |
-
-See [PRIVACY.md](https://github.com/mcp-tool-shop-org/InControl-Desktop/blob/main/docs/PRIVACY.md) for complete data handling documentation.
+```csharp
+var client = inferenceClientFactory.Create("ollama");
+await foreach (var token in client.StreamChatAsync(messages))
+{
+    Console.Write(token);
+}
+```
 
 ## Security and data scope
 
-InControl Desktop is a local-first WinUI 3 desktop application for private LLM chat.
+| Aspect | Detail |
+|--------|--------|
+| Data accessed | Local Ollama API (localhost), chat history in local storage, model configuration files |
+| Data NOT accessed | No cloud sync, no telemetry, no analytics |
+| Permissions | Localhost network (Ollama API), file system for chat history. MSIX sandboxed |
 
-- **Data accessed:** Local Ollama API (localhost), chat history in local storage, model configuration files
-- **Data NOT accessed:** No cloud sync, no telemetry, no analytics. All inference runs locally via Ollama
-- **Permissions:** Localhost network (Ollama API), file system for chat history. MSIX sandboxed
+See [SECURITY.md](https://github.com/mcp-tool-shop-org/InControl-Desktop/blob/main/SECURITY.md) for vulnerability reporting.

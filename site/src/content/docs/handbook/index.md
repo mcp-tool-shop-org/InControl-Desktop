@@ -9,9 +9,9 @@ Welcome to the InControl Desktop handbook.
 
 ## What's inside
 
-- **[Getting Started](/InControl-Desktop/handbook/getting-started/)** — Install the app and chat with your first local model
-- **[Usage](/InControl-Desktop/handbook/usage/)** — Building from source, running tests, and daily workflows
-- **[Reference](/InControl-Desktop/handbook/reference/)** — NuGet packages, architecture, tech stack, and data storage
-- **[Troubleshooting](/InControl-Desktop/handbook/troubleshooting/)** — Common issues and quick fixes
+- **[Getting Started](/InControl-Desktop/handbook/getting-started/)** — Install and run InControl Desktop
+- **[Architecture](/InControl-Desktop/handbook/architecture/)** — Layered design and tech stack
+- **[Configuration](/InControl-Desktop/handbook/configuration/)** — Backends, data storage, and troubleshooting
+- **[Reference](/InControl-Desktop/handbook/reference/)** — NuGet packages, hardware requirements, and security
 
 [Back to landing page](/InControl-Desktop/)
